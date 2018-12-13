@@ -91,7 +91,5 @@ def max_cross_correlation(c_tensor):
 
 def avg_cross_correlation(c_tensor):
     shape = c_tensor.shape
-    print(shape)
-    length = shape[0]*shape[1]*shape[2] - shape[0]*shape[2]
-    print("length: ", length)
+    length = shape[0] * (shape[0] - 1)
     return scalar_from_tensor(c_tensor, _is_cross_corr_index, _sum_of_squares) / length
