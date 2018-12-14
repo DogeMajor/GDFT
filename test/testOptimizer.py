@@ -16,7 +16,7 @@ class TestOptimizer(unittest.TestCase):
 
     def test_get_correlations(self):
         correlations = self.optimizer.get_correlations(GDFT_MAT)
-        #self.assertAlmostEqual((0.5, 0.5, 0.5, 1/6), correlations)
+        self.assertAlmostEqual((0.5, 0.5, 0.5, 0.5, 2.0), correlations)
 
     def test_get_random_gdft(self):
         gdft = self.optimizer.get_random_gdft(2)
@@ -39,37 +39,51 @@ class TestOptimizer(unittest.TestCase):
         correlations = self.optimizer.get_correlations(dft8)
         #print(correlations)
 
-    '''def test_scipys_fmin_bfgs_optimizer(self):
-        from scipy.optimize import fmin_bfgs
-        def f(x):
-            return (x - 3) ** 2, 2 * (x - 3)
-        params = fmin_bfgs(lambda x: f(x)[0], 1000, lambda x: f(x)[1])
-        self.assertAlmostEqual(params[0], 3)'''
 
     def test_calc_correlation(self):
         params = [0]*16
         R_ac = self.optimizer._calc_correlation(8, params, avg_auto_correlation)
         self.assertEqual(R_ac, avg_auto_correlation(corr_tensor(dft_matrix(8))))
+        thetas = np.array([0.39141802, 0.4717793 , 0.49257769, 0.52124477, 2.28552077,
+                           3.27810469, 4.8816465 , 5.72360472])
 
-    def test_optimize_avg_cross_corr(self):
+        gammas = np.array([0.28036933, 1.06012391, 1.26076182, 2.30176797, 2.75600197,
+                           3.21080787, 4.04318979,4.7630171])
+        gdft = gdft_matrix(8, thetas, gammas)
+        print(gdft[0, :])
+        correlations = self.optimizer.get_correlations(gdft)
+        print(correlations)
+
+        gammas = np.ones(8)
+        gdft = gdft_matrix(8, thetas, thetas)
+        print(gdft[0, :])
+        correlations = self.optimizer.get_correlations(gdft)
+        print(correlations)
+
+    '''def test_optimize_avg_cross_corr(self):
         params0 = self.optimizer._optimize_corr_fn(8, avg_auto_correlation)
-        print(params0)
-        print(params0[0].shape)
-        print(type(params0[0]))
         parameters = self.optimizer._optimize_corr_fn(8, avg_auto_correlation, init_guess=params0[0])
-        print(parameters)
+        ordered_params = self.optimizer._order_results(parameters)
+        print(ordered_params[0])'''
 
-    def test_optimize_avg_cross_corr_with_cycles(self):
+
+    '''def test_optimize_avg_cross_corr_with_cycles(self):
         params0 = self.optimizer.optimize_corr_fn(8, avg_auto_correlation)
-        print(params0)
+        params = self.optimizer._order_results(params0)
+        print(params)
 
-    def test_constraints(self):
-        def constraints(_params):
-            return int(any(np.isreal(_params)))
+    def test_order_results(self):
+        parameters = (np.array(range(15, -1, -1)), 9, 're')
+        ordered_res = self.optimizer._order_results(parameters)
+        self.assertEqual(list(ordered_res[0][8:]), list(range(8)))
+        self.assertEqual(list(ordered_res[0][:8]), list(range(8, 16)))
+        
 
-        params = [0] * 16
-        print(constraints(params))
-        self.assertEqual(int(any(np.iscomplex(params))), 0)
+
+    def test_get_optimized_params(self):
+        theta_vecs, gamma_vecs = self.optimizer.get_optimized_params(8, avg_auto_correlation, iter_times=10)
+        summary = self.optimizer.get_params_summary(theta_vecs, gamma_vecs)
+        print(summary)'''
 
 
     def tearDown(self):

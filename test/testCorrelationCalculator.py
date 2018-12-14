@@ -31,7 +31,22 @@ class TestCorrelations(unittest.TestCase):
 
     def test_avg_cross_correlation(self):
         avg_cc = avg_cross_correlation(self.corrs)
-        self.assertEqual(avg_cc, 1/6)
+        self.assertEqual(avg_cc, 0.5)
+
+
+    def test_merit_factor(self):
+        m_factor = merit_factor(self.corrs, 0)
+        self.assertEqual(m_factor, 2)
+
+        m_factor = merit_factor(self.corrs, 1)
+        self.assertEqual(m_factor, 2)
+
+    def test_merit_factors(self):
+        m_factors = merit_factors(self.corrs)
+        self.assertEqual(list(m_factors), [2, 2])
+        merit_avg = avg_merit_factor(self.corrs)
+        self.assertEqual(merit_avg, 2.0)
+
 
     def tearDown(self):
         del self.corrs

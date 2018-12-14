@@ -93,3 +93,26 @@ def avg_cross_correlation(c_tensor):
     shape = c_tensor.shape
     length = shape[0] * (shape[0] - 1)
     return scalar_from_tensor(c_tensor, _is_cross_corr_index, _sum_of_squares) / length
+
+
+#------------------------Merit factors--------------------
+
+def merit_factor(c_tensor, alpha):
+    shape = c_tensor.shape
+    mid_index = int(shape[2]/2)
+    abs_diags = abs(c_tensor[alpha, alpha, :])
+    diags_squared = np.power(abs_diags, 2)
+    denominator = diags_squared[mid_index]
+    nominator = np.sum(diags_squared) - denominator
+    return denominator/nominator
+
+def merit_factors(c_tensor):
+    shape = c_tensor.shape
+    m_vecs = np.zeros(shape[0], dtype=np.complex128)
+    for alpha in range(shape[0]):
+        m_vecs[alpha] = merit_factor(c_tensor, alpha)
+    return m_vecs
+
+def avg_merit_factor(c_tensor):
+    m_factors = merit_factors(c_tensor)
+    return m_factors.mean(axis=0)
