@@ -8,6 +8,8 @@ from gdft import *
 
 dft2 = np.array([[1,1],[1,-1]], dtype=np.complex128)
 
+GDFT_MAT = np.array([[1,-1],[-1,-1]], dtype=np.complex128)
+
 class TestGDFT(unittest.TestCase):
 
     def setUp(self):
