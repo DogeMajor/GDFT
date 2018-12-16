@@ -4,7 +4,7 @@ from scipy.linalg import expm
 
 
 def dft_matrix(dim):
-    W = np.exp(1j * 2 * np.pi / dim)
+    W = np.exp(-1j * 2 * np.pi / dim)
 
     def get_el(row_ind, col_ind):
         return W ** (row_ind * col_ind)

@@ -26,11 +26,6 @@ class Optimizer(object):
         gammas = np.random.uniform(0, 2 * np.pi, (length))
         return gdft_matrix(length, thetas, gammas)
 
-    def generate_random_results(self, length, n):
-        gdfts = [self.get_random_gdft(length) for i in range(n)]
-        results = [self.get_correlations(gdft) for gdft in gdfts]
-        return results
-
     def _calc_correlation(self, length, params, corr_fn):
         gdft = gdft_matrix(length, params[0:length], params[length:])
         c_tensor = corr_tensor(gdft)
