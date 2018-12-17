@@ -2,37 +2,30 @@ import numpy as np
 from scipy.linalg import expm
 
 
-class Correlation(np.ndindex):
+class Correlation(object):
 
-    def __init__(self, gdft, *shape):
-        super().__init__(*shape)
+    def __init__(self, gdft):
         self._gdft = gdft
-        self._conj_gdft = np.conjugate(gdft)
-        self._value = (0, 0, 0)
+        self._conj_gdft = np.conjugate(self._gdft)
         self._dims = gdft.shape[0], gdft.shape[0], 2*gdft.shape[0]-1
-        #self._indices = np.ndindex(self._dims)
 
-    def __iter__(self):
-        #self._it = 0
-        return self
+    def _corr_mat(self, mu):
+        N = self._dims[0]
+        corr_matrix = np.zeros((N, N), dtype=np.complex128)
+        for row in range(N):
+            for col in range(N):
+                corr_matrix[row, col] = self._aperiodic_corr_fn(row, col, mu)
+        return corr_matrix
 
-    def __next__(self):
-        print(self._it.iterrange)
-        #print(self._it.__repr__)
-        #if self._it.has_multi_index(self._value) == True:
-        if not self._it.finished:
-            current = self._aperiodic_corr_fn(self._value)
-            #self.next()
-            #print(self._it.multi_index)
-            self._value = self._it
-            print(self._value)
-            return current
+    def correlation_tensor(self):
+        N = self._dims[0]
+        tensor = np.zeros((N, N, 2 * N - 1), dtype=np.complex128)
+        for mu in range(2 * N - 1):
+            tensor[:, :, mu] = self._corr_mat(mu)
+        return tensor
 
-        else:
-            raise StopIteration
-
-    def _aperiodic_corr_fn(self, index):
-        alpha, beta, pos_mu = index[0], index[1], index[2]
+    def _aperiodic_corr_fn(self, alpha, beta, pos_mu):
+        #alpha, beta, pos_mu = index[0], index[1], index[2]
         N = self._dims[0]
         d = 0.0
         mu = pos_mu - N + 1
