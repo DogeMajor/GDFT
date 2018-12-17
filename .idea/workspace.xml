@@ -2,10 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="df3ca34c-22d8-4b15-b7a9-55006b6f5138" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/temp.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/temp.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/correlations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/correlations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gdft.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gdft.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/optimizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/optimizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testCorrelations.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/testCorrelations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/testOptimizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/testOptimizer.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,7 +16,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.43294117">
+    <splitter split-orientation="horizontal" split-proportion="0.7309091">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -27,11 +28,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/gdft.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-51">
-                  <caret line="9" column="39" lean-forward="true" selection-start-line="9" selection-start-column="39" selection-end-line="9" selection-end-column="39" />
+                <state relative-caret-position="357">
+                  <caret line="21" column="29" lean-forward="true" selection-start-line="21" selection-start-column="29" selection-end-line="21" selection-end-column="29" />
                   <folding>
                     <element signature="e#0#29#0" expanded="true" />
                   </folding>
@@ -39,11 +40,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/correlations.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1299">
-                  <caret line="107" selection-start-line="107" selection-end-line="107" />
+                <state relative-caret-position="450">
+                  <caret line="28" column="26" lean-forward="true" selection-start-line="28" selection-start-column="26" selection-end-line="28" selection-end-column="26" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -54,8 +55,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/optimizer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="85">
-                  <caret line="26" column="50" selection-start-line="26" selection-start-column="50" selection-end-line="26" selection-end-column="50" />
+                <state relative-caret-position="153">
+                  <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
                   </folding>
@@ -64,10 +65,10 @@
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/results_gdft8_AC">
+            <entry file="file://$PROJECT_DIR$/data/temp.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="255">
-                  <caret line="15" column="16" selection-start-line="13" selection-start-column="43" selection-end-line="15" selection-end-column="16" />
+                <state>
+                  <caret column="518" selection-start-column="503" selection-end-column="518" />
                 </state>
               </provider>
             </entry>
@@ -97,11 +98,20 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/test/testOptimizer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="144">
-                  <caret line="47" selection-start-line="47" selection-end-line="47" />
+                <state relative-caret-position="104">
+                  <caret line="94" column="13" lean-forward="true" selection-start-line="94" selection-start-column="13" selection-end-line="94" selection-end-column="13" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/test/testCorrelations.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="221">
+                  <caret line="58" lean-forward="true" selection-start-line="58" selection-end-line="58" />
                 </state>
               </provider>
             </entry>
@@ -109,7 +119,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/test/testCorrelationCalculator.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="731">
+                <state relative-caret-position="-39">
                   <caret line="43" column="33" lean-forward="true" selection-start-line="43" selection-start-column="33" selection-end-line="43" selection-end-column="33" />
                 </state>
               </provider>
@@ -141,17 +151,18 @@
         <option value="$PROJECT_DIR$/test/__init__.py" />
         <option value="$PROJECT_DIR$/test/tools.py" />
         <option value="$PROJECT_DIR$/test/testGDFT.py" />
-        <option value="$PROJECT_DIR$/test/testCorrelations.py" />
         <option value="$PROJECT_DIR$/src/GDFTOptimizer.py" />
         <option value="$PROJECT_DIR$/src/gdftoptimizer.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/src/utils.py" />
         <option value="$PROJECT_DIR$/data/results_gdft8_AC" />
         <option value="$PROJECT_DIR$/test/testCorrelationCalculator.py" />
-        <option value="$PROJECT_DIR$/src/correlations.py" />
-        <option value="$PROJECT_DIR$/src/optimizer.py" />
         <option value="$PROJECT_DIR$/src/gdft.py" />
+        <option value="$PROJECT_DIR$/src/optimizer.py" />
         <option value="$PROJECT_DIR$/test/testOptimizer.py" />
+        <option value="$PROJECT_DIR$/data/temp.txt" />
+        <option value="$PROJECT_DIR$/test/testCorrelations.py" />
+        <option value="$PROJECT_DIR$/src/correlations.py" />
       </list>
     </option>
   </component>
@@ -212,7 +223,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.testOptimizer">
+  <component name="RunManager" selected="Python.testCorrelations">
     <configuration name="testCorrelationCalculator" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="GDFT" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -313,9 +324,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.testCorrelations" />
         <item itemvalue="Python.testOptimizer" />
         <item itemvalue="Python.testCorrelationCalculator" />
-        <item itemvalue="Python.testCorrelations" />
         <item itemvalue="Python tests.Unittests in testOptimizer.py" />
         <item itemvalue="Python.testGDFT" />
       </list>
@@ -346,7 +357,7 @@
     <frame x="-7" y="2" width="1378" height="733" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.048507463" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17910448" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -397,13 +408,6 @@
     <entry file="file://$PROJECT_DIR$/test/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/testCorrelations.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="986">
-          <caret line="58" column="40" lean-forward="true" selection-start-line="58" selection-start-column="40" selection-end-line="58" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Program Files (x86)/Python36-32/Lib/site-packages/scipy/optimize/lbfgsb.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2389">
@@ -418,13 +422,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/results_gdft8_AC">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="16" selection-start-line="13" selection-start-column="43" selection-end-line="15" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/testGDFT.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
@@ -435,47 +432,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/testCorrelationCalculator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="731">
-          <caret line="43" column="33" lean-forward="true" selection-start-line="43" selection-start-column="33" selection-end-line="43" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/correlations.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1299">
-          <caret line="107" selection-start-line="107" selection-end-line="107" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/optimizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="26" column="50" selection-start-line="26" selection-start-column="50" selection-end-line="26" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="100">
           <caret line="14" column="35" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/gdft.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-51">
-          <caret line="9" column="39" lean-forward="true" selection-start-line="9" selection-start-column="39" selection-end-line="9" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -488,8 +448,66 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/testOptimizer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="47" selection-start-line="47" selection-end-line="47" />
+        <state relative-caret-position="104">
+          <caret line="94" column="13" lean-forward="true" selection-start-line="94" selection-start-column="13" selection-end-line="94" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/testCorrelationCalculator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-39">
+          <caret line="43" column="33" lean-forward="true" selection-start-line="43" selection-start-column="33" selection-end-line="43" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/results_gdft8_AC">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1002">
+          <caret line="19" column="33" lean-forward="true" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/optimizer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/gdft.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="21" column="29" lean-forward="true" selection-start-line="21" selection-start-column="29" selection-end-line="21" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/temp.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="518" selection-start-column="503" selection-end-column="518" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/testCorrelations.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="58" lean-forward="true" selection-start-line="58" selection-end-line="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/correlations.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="28" column="26" lean-forward="true" selection-start-line="28" selection-start-column="26" selection-end-line="28" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

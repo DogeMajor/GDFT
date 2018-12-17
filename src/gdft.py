@@ -18,7 +18,12 @@ def g_matrix(phase_shifts):
     diags = expm(1j * np.diag(phase_shifts))
     return np.matrix(diags)
 
-def gdft_matrix(dim, thetas, gammas):
+def gdft_matrix(dim, thetas):
+    dft_mat = dft_matrix(dim)
+    g1 = g_matrix(thetas)
+    return g1 * dft_mat * g1
+
+def non_orthogonal_gdft_matrix(dim, thetas, gammas):
     dft_mat = dft_matrix(dim)
     g1 = g_matrix(thetas)
     g2 = g_matrix(gammas)

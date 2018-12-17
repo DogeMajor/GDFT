@@ -26,7 +26,7 @@ class TestOptimizer(unittest.TestCase):
 
 
     def test_calc_correlation(self):
-        params = [0]*16
+        params = [0]*8
         R_ac = self.optimizer._calc_correlation(8, params, avg_auto_correlation)
         self.assertEqual(R_ac, avg_auto_correlation(corr_tensor(dft_matrix(8))))
 
@@ -37,18 +37,18 @@ class TestOptimizer(unittest.TestCase):
         gammas = np.array([0.28036933, 1.06012391, 1.26076182, 2.30176797, 2.75600197,
                            3.21080787, 4.04318979, 4.7630171])
 
-        gdft = gdft_matrix(8, thetas, gammas)
+        gdft = gdft_matrix(8, thetas)
         old_correlations = self.optimizer.get_correlations(gdft)
         gammas = np.ones(8)
-        new_gdft = gdft_matrix(8, thetas, thetas)
+        new_gdft = non_orthogonal_gdft_matrix(8, thetas, gammas)
         new_correlations = self.optimizer.get_correlations(new_gdft)
         for new_corr, old_corr in zip(new_correlations, old_correlations):
             self.assertAlmostEqual(new_corr, old_corr)
         self.assertNotEqual(new_gdft[0, 0], gdft[0, 0])
-        self.assertTrue(AlmostEqualMatrices(np.dot(new_gdft, np.conjugate(new_gdft)), 8*np.identity(8)))
+        self.assertTrue(AlmostEqualMatrices(np.dot(gdft, np.conjugate(gdft)), 8*np.identity(8)))
 
 
-    '''def test_optimize_avg_cross_corr(self):
+    def test_optimize_avg_cross_corr(self):
         params0 = self.optimizer._optimize_corr_fn(8, avg_auto_correlation)
         parameters = self.optimizer._optimize_corr_fn(8, avg_auto_correlation, init_guess=params0[0])
         ordered_params = self.optimizer._order_results(parameters)
@@ -63,20 +63,41 @@ class TestOptimizer(unittest.TestCase):
     def test_order_results(self):
         parameters = (np.array(range(15, -1, -1)), 9, 're')
         ordered_res = self.optimizer._order_results(parameters)
-        self.assertEqual(list(ordered_res[0][8:]), list(range(8)))
-        self.assertEqual(list(ordered_res[0][:8]), list(range(8, 16)))
-        
+        self.assertEqual(list(ordered_res[0]), list(range(16)))
+
 
 
     def test_get_optimized_params(self):
-        theta_vecs, gamma_vecs = self.optimizer.get_optimized_params(8, avg_auto_correlation, iter_times=10)
-        summary = self.optimizer.get_params_summary(theta_vecs, gamma_vecs)
-        print(summary)'''
+        thetas = self.optimizer.get_optimized_params(8, avg_auto_correlation, iter_times=10)
+        summary = self.optimizer.get_params_summary(thetas)
+        print(summary)
 
 
     def tearDown(self):
         del self.corrs
         del self.optimizer
 
+class Sentence(object):
+    def __init__(self, s):
+        self._sentence = s.split(' ')
+        self._max = len(self._sentence)
+        self._value = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._value < self._max:
+
+            current = self._sentence[self._value]
+            self._value += 1
+            return current
+        else:
+            raise StopIteration
+
+
 if __name__ == '__main__':
-    unittest.main()
+    #unittest.main()
+    sent = Sentence('I had a rough day')
+    for s in sent:
+        print(s)

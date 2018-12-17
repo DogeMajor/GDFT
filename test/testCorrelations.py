@@ -36,52 +36,40 @@ class TestCorrelations(unittest.TestCase):
         c_vec = corr_vector(self.dft_mat, 0, 1)
         self.assertEqual(c_vec.shape, (7,))
         self.assertAlmostEqual(c_vec[0], 0.25)
-        self.assertAlmostEqual(c_vec[5], -0.25 + 0.25*1j)
+        self.assertAlmostEqual(c_vec[5], -0.25 - 0.25*1j)
 
     def testCorrelationMatrix(self):
         c_mat = corr_mat(self.dft_mat, 0)
         self.assertEqual(c_mat.shape, (4,4))
         self.assertEqual(c_mat.dtype, np.complex128)
         self.assertEqual(c_mat[0,0], 0.25)
-        self.assertAlmostEqual(c_mat[3, 3], 0.25*1j)
+        self.assertAlmostEqual(c_mat[3, 3], -0.25*1j)
 
     def testCorrelationTensor(self):
         dft_mat = dft_matrix(2)
         corrs = corr_tensor(dft_mat)
         self.assertEqual(aperiodic_corr_fn(dft_mat, 0, 1, 1), corrs[0, 1, 1])
         self.assertEqual(aperiodic_corr_fn(dft_mat, 1, 0, 2), corrs[1, 0, 2])
-
-    def testOutOfPhaseAutoCorrelation(self):
-        corrs = corr_tensor(dft_matrix(2))
-        max_ac = max_out_of_phase_auto_correlation(corrs)
-        self.assertAlmostEqual(max_ac, 0.5)
-
-    def test_avg_auto_correlation(self):
-        corrs = corr_tensor(dft_matrix(8))
-        avg_ac = avg_auto_correlation(corrs)
-        print(avg_ac)
-
-
-    def test_max_cross_correlation(self):
-        corrs = corr_tensor(dft_matrix(2))
-        max_cc = max_cross_correlation(corrs)
-        self.assertAlmostEqual(max_cc, 1.0)
-
-
-    def test_avg_cross_correlation(self):
-        corrs = corr_tensor(dft_matrix(2))
-        avg_cc = avg_cross_correlation(corrs)
-        self.assertEqual(avg_cc, 2/3)
-
-    '''def test_avg_auto_correlation(self):
-        corrs = corr_tensor(dft_matrix(2))
-        avg_ac = avg_auto_correlation(corrs)
-        self.assertEqual(avg_ac, 2/3)'''
+        #print(corrs)
 
 
     def tearDown(self):
         del self.dft_mat
 
+
+class TestCorrelation(unittest.TestCase):
+
+    def setUp(self):
+        self.correlation = Correlation(dft_matrix(4), (4, 4, 8))
+
+
+    def test_next_method(self):
+        #print((0,0,0) in range(2,2,4))
+        for corr in self.correlation:
+            print(corr)
+
+    def tearDown(self):
+        del self.correlation
 
 if __name__ == '__main__':
     unittest.main()

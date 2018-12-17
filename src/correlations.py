@@ -2,6 +2,56 @@ import numpy as np
 from scipy.linalg import expm
 
 
+class Correlation(np.ndindex):
+
+    def __init__(self, gdft, *shape):
+        super().__init__(*shape)
+        self._gdft = gdft
+        self._conj_gdft = np.conjugate(gdft)
+        self._value = (0, 0, 0)
+        self._dims = gdft.shape[0], gdft.shape[0], 2*gdft.shape[0]-1
+        #self._indices = np.ndindex(self._dims)
+
+    def __iter__(self):
+        #self._it = 0
+        return self
+
+    def __next__(self):
+        print(self._it.iterrange)
+        #print(self._it.__repr__)
+        #if self._it.has_multi_index(self._value) == True:
+        if not self._it.finished:
+            current = self._aperiodic_corr_fn(self._value)
+            #self.next()
+            #print(self._it.multi_index)
+            self._value = self._it
+            print(self._value)
+            return current
+
+        else:
+            raise StopIteration
+
+    def _aperiodic_corr_fn(self, index):
+        alpha, beta, pos_mu = index[0], index[1], index[2]
+        N = self._dims[0]
+        d = 0.0
+        mu = pos_mu - N + 1
+        if abs(mu) >= N:
+            return 0.0
+
+        elif mu > 0 and mu <= N-1:
+            for nu in range(N-mu):
+                d = d + self._gdft[nu, alpha] * self._conj_gdft[nu + mu, beta]
+            return d/N
+
+        else:
+            for nu in range(N+mu):
+                d = d + self._gdft[nu - mu, alpha] * self._conj_gdft[nu, beta]
+            return d/N
+
+
+
+
 def aperiodic_corr_fn(matrix, alpha, beta, pos_mu):
     N = matrix.shape[0]
     d = 0.0
