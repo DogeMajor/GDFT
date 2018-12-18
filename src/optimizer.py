@@ -13,7 +13,8 @@ class Optimizer(object):
         self._dft = dft_matrix(dim)
 
     def get_correlations(self, gdft):
-        c_tensor = corr_tensor(gdft)
+        corr_obj = Correlation(gdft)
+        c_tensor = corr_obj.correlation_tensor()
         max_ac = max_auto_correlation(c_tensor)
         avg_ac = avg_auto_correlation(c_tensor)
         max_cc = max_cross_correlation(c_tensor)
@@ -27,7 +28,8 @@ class Optimizer(object):
 
     def _calc_correlation(self, length, params, corr_fn):
         gdft = gdft_matrix(length, params)
-        c_tensor = corr_tensor(gdft)
+        corr_obj = Correlation(gdft)
+        c_tensor = corr_obj.correlation_tensor()
         return corr_fn(c_tensor)
 
     def _optimize_corr_fn(self, length, corr_fn, init_guess=[]):
@@ -64,6 +66,7 @@ class Optimizer(object):
         i.e. all the phase shifts for both gammas and thetas in ordered form'''
         params = np.zeros((iter_times, length), dtype=np.complex128)#params, corr_fn_result, iteration
         for n in range(iter_times):
+            #params = self._order_results(self.optimize_corr_fn(length, corr_fn))[0]
             params = self._order_results(self.optimize_corr_fn(length, corr_fn))[0]
 
         return params

@@ -13,7 +13,7 @@ GDFT_MAT = np.array([[1,-1],[-1,-1]], dtype=np.complex128)
 class TestCorrelations(unittest.TestCase):
 
     def setUp(self):
-        self.corrs = corr_tensor(dft_matrix(2))
+        self.corrs = Correlation(dft_matrix(2)).correlation_tensor()
 
     def test_max_auto_correlation(self):
         max_ac = max_auto_correlation(self.corrs)
@@ -26,7 +26,7 @@ class TestCorrelations(unittest.TestCase):
     def test_max_cross_correlation(self):
         max_cc = max_cross_correlation(self.corrs)
         self.assertAlmostEqual(max_cc, 0.5)
-        corr = corr_tensor(dft_matrix(8))
+        corr = Correlation(dft_matrix(8)).correlation_tensor()
         self.assertAlmostEqual(max_cross_correlation(corr), 0.327, places=3)
 
     def test_avg_cross_correlation(self):
