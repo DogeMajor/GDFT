@@ -37,7 +37,7 @@ class Optimizer(object):
             thetas0 = np.random.uniform(0, 2 * np.pi, (length))
             init_guess = thetas0
 
-        bnds = tuple((0, 2*np.pi) for n in range(length))
+        bnds = tuple((0, np.pi) for n in range(length))
 
         def output_fn(_params):
             return self._calc_correlation(length, _params, corr_fn)
@@ -62,8 +62,7 @@ class Optimizer(object):
         return np.sort(params), res[1]
 
     def get_optimized_params(self, length, corr_fn, iter_times=5):
-        '''Iterates optimize_corr_fn several times and returns all the results
-        i.e. all the phase shifts for both gammas and thetas in ordered form'''
+        '''Iterates optimize_corr_fn several times and returns all the results'''
         params = np.zeros((iter_times, length), dtype=np.complex128)#params, corr_fn_result, iteration
         for n in range(iter_times):
             #params = self._order_results(self.optimize_corr_fn(length, corr_fn))[0]

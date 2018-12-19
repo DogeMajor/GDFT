@@ -24,6 +24,53 @@ thetas6 = np.array([0.93482628, 1.07355423, 3.48993049, 3.8805253 , 3.96152232,
                     5.58643223, 6.04383695, 6.12363789])
 
 
+#-----------only values between 0 and pi are allowed in the following theta vecs-------------
+
+thetas7 = np.array([0.15847839, 0.32878537, 0.43786295, 1.21297503, 2.04867586,
+                    2.80857661, 2.98617521, 3.14135541])
+
+thetas8 = np.array([0.30030045, 0.39933246, 0.40867739, 1.28074787, 2.28478356,
+                    2.94454651, 3.00267416, 3.11595278])
+
+thetas9 = np.array([0.31230405, 0.40569868, 0.40757623, 1.28524824, 2.30053787,
+                    2.94532072, 2.99596616, 3.13543097])
+
+thetas10 = np.array([0.08858783, 0.22655229, 0.35270027, 1.14690321, 2.03414003,
+                     2.82637154, 2.84963627, 2.98563405])
+
+thetas11 = np.array([1.50625972e-05, 1.37137054e-01, 2.60749707e-01, 1.05664117e+00,
+                     1.94641101e+00, 2.73948941e+00, 2.75852795e+00, 2.89283675e+00])
+
+thetas12 = np.array([0.09668558, 0.21427694, 0.27117106, 0.9284712, 1.9343563,
+                     2.80765764, 2.815155, 2.9135714])
+
+thetas13 = np.array([5.14709405e-04, 1.19545652e-01, 1.76027032e-01, 8.32504730e-01,
+                     1.83900738e+00, 2.71271675e+00, 2.71960025e+00, 2.81781812e+00])
+
+
+
+#---unordered thetas between 0 and pi-----------------
+
+thetas14 = np.array([0.05249126, 2.72382596, 0.26529619, 2.00643631, 2.96519007,
+                     3.14156252, 1.23441539, 0.48058796])
+
+thetas15 = np.array([0.1042914, 0.94738587, 2.9437974, 2.85669262, 1.98720398,
+                     0.33532913, 2.88312519, 0.30104954])
+
+thetas16 = np.array([0.15212298, 1.00405324, 3.00929904, 2.93102814, 2.07037379,
+                     0.42733653, 2.98396613, 0.41072977])
+
+thetas17 = np.array([0.39839151, 1.19332787, 3.14159265, 3.00633618, 2.08870024,
+                    0.38866847, 2.8883232, 0.25809249])
+
+thetas18 = np.array([0.40953218, 2.99805248, 0.45673289, 2.1150655, 2.99101179,
+                     3.08456032, 1.09461761, 0.25798233])
+
+thetas19 = np.array([2.78752335, 2.01232491, 0.08380702, 0.23881077, 1.17619691,
+                      2.89597022, 0.41607719, 3.06603981])
+
+unordered_thetas = [thetas14, thetas15, thetas16, thetas17, thetas18, thetas19]
+
 plt.grid(True)
 
 def rotate(thetas, deg_angle):
@@ -46,6 +93,10 @@ def _to_y(theta):
 def to_coords(thetas):
     return _to_x(thetas), _to_y(thetas)
 
+def rotate_to_center(thetas, deg_angle):
+    angle = deg_angle * (np.pi / 180)
+    return thetas - angle
+
 #Visually estimated how to rotate the angles so that they resemble the same structure
 rot_thetas2 = order(rotate(thetas2, 65))
 rot_thetas3 = order(rotate(thetas3, 195))
@@ -54,6 +105,9 @@ rot_thetas5 = order(rotate(thetas5, -115))
 rot_thetas6 = order(rotate(thetas6, -177))
 
 all_thetas = [rot_thetas2, rot_thetas3, rot_thetas4, rot_thetas5, rot_thetas6]
+limited_thetas = [rotate_to_center(thetas7, 5), rotate_to_center(thetas8, 8), rotate_to_center(thetas9, 9),
+                  rotate_to_center(thetas10, -2), rotate_to_center(thetas11, -8), rotate_to_center(thetas12, -3),
+                  rotate_to_center(thetas13, -9)]
 
 def generate_points(thetas):
     length = thetas.shape[0]
@@ -97,14 +151,24 @@ def cand_fn(x, dim=8):
 def cand_fn2(x, dim=8):
     return 0.5*np.pi*(1 + np.sin(np.pi*(x+1-dim/2)/(dim-1)))
 
+
+
+
 if __name__ == "__main__":
-    #polar_plot_angles(thetas2)
-    #polar_plot_angles(rot_thetas6)
+    '''for thetas in unordered_thetas:
+        polar_plot_angles(thetas)'''
 
-    for thetas in all_thetas[2:]:
-        plot_fitted_polynome(thetas, 3)
+    #polar_plot_angles(limited_thetas[6])
 
+    for thetas in unordered_thetas[2:]:
+        plot_fitted_polynome(thetas, 5)
 
-    plot_fn(cand_fn2, 8)
+    #plot_fitted_polynome(unordered_thetas[5], 5)
 
+    polynome = fit_polynome(unordered_thetas[5], 5)
+    print(polynome)
+    '''plot_fn(cand_fn2, 8)
+    for thetas in unordered_thetas:
+        print(thetas)
+        #print(16*(1/np.pi)*(thetas-0.5*np.pi))'''
     plt.show()
