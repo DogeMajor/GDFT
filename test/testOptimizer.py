@@ -49,19 +49,38 @@ class TestOptimizer(unittest.TestCase):
         self.assertTrue(AlmostEqualMatrices(np.dot(gdft, np.conjugate(gdft)), 8*np.identity(8)))
 
 
-    def test_optimize_avg_cross_corr(self):
+    def test_optimize_avg_auto_corr(self):
         params0 = self.optimizer._optimize_corr_fn(8, avg_auto_correlation)
         parameters = self.optimizer._optimize_corr_fn(8, avg_auto_correlation, init_guess=params0[0])
         ordered_params = self.optimizer._order_results(parameters)
-        print(ordered_params[0])
+
 
 
     def test_optimize_avg_cross_corr_with_cycles(self):
         params0 = self.optimizer.optimize_corr_fn(8, avg_auto_correlation)
         params = self.optimizer._order_results(params0)
-        print(params)
+        print(params0)
 
-    '''def test_order_results(self):
+    '''def test_if_the_order_of_params_changes_corrs(self):
+        thetas = np.array([0.05249126, 2.72382596, 0.26529619, 2.00643631, 2.96519007,
+                           3.14156252, 1.23441539, 0.48058796])
+        gdft = gdft_matrix(8,thetas)
+        corrs = self.optimizer.get_correlations(gdft)
+        #print(corrs)
+        def swap_els(vec, i, j):
+            new_vec = np.array(vec)
+            new_vec[i], new_vec[j] = vec[j], vec[i]
+            return new_vec
+
+        for i in range(8):
+            new_thetas = swap_els(thetas, 7, i)
+            #print(i, new_thetas)
+            new_gdft = gdft_matrix(8, new_thetas)
+            new_corrs = self.optimizer.get_correlations(new_gdft)
+            print(i, new_corrs)
+
+    
+    def test_order_results(self):
         parameters = (np.array(range(15, -1, -1)), 9, 're')
         ordered_res = self.optimizer._order_results(parameters)
         self.assertEqual(list(ordered_res[0]), list(range(16)))
@@ -78,5 +97,21 @@ class TestOptimizer(unittest.TestCase):
         del self.corrs
         del self.optimizer
 
+def verify_optimal_thetas(thetas):
+    gdft = gdft_matrix(8, thetas)
+    c_tensor = Correlation(gdft).correlation_tensor()
+    print(avg_auto_correlation(c_tensor))
+
+
+
 if __name__ == '__main__':
     unittest.main()
+    '''thetas = np.array([0.15759434, 0.27662528, 0.33310666, 0.98958436, 1.99608701,
+                       2.86979638, 2.87667988, 2.97489775], dtype=np.complex128)
+    verify_optimal_thetas(thetas)
+    optimizer = Optimizer(8)
+    gdft = gdft_matrix(8, thetas)
+    print(optimizer.get_correlations(gdft))
+    params = np.array([0.84401301, 2.58966888, 3.14159265, 0.,         3.14159265, 1.27085015,
+     1.35837713, 0.22960154])
+     '''
