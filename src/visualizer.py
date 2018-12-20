@@ -61,15 +61,28 @@ thetas16 = np.array([0.15212298, 1.00405324, 3.00929904, 2.93102814, 2.07037379,
                      0.42733653, 2.98396613, 0.41072977])
 
 thetas17 = np.array([0.39839151, 1.19332787, 3.14159265, 3.00633618, 2.08870024,
-                    0.38866847, 2.8883232, 0.25809249])
+                     0.38866847, 2.8883232, 0.25809249])
 
 thetas18 = np.array([0.40953218, 2.99805248, 0.45673289, 2.1150655, 2.99101179,
                      3.08456032, 1.09461761, 0.25798233])
 
 thetas19 = np.array([2.78752335, 2.01232491, 0.08380702, 0.23881077, 1.17619691,
-                      2.89597022, 0.41607719, 3.06603981])
+                     2.89597022, 0.41607719, 3.06603981])
 
-unordered_thetas = [thetas14, thetas15, thetas16, thetas17, thetas18, thetas19]
+thetas20 = np.array([2.71203408, 0.13401165, 2.68585628, 1.03803098, 0.17259165,
+                     0.0895361, 2.08999672, 2.93713857])
+
+thetas21 = np.array([0.06428542, 0.89823397, 2.88550414, 2.78925131, 1.91062375,
+                     0.24960325, 2.78825635, 0.1970401])
+
+thetas22 = np.array([0, 0.87459821, 2.90250666, 2.84689823, 2.00891082,
+                     0.38853476, 2.96783281, 0.41726085])
+
+thetas23 = np.array([0.19618612, 1.03911766, 3.03537403, 2.94810336, 2.07845692,
+                     0.42642006, 2.97405462, 0.39182177])
+
+unordered_thetas = [thetas14, thetas15, thetas16, thetas17, thetas18, thetas19, thetas20,
+                    thetas21, thetas22, thetas23]
 
 plt.grid(True)
 
@@ -135,6 +148,11 @@ def polar_plot_angles(thetas):
     x, y = to_coords(thetas)
     plt.plot(x, y, 'o')
 
+def plot_polynome_roots(polynome):
+    coeffs = polynome.r
+    x, y = coeffs.real, coeffs.imag
+    plt.plot(x, y, 'o')
+
 
 #plt.plot(args, rot_thetas2, 'x')
 from datetime import datetime
@@ -160,13 +178,18 @@ if __name__ == "__main__":
 
     #polar_plot_angles(limited_thetas[6])
 
-    for thetas in unordered_thetas[2:]:
-        plot_fitted_polynome(thetas, 5)
+    #for thetas in unordered_thetas:
+    #    plot_fitted_polynome(thetas, 7)
 
-    #plot_fitted_polynome(unordered_thetas[5], 5)
+    #plot_fitted_polynome(unordered_thetas[0], 7)
 
-    polynome = fit_polynome(unordered_thetas[5], 5)
-    print(polynome)
+
+    for thetas in unordered_thetas:
+        polynome = fit_polynome(thetas, 7)
+        plot_polynome_roots(polynome)
+
+    #plot_polynome_roots(polynome)
+
     '''plot_fn(cand_fn2, 8)
     for thetas in unordered_thetas:
         print(thetas)

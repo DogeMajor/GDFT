@@ -76,3 +76,51 @@ class Optimizer(object):
         summary['theta_avgs'] = thetas.mean(axis=0)
         summary['theta_vars'] = np.var(thetas, axis=0)
         return summary
+
+
+class PolynomeOptimizer(Optimizer):
+
+    def __init__(self, dim):
+        super(PolynomeOptimizer, self).__init__(dim)
+
+    def _poly_to_thetas(self, polynome):
+        indices = np.array(range(self._dim))
+        return polynome(indices)
+
+    def _coeffs_to_thetas(self, coeffs):
+        polynome = np.poly1d(coeffs)
+        return self._poly_to_thetas(polynome)
+
+    def from_coeffs_to_gdft(self, coeffs):
+        polynome = np.poly1d(coeffs)
+        thetas = self._poly_to_thetas(polynome)
+        return gdft_matrix(self._dim, thetas)
+
+    def _get_poly_bounds(self, poly_grade):
+        def poly_bound(n):
+            return (-np.pi*n**-n, np.pi*(n+1)**-(n+1))
+        return tuple(poly_bound(n) for n in range(poly_grade, -1, -1))
+
+    def _optimize_corr_fn(self, poly_grade, corr_fn, init_guess=[]):
+        bnds = self._get_poly_bounds(poly_grade)
+        init_var = bnds[0][1]
+        if len(init_guess) == 0:
+            init_guess = np.random.uniform(-init_var, init_var, (poly_grade+1))
+
+        def output_fn(_coeffs):
+            thetas = self._coeffs_to_thetas(_coeffs)
+            return self._calc_correlation(self._dim, thetas, corr_fn)
+
+        print(bnds, init_guess)
+        minimized_coeffs = fmin_l_bfgs_b(output_fn, init_guess, bounds=bnds, approx_grad=True)
+        return minimized_coeffs
+
+    def optimize_corr_fn(self, poly_grade, corr_fn, init_guess=[], cycles=10):
+        results = self._optimize_corr_fn(poly_grade, corr_fn, init_guess)
+        for n in range(1, cycles):
+            new_results = self._optimize_corr_fn(poly_grade, corr_fn, init_guess)
+            print("corr", new_results[1])
+            if new_results[1] < results[1]:
+                results = new_results
+        return results
+

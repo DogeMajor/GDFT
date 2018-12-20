@@ -3,6 +3,8 @@ import unittest
 from numpy.linalg import det
 import numpy as np
 sys.path.append("../src")
+sys.path.append("src/")
+
 from tools import EqualMatrices, AlmostEqualMatrices
 from gdft import *
 
@@ -35,12 +37,12 @@ class TestGDFT(unittest.TestCase):
 
     def testGDFTMatrix(self):
         thetas = [-0.5 * np.pi, 0.5 * np.pi]
-        gammas = [0.5 * np.pi, -0.5 * np.pi]
-        gdft_mat = gdft_matrix(2, thetas, gammas)
+        gdft_mat = gdft_matrix(2, thetas)
         dft = dft_matrix(2)
         g1 = g_matrix(thetas)
-        g2 = g_matrix(gammas)
-        self.assertTrue(AlmostEqualMatrices(np.array([[1, -1], [-1, -1]], dtype=np.complex128), gdft_mat))
+        self.assertTrue(AlmostEqualMatrices(np.array([[-1, 1], [1, 1]], dtype=np.complex128), gdft_mat))
+        self.assertTrue(AlmostEqualMatrices(g1*dft*g1, gdft_mat))
+
 
     def tearDown(self):
         pass

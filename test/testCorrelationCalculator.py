@@ -1,11 +1,11 @@
 import sys
 sys.path.append("../src")
+sys.path.append("src/")
 import unittest
 import numpy as np
 from numpy.linalg import inv
 from gdft import *
 from correlations import *
-
 
 GDFT_MAT = np.array([[1,-1],[-1,-1]], dtype=np.complex128)
 
