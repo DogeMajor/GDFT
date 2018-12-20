@@ -5,7 +5,9 @@ import numpy as np
 
 class ComplexDecoder(object):
     '''Decodes json complex arrays to lists (or lists of lists etc.), not numpy.arrays.
-    Using np.array(result) will make np.arrays from these!!
+    Using np.array(result) will make np.arrays from these. There is no need to decode
+    all lists to numpy matrices, since that would require making all np.arrays
+    into special objects ala complex_array_json (below)!!
     Shall be used as hook for read in DAO's json.loads.'''
 
     def complex_number_decoder(self, obj):
