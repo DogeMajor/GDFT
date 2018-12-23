@@ -55,8 +55,6 @@ class Optimizer(object):
                 results = new_results
         return results
 
-
-    @show
     def _order_results(self, res):
         params = res[0]
         return np.sort(params), res[1]

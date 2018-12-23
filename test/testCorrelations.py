@@ -7,8 +7,7 @@ from numpy.linalg import inv
 from gdft import *
 from correlations import *
 
-
-GDFT_MAT = np.array([[1,-1],[-1,-1]], dtype=np.complex128)
+GDFT_MAT = np.array([[1, -1], [-1, -1]], dtype=np.complex128)
 
 
 class TestCorrelation(unittest.TestCase):
@@ -17,10 +16,8 @@ class TestCorrelation(unittest.TestCase):
         self.correlation = Correlation(dft_matrix(4))
 
     def test_aperiodic_corr_fn(self):
-        self.assertAlmostEqual(self.correlation._aperiodic_corr_fn(0, 1, 7), 0.0)
         self.assertAlmostEqual(self.correlation._aperiodic_corr_fn(0, 1, -1), 0.0)
         self.assertAlmostEqual(self.correlation._aperiodic_corr_fn(0, 1, 0), 0.25)
-        self.assertNotAlmostEqual(self.correlation._aperiodic_corr_fn(1, 1, 6), 0.0)
 
     def test_corr_mat(self):
         c_mat = self.correlation._corr_mat(0)
@@ -34,12 +31,13 @@ class TestCorrelation(unittest.TestCase):
         self.assertEqual(self.correlation._aperiodic_corr_fn(0, 1, 1), c_tensor[0, 1, 1])
         self.assertEqual(self.correlation._aperiodic_corr_fn(1, 0, 2), c_tensor[1, 0, 2])
 
+    def test_corr_tensor_building_for_speed(self):
+        correlation = Correlation(dft_matrix(50))
+        corr_tensor = correlation.correlation_tensor()
+
     def tearDown(self):
         del self.correlation
 
 
 if __name__ == '__main__':
     unittest.main()
-
-
-

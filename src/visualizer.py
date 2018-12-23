@@ -178,8 +178,8 @@ if __name__ == "__main__":
 
     #polar_plot_angles(limited_thetas[6])
 
-    #for thetas in unordered_thetas:
-    #    plot_fitted_polynome(thetas, 7)
+    '''for thetas in unordered_thetas:
+        plot_fitted_polynome(thetas, 7)'''
 
     #plot_fitted_polynome(unordered_thetas[0], 7)
 
