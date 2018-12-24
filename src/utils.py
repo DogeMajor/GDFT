@@ -1,4 +1,6 @@
 import time
+import datetime
+from dao import *
 
 def timer(function):
     def timer_wrapper(*args, **kwargs):
@@ -15,4 +17,19 @@ def show(function):
         cl_name = self.__class__.__name__
         print("Using {0} of class {1}".format(fn_name, cl_name))
         return function(self, *args, **kwargs)
+    return inner_fn
+
+def datetime_encoder(obj):
+    if isinstance(obj, datetime.datetime):
+        return "{}-{}-{} {}-{}".format(obj.year, obj.month, obj.day, obj.hour, obj.minute)
+    return obj
+
+def save_as_json(function):
+    def inner_fn(self, *args, **kwargs):
+        results = function(self, *args, **kwargs)
+        print("Saving results to a json file")
+        file_name = "results_"+str(time)+".json"
+        dao = DAO("../data/")
+        dao.write(results, results)
+        return results
     return inner_fn

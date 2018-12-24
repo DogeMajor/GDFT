@@ -16,3 +16,5 @@ def AlmostEqualMatrices(matA, matB, decimals=7):
         for col in range(matA.shape[1]):
             are_equal = are_equal and bool(round(matA[row, col], decimals) == round(matB[row, col], decimals))
     return are_equal
+
+

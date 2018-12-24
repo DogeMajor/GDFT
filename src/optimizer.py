@@ -1,4 +1,5 @@
 import time
+import datetime
 from scipy.optimize import fmin_bfgs, fmin_l_bfgs_b
 from utils import *
 from gdft import *
@@ -11,15 +12,20 @@ class Optimizer(object):
     def __init__(self, dim):
         self._dim = dim
         self._dft = dft_matrix(dim)
+        self._analyzer = CorrelationAnalyzer(dim)
+        self._corr_fns = {"max_auto_corr": self._analyzer.max_auto_corr,
+                          "avg_auto_corr": self._analyzer.avg_auto_corr,
+                          "max_cross_corr": self._analyzer.max_cross_corr,
+                          "avg_cross_corr": self._analyzer.avg_cross_corr}
 
     def get_correlations(self, gdft):
         corr_obj = Correlation(gdft)
-        c_tensor = corr_obj.correlation_tensor()
-        max_ac = max_auto_correlation(c_tensor)
-        avg_ac = avg_auto_correlation(c_tensor)
-        max_cc = max_cross_correlation(c_tensor)
-        avg_cc = avg_cross_correlation(c_tensor)
-        avg_merit = avg_merit_factor(c_tensor)
+        self._analyzer.set_corr_tensor(corr_obj.correlation_tensor())
+        max_ac = self._analyzer.max_auto_corr()
+        avg_ac = self._analyzer.avg_auto_corr()
+        max_cc = self._analyzer.max_cross_corr()
+        avg_cc = self._analyzer.avg_cross_corr()
+        avg_merit = self._analyzer.avg_merit_factor()
         return (max_ac, avg_ac, max_cc, avg_cc, avg_merit)
 
     def get_random_gdft(self, length):
@@ -30,14 +36,16 @@ class Optimizer(object):
         gdft = gdft_matrix(length, params)
         corr_obj = Correlation(gdft)
         c_tensor = corr_obj.correlation_tensor()
-        return corr_fn(c_tensor)
+        self._analyzer.set_corr_tensor(c_tensor)
+        return corr_fn()
 
-    def _optimize_corr_fn(self, length, corr_fn, init_guess=[]):
+    def _optimize_corr_fn(self, length, corr_fn_name, init_guess=[]):
         if len(init_guess) == 0:
             thetas0 = np.random.uniform(0, 2 * np.pi, (length))
             init_guess = thetas0
 
         bnds = tuple((0, np.pi) for n in range(length))
+        corr_fn = self._corr_fns[corr_fn_name]
 
         def output_fn(_params):
             return self._calc_correlation(length, _params, corr_fn)
@@ -46,13 +54,15 @@ class Optimizer(object):
         minimized_params = fmin_l_bfgs_b(output_fn, init_guess, bounds=bnds, approx_grad=True)
         return minimized_params
 
-    def optimize_corr_fn(self, length, corr_fn, init_guess=[], cycles=10):
-        results = self._optimize_corr_fn(length, corr_fn, init_guess)
+    def optimize_corr_fn(self, length, corr_fn_name, init_guess=[], stop_criteria=None, cycles=10):
+        results = self._optimize_corr_fn(length, corr_fn_name, init_guess)
         for n in range(1, cycles):
-            new_results = self._optimize_corr_fn(length, corr_fn, init_guess)
-            print("corr", new_results[1])
+            new_results = self._optimize_corr_fn(length, corr_fn_name, init_guess)
+            print(corr_fn_name, new_results[1])
             if new_results[1] < results[1]:
                 results = new_results
+            if stop_criteria and results < stop_criteria:
+                break
         return results
 
     def _order_results(self, res):
@@ -68,57 +78,36 @@ class Optimizer(object):
 
         return params
 
-    def get_params_summary(self, thetas):
+    def get_params_summary(self, params):
         summary = {}
+        thetas = params[0]
         summary['theta_vecs'] = thetas
         summary['theta_avgs'] = thetas.mean(axis=0)
         summary['theta_vars'] = np.var(thetas, axis=0)
+        summary['correlation measure'] = params[1]
         return summary
 
 
-class PolynomeOptimizer(Optimizer):
+class Runner(object):
 
     def __init__(self, dim):
-        super(PolynomeOptimizer, self).__init__(dim)
+        self._optimizer = Optimizer(dim)
 
-    def _poly_to_thetas(self, polynome):
-        indices = np.array(range(self._dim))
-        return polynome(indices)
+    @save_as_json
+    def optimize(self, corr_fn_name, stop_criteria, epochs):
+        date = datetime_encoder(datetime.datetime.now())
+        results = {"info": "Optimizer results for "+corr_fn_name+" at time "+date}
+        results["results"] = []
+        for n in range(epochs):
+            params = self._optimizer.optimize_corr_fn(self, length, corr_fn_name, init_guess=[], stop_criteria, cycles=10)
+            results["results"].append(self._optimizer.get_params_summary(params))
 
-    def _coeffs_to_thetas(self, coeffs):
-        polynome = np.poly1d(coeffs)
-        return self._poly_to_thetas(polynome)
-
-    def from_coeffs_to_gdft(self, coeffs):
-        polynome = np.poly1d(coeffs)
-        thetas = self._poly_to_thetas(polynome)
-        return gdft_matrix(self._dim, thetas)
-
-    def _get_poly_bounds(self, poly_grade):
-        def poly_bound(n):
-            return (-np.pi*n**-n, np.pi*(n+1)**-(n+1))
-        return tuple(poly_bound(n) for n in range(poly_grade, -1, -1))
-
-    def _optimize_corr_fn(self, poly_grade, corr_fn, init_guess=[]):
-        bnds = self._get_poly_bounds(poly_grade)
-        init_var = bnds[0][1]
-        if len(init_guess) == 0:
-            init_guess = np.random.uniform(-init_var, init_var, (poly_grade+1))
-
-        def output_fn(_coeffs):
-            thetas = self._coeffs_to_thetas(_coeffs)
-            return self._calc_correlation(self._dim, thetas, corr_fn)
-
-        print(bnds, init_guess)
-        minimized_coeffs = fmin_l_bfgs_b(output_fn, init_guess, bounds=bnds, approx_grad=True)
-        return minimized_coeffs
-
-    def optimize_corr_fn(self, poly_grade, corr_fn, init_guess=[], cycles=10):
-        results = self._optimize_corr_fn(poly_grade, corr_fn, init_guess)
-        for n in range(1, cycles):
-            new_results = self._optimize_corr_fn(poly_grade, corr_fn, init_guess)
-            print("corr", new_results[1])
-            if new_results[1] < results[1]:
-                results = new_results
         return results
+
+
+if __name__=="__main__":
+    runner = Runner(8)
+    runner.optimize("max_auto_corr", 0.09, 2)
+
+
 

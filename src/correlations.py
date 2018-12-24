@@ -33,7 +33,6 @@ class Correlation(object):
                 corr_matrix[row, col] = self._aperiodic_corr_fn(row, col, mu)
         return corr_matrix
 
-    @timer
     def correlation_tensor(self):
         N = self._dims[0]
         tensor = np.zeros((N, N, 2 * N - 1), dtype=np.complex128)
@@ -52,7 +51,7 @@ class Correlation(object):
             d = np.sum(self._gdft[:-mu, alpha] * self._conj_gdft[mu:, beta])
             return d / N
 
-        np.sum(self._gdft[-mu:, alpha] * self._conj_gdft[:N+mu, beta])
+        d = np.sum(self._gdft[-mu:, alpha] * self._conj_gdft[:N+mu, beta])
         return d/N
 
 
@@ -140,7 +139,6 @@ class CorrelationAnalyzer(object):
     def max_auto_corr(self):
         return self._reduce_corr_tensor(self._auto_corr_mask, get_max_length)
 
-    @timer
     def avg_auto_corr(self):
         length = self._corr_tensor.shape[0]
         return self._reduce_corr_tensor(self._auto_corr_mask, get_squared_sum) / length
@@ -164,11 +162,9 @@ class CorrelationAnalyzer(object):
 
     def merit_factors(self):
         shape = self._corr_tensor.shape[0]
-        gen = (merit_factor(i) for i in range(shape))
+        gen = (self.merit_factor(i) for i in range(shape))
         return np.fromiter(gen, np.complex128)
 
     def avg_merit_factor(self):
-        m_factors = merit_factors()
+        m_factors = self.merit_factors()
         return m_factors.mean(axis=0)
-
-
