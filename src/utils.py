@@ -1,5 +1,6 @@
 import time
 import datetime
+from collections import namedtuple
 from dao import *
 
 def timer(function):
@@ -21,15 +22,26 @@ def show(function):
 
 def datetime_encoder(obj):
     if isinstance(obj, datetime.datetime):
-        return "{}-{}-{} {}-{}".format(obj.year, obj.month, obj.day, obj.hour, obj.minute)
+        return "{}-{}-{} {}_{}".format(obj.year, obj.month, obj.day, obj.hour, obj.minute)
     return obj
 
 def save_as_json(function):
     def inner_fn(self, *args, **kwargs):
         results = function(self, *args, **kwargs)
         print("Saving results to a json file")
-        file_name = "results_"+str(time)+".json"
+        date_string = datetime_encoder(datetime.datetime.now())
+        file_name = "results_"+date_string+".json"
         dao = DAO("../data/")
-        dao.write(results, results)
+        dao.write(file_name, results)
         return results
     return inner_fn
+
+
+Thetas = namedtuple('Thetas', 'thetas correlations')
+
+def extract_thetas_records(path, file_name):
+    dao = DAO(path)
+    content = dao.read(file_name)
+    theta_vecs = [np.array(result["theta_vec"]) for result in content["results"]]
+    corrs = [result["correlation"] for result in content["results"]]
+    return Thetas(thetas=theta_vecs, correlations=corrs)
