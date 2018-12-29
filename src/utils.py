@@ -22,8 +22,9 @@ def show(function):
 
 def datetime_encoder(obj):
     if isinstance(obj, datetime.datetime):
-        return "{}-{}-{} {}_{}".format(obj.year, obj.month, obj.day, obj.hour, obj.minute)
+        return "{}-{}_{}_{}".format(obj.month, obj.day, obj.hour, obj.minute)
     return obj
+
 
 def save_as_json(function):
     def inner_fn(self, *args, **kwargs):
