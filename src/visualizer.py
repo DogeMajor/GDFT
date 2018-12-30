@@ -25,7 +25,7 @@ def to_coords(thetas):
 def rotate_to_center(thetas, deg_angle):
     angle = deg_angle * (np.pi / 180)
     return thetas - angle
-'''
+
 def generate_points(thetas):
     length = thetas.shape[0]
     args = np.array(list(range(length)))
@@ -35,11 +35,10 @@ def fit_polynome(thetas, grade):
     args, thetas = generate_points(thetas)
     z = np.polyfit(args, thetas, grade)
     f = np.poly1d(z)
-    return f'''
+    return f
 
-def plot_fitted_polynome(thetas, grade):
+def plot_fitted_polynome(pol_fn, thetas):
     args, thetas = generate_points(thetas)
-    pol_fn = fit_polynome(thetas, grade)
     x_new = np.linspace(args[0], args[-1], 50)
     y_new = pol_fn(x_new)
     plt.plot(args, thetas, 'o', x_new, y_new)
@@ -85,35 +84,36 @@ new_kmean_thetas = [[0.29941173, 2.89847069, 0.36766799, 2.03652784, 2.92300659,
         0.23436835, 2.20397707, 3.02027523]]
 
 if __name__ == "__main__":
-    theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_15_38.json")
-    thetas_analyzer = ThetasAnalyzer(16)
-    sorted_thetas =
+    #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_15_38.json")
+
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_11_58.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "10thetas_16x16__12-26_19_4.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "100thetas_4x4__12-26_16_6.json")
-    #theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
+    theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
     #theta_collections = extract_thetas_records("../data/", "results_2018-12-24 23_33.json")
-    new_thetas = [thetas for thetas in theta_collections.thetas]
+    thetas_analyzer = ThetasAnalyzer(8)
+    sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
+    print(sorted_thetas)
+    fitted_polynomes = thetas_analyzer.fit_polynomes(theta_collections.thetas, 7)
+
+    '''new_thetas = [thetas for thetas in theta_collections.thetas]
     print(new_thetas[0])
     results = classify_thetas(new_thetas, 5)
     print(results)
     grouped_thetas = group_by_label(new_thetas, results)
     print(grouped_thetas)
     print(to_histogram(results))
-    print(results[0])
+    print(results[0])'''
 
-    #for k_mean_theta in new_thetas[:30]:
+    #for k_mean_theta in sorted_thetas.thetas[0]:
     #    polar_plot_angles(k_mean_theta)
 
-    #polar_plot_angles(limited_thetas[6])
-
-    for theta in new_thetas:#kmean_thetas[:-3]:
-        plot_fitted_polynome(theta, 15)
+    #for polynome, theta in zip(fitted_polynomes.polynomes, fitted_polynomes.theta_vecs):#kmean_thetas[:-3]:
+    #    plot_fitted_polynome(polynome, theta)
 
     #plot_fitted_polynome(unordered_thetas[0], 7)
-    '''for k_mean_theta in new_thetas:#grouped_thetas[0]:
-        polynome = fit_polynome(k_mean_theta, 15)
-        plot_polynome_roots(polynome)'''
+    for polynome, theta in zip(fitted_polynomes.polynomes, fitted_polynomes.theta_vecs):#grouped_thetas[0]:
+        plot_polynome_roots(polynome)
 
     #plot_polynome_roots(polynome)
 

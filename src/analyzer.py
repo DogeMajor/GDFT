@@ -2,11 +2,20 @@ import time
 import datetime
 from collections import namedtuple, Counter
 import numpy as np
+from scipy.cluster.vq import kmeans2
 from utils import *
 from gdft import *
 from correlations import *
 
 np.random.seed(int(time.time()))
+
+
+def extract_thetas_records(path, file_name):
+    dao = DAO(path)
+    content = dao.read(file_name)
+    theta_vecs = [np.array(result["theta_vec"]) for result in content["results"]]
+    corrs = [result["correlation"] for result in content["results"]]
+    return Thetas(thetas=theta_vecs, correlations=corrs)
 
 Polynomes = namedtuple('Polynomes', 'polynomes theta_vecs')
 SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram')
@@ -66,3 +75,26 @@ class ThetasAnalyzer(object):
 
     def _to_histogram(self, k_means_results):
         return Counter(k_means_results[1])
+
+class RootGenerator(object):
+
+    def __init__(self, dim):
+        self._dim = dim
+
+    def ellipisis_height(self, x):
+        x0 = (self._dim - 1)/2
+        return np.sqrt(1 - ((x-x0)**2)/1.5**2)
+
+    def polynome_root(self, x):
+        if 2 < x < self._dim - 3:
+            return x + 1j * self.ellipisis_height(x)
+        return x, 0
+
+    def polynome_roots(self, root_type="bigger"):
+        start, stop = -1, self._dim / 2
+        if root_type == "bigger":
+            start, stop = self._dim / 2, self._dim
+
+        pos_roots = [self.polynome_root(n) for n in range(start, stop)]
+        conjugate_roots = [self.polynome_root(n).conjugate() for n in range(start, stop)]
+        return pos_roots + conjugate_roots
