@@ -66,6 +66,7 @@ class ThetasAnalyzer(object):
 
 
     def fit_sorted_polynomes(self, sorted_thetas):
+        pass
 
 
     def sort_thetas(self, theta_vecs, groups):

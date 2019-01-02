@@ -44,7 +44,6 @@ class Correlation(object):
 
     def _aperiodic_corr_fn(self, alpha, beta, pos_mu):
         N = self._dims[0]
-        d = 0.0
         mu = pos_mu - N + 1
 
         if 0 < mu <= N-1:
