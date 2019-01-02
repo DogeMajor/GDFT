@@ -43,7 +43,8 @@ def plot_fitted_polynome(pol_fn, thetas):
     y_new = pol_fn(x_new)
     plt.plot(args, thetas, 'o', x_new, y_new)
 
-def plot_angles(args, thetas):
+def plot_angles(thetas):
+    args, thetas = generate_points(thetas)
     plt.plot(args, thetas, 'x')
 
 def polar_plot_angles(thetas):
@@ -85,16 +86,17 @@ new_kmean_thetas = [[0.29941173, 2.89847069, 0.36766799, 2.03652784, 2.92300659,
 
 if __name__ == "__main__":
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_15_38.json")
-
+    theta_collections = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_11_58.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "10thetas_16x16__12-26_19_4.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "100thetas_4x4__12-26_16_6.json")
-    theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
+    #theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
     #theta_collections = extract_thetas_records("../data/", "results_2018-12-24 23_33.json")
-    thetas_analyzer = ThetasAnalyzer(8)
+    thetas_analyzer = ThetasAnalyzer(16)
     sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
-    print(sorted_thetas)
-    fitted_polynomes = thetas_analyzer.fit_polynomes(theta_collections.thetas, 7)
+    #print(sorted_thetas)
+    fitted_polynomes = thetas_analyzer.fit_polynomes(theta_collections.thetas, 15)
+    #print(fitted_polynomes)
 
     '''new_thetas = [thetas for thetas in theta_collections.thetas]
     print(new_thetas[0])
@@ -108,12 +110,30 @@ if __name__ == "__main__":
     #for k_mean_theta in sorted_thetas.thetas[0]:
     #    polar_plot_angles(k_mean_theta)
 
-    #for polynome, theta in zip(fitted_polynomes.polynomes, fitted_polynomes.theta_vecs):#kmean_thetas[:-3]:
-    #    plot_fitted_polynome(polynome, theta)
+    '''for polynome, theta in zip(fitted_polynomes.polynomes, fitted_polynomes.theta_vecs):#kmean_thetas[:-3]:
+        #plot_fitted_polynome(polynome, theta)
+        plot_angles(theta)'''
+
+    #for theta in fitted_polynomes.theta_vecs[0:30]:
+    for theta in sorted_thetas.thetas[0]:
+        plot_angles(np.sort(theta))
+        #print(theta)
 
     #plot_fitted_polynome(unordered_thetas[0], 7)
-    for polynome, theta in zip(fitted_polynomes.polynomes, fitted_polynomes.theta_vecs):#grouped_thetas[0]:
-        plot_polynome_roots(polynome)
+    #for polynome, theta in zip(fitted_polynomes.polynomes[1:4], fitted_polynomes.theta_vecs):#grouped_thetas[0]:
+    #    plot_polynome_roots(polynome)
+
+    '''for theta in theta_collections.thetas[3:5]:# + theta_collections.thetas[6:8]:
+        #plot_angles(theta)
+        polar_plot_angles(theta)
+        print(rotate_to_center(theta, 0.25169209*180/np.pi))'''
+
+    #plot_angles(np.array([0.09465623, 0.41877879, 3.02807566, 2.90387726, 1.99285297, 0.94911141,
+    #                      2.64581432, 0.20322705]))
+    #for theta in theta_collections.thetas[8:10]:# + theta_collections.thetas[6:8]:
+    #    plot_angles(theta)
+        #polar_plot_angles(theta)
+        #print(rotate_to_center(theta, 0.25169209*180/np.pi))
 
     #plot_polynome_roots(polynome)
 

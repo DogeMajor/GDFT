@@ -5,11 +5,15 @@ class SequenceFinder(object):
         pass
 
     def _to_integers(self, seq, scaling=1):
-        abs_seqs = abs(seq)
-        min_val = min(abs_seqs)
+        abs_seq = [abs(item) for item in seq]
+        min_val = min(abs_seq)
         def _to_int(item):
             return int((scaling/min_val) * item)
         return list(map(_to_int, seq))
+
+    def _to_abs_integers(self, seq, scaling=1):
+        abs_seq = [abs(item) for item in seq]
+        return self._to_integers(abs_seq, scaling)
 
     def nth_diff(self, seq, n):
         '''Forward difference'''

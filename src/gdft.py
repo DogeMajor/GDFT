@@ -2,6 +2,7 @@ from functools import partial
 import numpy as np
 from scipy.linalg import expm
 from cmath import exp
+from utils import timer
 
 
 def dft_matrix2(dim):
@@ -37,3 +38,11 @@ def non_orthogonal_gdft_matrix(dim, thetas, gammas):
     g1 = g_matrix(thetas)
     g2 = g_matrix(gammas)
     return g1.dot(dft_mat.dot(g2))
+
+@timer
+def permutation_matrix(dim, orderings=None):
+    perm = np.zeros((dim, dim))
+    for index, order in enumerate(orderings):
+        perm[index, order] = 1
+
+    return perm
