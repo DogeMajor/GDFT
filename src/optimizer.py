@@ -1,5 +1,8 @@
 import time
+import datetime
+from collections import namedtuple
 from scipy.optimize import fmin_bfgs, fmin_l_bfgs_b
+from scipy.cluster.vq import kmeans2
 from utils import *
 from gdft import *
 from correlations import *
@@ -11,68 +14,92 @@ class Optimizer(object):
     def __init__(self, dim):
         self._dim = dim
         self._dft = dft_matrix(dim)
+        self._analyzer = CorrelationAnalyzer(dim)
+        self._corr_fns = {"max_auto_corr": self._analyzer.max_auto_corr,
+                          "avg_auto_corr": self._analyzer.avg_auto_corr,
+                          "max_cross_corr": self._analyzer.max_cross_corr,
+                          "avg_cross_corr": self._analyzer.avg_cross_corr,
+                          "avg_merit_factor": self._analyzer.avg_merit_factor}
 
     def get_correlations(self, gdft):
         corr_obj = Correlation(gdft)
-        c_tensor = corr_obj.correlation_tensor()
-        max_ac = max_auto_correlation(c_tensor)
-        avg_ac = avg_auto_correlation(c_tensor)
-        max_cc = max_cross_correlation(c_tensor)
-        avg_cc = avg_cross_correlation(c_tensor)
-        avg_merit = avg_merit_factor(c_tensor)
-        return (max_ac, avg_ac, max_cc, avg_cc, avg_merit)
+        self._analyzer.set_corr_tensor(corr_obj.correlation_tensor())
+        Correlations = namedtuple('Correlations', self._corr_fns.keys())
+        corrs = {fn_name: corr_fn() for fn_name, corr_fn in self._corr_fns.items()}
+        return Correlations(**corrs)
 
     def get_random_gdft(self, length):
         thetas = np.random.uniform(0, 2 * np.pi, (length))
-        return gdft_matrix(length, thetas)#With gammas==thetas, gdft remains orthogonal!!!
+        return gdft_matrix(length, thetas)
 
-    def _calc_correlation(self, length, params, corr_fn):
-        gdft = gdft_matrix(length, params)
+    def _calc_correlation(self, params, corr_fn):
+        gdft = gdft_matrix(self._dim, params)
         corr_obj = Correlation(gdft)
         c_tensor = corr_obj.correlation_tensor()
-        return corr_fn(c_tensor)
+        self._analyzer.set_corr_tensor(c_tensor)
+        return corr_fn()
 
-    def _optimize_corr_fn(self, length, corr_fn, init_guess=[]):
+    def _optimize_corr_fn(self, corr_fn_name, init_guess=[]):
         if len(init_guess) == 0:
-            thetas0 = np.random.uniform(0, 2 * np.pi, (length))
+            thetas0 = np.random.uniform(0, 2 * np.pi, (self._dim))
             init_guess = thetas0
 
-        bnds = tuple((0, np.pi) for n in range(length))
+        bnds = tuple((0, np.pi) for n in range(self._dim))
+        corr_fn = self._corr_fns[corr_fn_name]
 
         def output_fn(_params):
-            return self._calc_correlation(length, _params, corr_fn)
+            return self._calc_correlation(_params, corr_fn)
 
         #minimized_params = fmin_bfgs(output_fn, params0, bounds=bnds, constraints=cons)
         minimized_params = fmin_l_bfgs_b(output_fn, init_guess, bounds=bnds, approx_grad=True)
         return minimized_params
 
-    def optimize_corr_fn(self, length, corr_fn, init_guess=[], cycles=10):
-        results = self._optimize_corr_fn(length, corr_fn, init_guess)
-        for n in range(1, cycles):
-            new_results = self._optimize_corr_fn(length, corr_fn, init_guess)
-            print("corr", new_results[1])
+    def optimize_corr_fn(self, corr_fn_name, stop_criteria=None, init_guess=[], cycles=10):
+        results = self._optimize_corr_fn(corr_fn_name, init_guess)
+        for n in range(cycles):
+            new_results = self._optimize_corr_fn(corr_fn_name, init_guess)
+            print(corr_fn_name, new_results[1])
             if new_results[1] < results[1]:
                 results = new_results
+            if stop_criteria and results[1] < stop_criteria:
+                break
         return results
 
-
-    @show
-    def _order_results(self, res):
-        params = res[0]
-        return np.sort(params), res[1]
-
-    def get_optimized_params(self, length, corr_fn, iter_times=5):
-        '''Iterates optimize_corr_fn several times and returns all the results'''
-        params = np.zeros((iter_times, length), dtype=np.complex128)#params, corr_fn_result, iteration
-        for n in range(iter_times):
-            #params = self._order_results(self.optimize_corr_fn(length, corr_fn))[0]
-            params = self._order_results(self.optimize_corr_fn(length, corr_fn))[0]
-
-        return params
-
-    def get_params_summary(self, thetas):
+    def get_params_summary(self, params):
         summary = {}
-        summary['theta_vecs'] = thetas
-        summary['theta_avgs'] = thetas.mean(axis=0)
-        summary['theta_vars'] = np.var(thetas, axis=0)
+        thetas = params[0]
+        summary['theta_vec'] = thetas
+        summary['theta_avg'] = thetas.mean(axis=0)
+        summary['theta_var'] = np.var(thetas, axis=0)
+        summary['correlation'] = params[1]
         return summary
+
+
+class Runner(object):
+
+    def __init__(self, dim):
+        self._optimizer = Optimizer(dim)
+
+    @timer
+    #@save_as_json
+    def optimize(self, corr_fn_name, epochs, stop_criteria=None, save_results=True):
+        date = datetime_encoder(datetime.datetime.now())
+        results = {"info": "Optimizer results for "+corr_fn_name+" at time "+date}
+        results["results"] = []
+        for n in range(epochs):
+            params = self._optimizer.optimize_corr_fn(corr_fn_name, stop_criteria)
+            summary = self._optimizer.get_params_summary(params)
+            results["results"].append(summary)
+        return results
+
+    def save_results(self, file_name, results):
+        date_string = datetime_encoder(datetime.datetime.now())
+        dao = DAO("../data/")
+        dao.write(file_name + date_string + ".json", results)
+
+if __name__ == "__main__":
+    #runner = Runner(16)
+    #results = runner.optimize("avg_auto_corr", 30, stop_criteria=0.12)
+    #runner.save_results("30thetas_16x16__", results)
+    thetas = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
+    print(thetas)

@@ -2,10 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="df3ca34c-22d8-4b15-b7a9-55006b6f5138" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/test/testThetasAnalyzer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/analyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/analyzer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gdft.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gdft.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/optimizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/optimizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/sequencefinder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/sequencefinder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/visualizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/visualizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/testOptimizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/testOptimizer.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,15 +16,18 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FavoritesManager">
+    <favorites_list name="GDFT" />
+  </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.3550543">
+    <splitter split-orientation="horizontal" split-proportion="0.7274291">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/utils.py">
+            <entry file="file://$PROJECT_DIR$/src/sequencefinder.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="238">
-                  <caret line="14" column="35" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
+                <state relative-caret-position="102">
+                  <caret line="6" column="43" lean-forward="true" selection-start-line="6" selection-start-column="43" selection-end-line="6" selection-end-column="43" />
                 </state>
               </provider>
             </entry>
@@ -29,8 +35,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/gdft.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="136">
-                  <caret line="23" column="28" lean-forward="true" selection-start-line="23" selection-start-column="28" selection-end-line="23" selection-end-column="28" />
+                <state relative-caret-position="-153">
+                  <caret line="24" column="27" lean-forward="true" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
                   <folding>
                     <element signature="e#0#29#0" expanded="true" />
                   </folding>
@@ -39,10 +45,22 @@
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/visualizer.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1989">
+                  <caret line="117" column="37" selection-start-line="117" selection-start-column="37" selection-end-line="117" selection-end-column="37" />
+                  <folding>
+                    <element signature="e#0#31#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/optimizer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="731">
-                  <caret line="52" column="41" lean-forward="true" selection-start-line="52" selection-start-column="41" selection-end-line="52" selection-end-column="41" />
+                <state relative-caret-position="198">
+                  <caret line="103" column="81" lean-forward="true" selection-start-line="103" selection-start-column="4" selection-end-line="103" selection-end-column="81" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
                   </folding>
@@ -51,30 +69,24 @@
             </entry>
           </file>
           <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/visualizer.py">
+            <entry file="file://$PROJECT_DIR$/src/analyzer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="106">
-                  <caret line="158" column="36" lean-forward="true" selection-start-line="158" selection-start-column="36" selection-end-line="158" selection-end-column="36" />
+                <state relative-caret-position="640">
+                  <caret line="99" column="49" lean-forward="true" selection-start-line="99" selection-start-column="49" selection-end-line="99" selection-end-column="49" />
                   <folding>
-                    <element signature="e#0#24#0" expanded="true" />
+                    <element signature="e#0#11#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/4_2018-12-18.png">
-              <provider selected="true" editor-type-id="images" />
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/3_2018-12-18.png">
-              <provider selected="true" editor-type-id="images" />
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/2_2018-12-18.png">
-              <provider selected="true" editor-type-id="images" />
+            <entry file="file://$PROJECT_DIR$/test/testThetasAnalyzer.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="85">
+                  <caret line="8" column="22" lean-forward="true" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
+                </state>
+              </provider>
             </entry>
           </file>
         </leaf>
@@ -84,8 +96,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/test/testGDFT.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="119">
-                  <caret line="10" column="43" selection-start-line="10" selection-start-column="43" selection-end-line="10" selection-end-column="43" />
+                <state relative-caret-position="17">
+                  <caret line="5" column="25" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="25" />
                   <folding>
                     <element signature="e#0#10#0" expanded="true" />
                   </folding>
@@ -94,19 +106,10 @@
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/tools.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="34">
-                  <caret line="2" column="20" selection-start-line="2" selection-start-column="20" selection-end-line="2" selection-end-column="20" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/correlations.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="171">
-                  <caret line="73" column="34" selection-start-line="73" selection-start-column="4" selection-end-line="73" selection-end-column="34" />
+                <state relative-caret-position="-511">
+                  <caret line="121" selection-start-line="121" selection-end-line="121" />
                   <folding>
                     <element signature="e#0#18#0" expanded="true" />
                   </folding>
@@ -114,11 +117,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/data/temp.txt">
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/test/testSequenceFinder.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="391">
-                  <caret line="23" column="39" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
+                <state relative-caret-position="-34">
+                  <caret line="16" column="38" lean-forward="true" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="38" />
                 </state>
               </provider>
             </entry>
@@ -126,26 +129,26 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/test/testCorrelations.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="136">
-                  <caret line="8" selection-start-line="8" selection-end-line="8" />
+                <state relative-caret-position="85">
+                  <caret line="5" column="28" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="28" />
                 </state>
               </provider>
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/testCorrelationCalculator.py">
+            <entry file="file://$PROJECT_DIR$/test/testCorrelationAnalyzer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="340">
-                  <caret line="20" selection-start-line="20" selection-end-line="20" />
+                <state relative-caret-position="867">
+                  <caret line="51" column="22" selection-start-line="51" selection-start-column="22" selection-end-line="51" selection-end-column="22" />
                 </state>
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/test/testOptimizer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="170">
-                  <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+                <state relative-caret-position="-658">
+                  <caret line="20" column="59" selection-start-line="20" selection-start-column="59" selection-end-line="20" selection-end-column="59" />
                 </state>
               </provider>
             </entry>
@@ -157,7 +160,14 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>inv</find>
+      <find>polynome</find>
+      <find>decoder</find>
+      <find>GDFT_MAT</find>
+      <find>expm</find>
       <find>print</find>
+      <find>_calc_correlation</find>
+      <find>length</find>
+      <find>plot_angles</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -175,28 +185,39 @@
         <option value="$PROJECT_DIR$/test/testDFT.py" />
         <option value="$PROJECT_DIR$/test/test_utils.py" />
         <option value="$PROJECT_DIR$/test/__init__.py" />
-        <option value="$PROJECT_DIR$/test/tools.py" />
-        <option value="$PROJECT_DIR$/test/testGDFT.py" />
         <option value="$PROJECT_DIR$/src/GDFTOptimizer.py" />
         <option value="$PROJECT_DIR$/src/gdftoptimizer.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/src/utils.py" />
         <option value="$PROJECT_DIR$/data/results_gdft8_AC" />
-        <option value="$PROJECT_DIR$/src/gdft.py" />
-        <option value="$PROJECT_DIR$/test/testCorrelations.py" />
-        <option value="$PROJECT_DIR$/src/correlations.py" />
-        <option value="$PROJECT_DIR$/test/testCorrelationCalculator.py" />
         <option value="$PROJECT_DIR$/data/temp.txt" />
-        <option value="$PROJECT_DIR$/src/optimizer.py" />
+        <option value="$PROJECT_DIR$/test/testPolynomeOptimizer.py" />
+        <option value="$PROJECT_DIR$/data/static_julinfo.json" />
+        <option value="$PROJECT_DIR$/src/dao.py" />
+        <option value="$PROJECT_DIR$/test/testSequenceFinder.py" />
+        <option value="$PROJECT_DIR$/test/testDAO.py" />
+        <option value="$PROJECT_DIR$/test/testCorrelationCalculator.py" />
+        <option value="$PROJECT_DIR$/test/testCorrelations.py" />
+        <option value="$PROJECT_DIR$/test/testCorrelationAnalyzer.py" />
+        <option value="$PROJECT_DIR$/test/tools.py" />
+        <option value="$PROJECT_DIR$/test/testGDFT.py" />
+        <option value="$PROJECT_DIR$/all_tests.sh" />
+        <option value="$PROJECT_DIR$/src/correlations.py" />
+        <option value="$PROJECT_DIR$/data/results_2018-12-24 20-39.json" />
+        <option value="$PROJECT_DIR$/data/results_2018-12-24 22_57.json" />
         <option value="$PROJECT_DIR$/test/testOptimizer.py" />
+        <option value="$PROJECT_DIR$/src/utils.py" />
+        <option value="$PROJECT_DIR$/src/analyzer.py" />
+        <option value="$PROJECT_DIR$/src/sequencefinder.py" />
+        <option value="$PROJECT_DIR$/src/gdft.py" />
+        <option value="$PROJECT_DIR$/test/testThetasAnalyzer.py" />
+        <option value="$PROJECT_DIR$/src/optimizer.py" />
         <option value="$PROJECT_DIR$/src/visualizer.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="-7" />
-    <option name="y" value="2" />
-    <option name="width" value="1378" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="27" />
+    <option name="width" value="470" />
     <option name="height" value="733" />
   </component>
   <component name="ProjectView">
@@ -204,6 +225,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -230,12 +252,15 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="auto.test.manager.delay" value="5000" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\ansel\Documents\Programming\GDFT\test" />
+      <recent name="C:\Users\ansel\Documents\Programming\GDFT\data" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -251,7 +276,7 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.visualizer">
-    <configuration name="testCorrelationCalculator" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="optimizer" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="GDFT" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -259,32 +284,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/testCorrelationCalculator.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="testCorrelations" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="GDFT" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/testCorrelations.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/optimizer.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -314,6 +318,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="testThetasAnalyzer" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="GDFT" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/testThetasAnalyzer.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="visualizer" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="GDFT" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -335,7 +360,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Unittests in testOptimizer.py" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+    <configuration name="Unittests for testOptimizer.TestOptimizer.test_corr_deps_on_params" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <module name="GDFT" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -345,17 +370,17 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/test/testOptimizer.py&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <option name="_new_target" value="&quot;testOptimizer.TestOptimizer.test_corr_deps_on_params&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.visualizer" />
+        <item itemvalue="Python.optimizer" />
+        <item itemvalue="Python.testThetasAnalyzer" />
         <item itemvalue="Python.testOptimizer" />
-        <item itemvalue="Python.testCorrelationCalculator" />
-        <item itemvalue="Python.testCorrelations" />
-        <item itemvalue="Python tests.Unittests in testOptimizer.py" />
+        <item itemvalue="Python tests.Unittests for testOptimizer.TestOptimizer.test_corr_deps_on_params" />
       </list>
     </recent_temporary>
   </component>
@@ -373,56 +398,98 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Unittests_in_testOptimizer_py - 2018.12.12 at 00h 06m 53s.xml">
-      <configuration name="Unittests in testOptimizer.py" configurationId="tests" />
+    <history-entry file="Unittests_for_testGDFT_TestGDFT_testGDFTMatrix - 2018.12.23 at 23h 34m 30s.xml">
+      <configuration name="Unittests for testGDFT.TestGDFT.testGDFTMatrix" configurationId="tests" />
     </history-entry>
-    <history-entry file="Unittests_in_testOptimizer_py - 2018.12.12 at 00h 07m 07s.xml">
-      <configuration name="Unittests in testOptimizer.py" configurationId="tests" />
+    <history-entry file="Unittests_for_testGDFT_TestGDFT_testGDFTMatrix - 2018.12.23 at 23h 35m 27s.xml">
+      <configuration name="Unittests for testGDFT.TestGDFT.testGDFTMatrix" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_testOptimizer_TestOptimizer - 2018.12.24 at 01h 17m 24s.xml">
+      <configuration name="Unittests for testOptimizer.TestOptimizer" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_testOptimizer_TestOptimizer - 2018.12.24 at 11h 29m 04s.xml">
+      <configuration name="Unittests for testOptimizer.TestOptimizer" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_testOptimizer_TestOptimizer - 2018.12.24 at 12h 07m 11s.xml">
+      <configuration name="Unittests for testOptimizer.TestOptimizer" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_testOptimizer_TestOptimizer - 2018.12.24 at 12h 17m 06s.xml">
+      <configuration name="Unittests for testOptimizer.TestOptimizer" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_in_testGDFT_py - 2018.12.24 at 12h 36m 04s.xml">
+      <configuration name="Unittests in testGDFT.py" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_testGDFT_TestGDFT_testGDFTMatrix - 2018.12.24 at 16h 37m 23s.xml">
+      <configuration name="Unittests for testGDFT.TestGDFT.testGDFTMatrix" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_testGDFT_TestGDFT_testGDFTMatrix - 2018.12.24 at 16h 37m 25s.xml">
+      <configuration name="Unittests for testGDFT.TestGDFT.testGDFTMatrix" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Unittests_for_testOptimizer_TestOptimizer_test_corr_deps_on_params - 2018.12.25 at 14h 38m 14s.xml">
+      <configuration name="Unittests for testOptimizer.TestOptimizer.test_corr_deps_on_params" configurationId="tests" />
     </history-entry>
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="2" width="1378" height="733" extended-state="0" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.10671642" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.78328174" visible="true" weight="0.13467261" />
       <window_info id="Structure" order="1" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info id="Favorites" order="2" sideWeight="0.21671827" side_tool="true" weight="0.10074627" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.80895525" visible="true" weight="0.35166666" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49850747" weight="0.4" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.8005952" visible="true" weight="0.3747954" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4955357" weight="0.47790506" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49925372" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Python Console" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.19104478" side_tool="true" visible="true" weight="0.35166666" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.71716416" weight="0.5482815" />
+      <window_info anchor="bottom" id="Python Console" order="9" sideWeight="0.49925372" weight="0.5368249" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.19940476" side_tool="true" weight="0.31096563" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Data View" order="3" />
     </layout>
     <layout-to-restore>
-      <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.09030837" />
-      <window_info id="Structure" order="2" weight="0.25" />
-      <window_info anchor="bottom" id="Event Log" order="0" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="1" />
-      <window_info anchor="bottom" id="Python Console" order="2" />
-      <window_info anchor="bottom" id="Terminal" order="3" />
-      <window_info anchor="bottom" id="Message" order="4" />
-      <window_info anchor="bottom" id="Find" order="5" />
-      <window_info anchor="bottom" id="Run" order="6" visible="true" weight="0.32903227" />
-      <window_info anchor="bottom" id="Debug" order="7" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="8" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="9" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="10" />
-      <window_info anchor="right" id="Data View" order="0" />
-      <window_info anchor="right" id="Commander" order="1" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="2" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="3" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.78328174" visible="true" weight="0.18526785" />
+      <window_info id="Structure" order="1" weight="0.25" />
+      <window_info id="Favorites" order="2" sideWeight="0.21671827" side_tool="true" weight="0.10074627" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.8005952" visible="true" weight="0.31096563" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4955357" weight="0.36006546" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49925372" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.71716416" />
+      <window_info anchor="bottom" id="Python Console" order="9" sideWeight="0.49925372" weight="0.5368249" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.19940476" side_tool="true" visible="true" weight="0.31096563" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Data View" order="3" />
     </layout-to-restore>
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>self._gdft[-mu:, alpha] * self._conj_gdft[:N+mu, beta]</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/__init__.py">
@@ -449,10 +516,79 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/2018-12-18.png" />
+    <entry file="file://$PROJECT_DIR$/src/2_2018-12-18.png" />
+    <entry file="file://$PROJECT_DIR$/src/3_2018-12-18.png" />
+    <entry file="file://$PROJECT_DIR$/src/4_2018-12-18.png" />
+    <entry file="file://$PROJECT_DIR$/datajulinfo.json" />
+    <entry file="file://$PROJECT_DIR$/data/julinfo2.json" />
+    <entry file="file://$PROJECT_DIR$/data/static_julinfo.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="18" selection-start-column="17" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/temp.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="159">
+          <caret line="31" selection-start-line="31" selection-end-line="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/matrix_info.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="49" lean-forward="true" selection-start-column="49" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/testPolynomeOptimizer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="18" selection-start-line="6" selection-start-column="18" selection-end-line="6" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/tools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="271">
+          <caret line="20" selection-start-line="20" selection-end-line="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/{'name'" />
+    <entry file="file://$PROJECT_DIR$/data/results_1545675330.2845256.json" />
+    <entry file="file://$PROJECT_DIR$/data/results_2018-12-24 20-20.json" />
+    <entry file="file://$PROJECT_DIR$/test/testDAO.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="273">
+          <caret line="90" selection-start-line="90" selection-end-line="90" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/all_tests.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="38" selection-start-line="6" selection-start-column="38" selection-end-line="6" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/results_gdft8_AC">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="90" column="68" selection-start-line="90" selection-start-column="68" selection-end-line="90" selection-end-column="68" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/test.json2018-12 26_1.json" />
+    <entry file="file://$PROJECT_DIR$/data/100_fitted_polys_gdft8.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/test/testGDFT.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="10" column="43" selection-start-line="10" selection-start-column="43" selection-end-line="10" selection-end-column="43" />
+        <state relative-caret-position="17">
+          <caret line="5" column="25" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="25" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
@@ -461,82 +597,125 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/testCorrelations.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" selection-start-line="8" selection-end-line="8" />
+        <state relative-caret-position="85">
+          <caret line="5" column="28" selection-start-line="5" selection-start-column="25" selection-end-line="5" selection-end-column="28" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/testCorrelationCalculator.py">
+    <entry file="file://$PROJECT_DIR$/test/testCorrelationAnalyzer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
+        <state relative-caret-position="867">
+          <caret line="51" column="22" selection-start-line="51" selection-start-column="22" selection-end-line="51" selection-end-column="22" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/2018-12-18.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/results_gdft8_AC">
+    <entry file="file://$PROJECT_DIR$/data/10thetas_16x16__12-27_11_58.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
-          <caret line="35" column="39" selection-start-line="33" selection-start-column="22" selection-end-line="35" selection-end-column="39" />
+        <state relative-caret-position="187">
+          <caret column="1332" selection-start-column="1332" selection-end-column="1332" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/tools.py">
+    <entry file="file://$PROJECT_DIR$/data/100thetas_16x16__12-26_17_38.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="20" selection-start-line="2" selection-start-column="20" selection-end-line="2" selection-end-column="20" />
+        <state>
+          <caret column="506" selection-start-column="506" selection-end-column="506" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/2_2018-12-18.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/3_2018-12-18.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/4_2018-12-18.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/utils.py">
+    <entry file="file://$PROJECT_DIR$/data/results_2018-12-24 22_57.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="35" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
+        <state>
+          <caret column="1322" selection-start-column="1322" selection-end-column="1322" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/results_2018-12-24 20-39.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="1058" selection-start-column="1058" selection-end-column="1058" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/results_2018-12-24 20-34.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="642" selection-start-column="642" selection-end-column="642" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/results_2018-12-24 20-22.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="371" selection-start-column="371" selection-end-column="371" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/testOptimizer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-658">
+          <caret line="20" column="59" selection-start-line="20" selection-start-column="59" selection-end-line="20" selection-end-column="59" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/correlations.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="73" column="34" selection-start-line="73" selection-start-column="4" selection-end-line="73" selection-end-column="34" />
+        <state relative-caret-position="-511">
+          <caret line="121" selection-start-line="121" selection-end-line="121" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/temp.txt">
+    <entry file="file://$PROJECT_DIR$/src/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="23" column="39" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/optimizer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="731">
-          <caret line="52" column="41" lean-forward="true" selection-start-line="52" selection-start-column="41" selection-end-line="52" selection-end-column="41" />
+        <state relative-caret-position="232">
+          <caret line="40" selection-start-line="40" selection-end-line="47" selection-end-column="56" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/test/testSequenceFinder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-34">
+          <caret line="16" column="38" lean-forward="true" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/dao.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="53" selection-start-line="6" selection-start-column="53" selection-end-line="6" selection-end-column="53" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/optimizer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="103" column="81" lean-forward="true" selection-start-line="103" selection-start-column="4" selection-end-line="103" selection-end-column="81" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/testThetasAnalyzer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="8" column="22" lean-forward="true" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/gdft.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="23" column="28" lean-forward="true" selection-start-line="23" selection-start-column="28" selection-end-line="23" selection-end-column="28" />
+        <state relative-caret-position="-153">
+          <caret line="24" column="27" lean-forward="true" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
           <folding>
             <element signature="e#0#29#0" expanded="true" />
           </folding>
@@ -545,18 +724,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/visualizer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="106">
-          <caret line="158" column="36" lean-forward="true" selection-start-line="158" selection-start-column="36" selection-end-line="158" selection-end-column="36" />
+        <state relative-caret-position="1989">
+          <caret line="117" column="37" selection-start-line="117" selection-start-column="37" selection-end-line="117" selection-end-column="37" />
           <folding>
-            <element signature="e#0#24#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/testOptimizer.py">
+    <entry file="file://$PROJECT_DIR$/src/sequencefinder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        <state relative-caret-position="102">
+          <caret line="6" column="43" lean-forward="true" selection-start-line="6" selection-start-column="43" selection-end-line="6" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/analyzer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="640">
+          <caret line="99" column="49" lean-forward="true" selection-start-line="99" selection-start-column="49" selection-end-line="99" selection-end-column="49" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
