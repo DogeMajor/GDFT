@@ -9,6 +9,8 @@ from correlations import *
 from analyzer import *
 from sequencefinder import SequenceFinder
 
+#------Test data-----------------------------------------------------------------------------
+
 normalized_thetas = np.array([-2.98774983e-09, 8.18550897e-01, 2.79042360e+00, 2.67879537e+00,
                               1.78476702e+00, 1.08366030e-01, 2.63164508e+00, 2.50189183e-02])
 
@@ -94,6 +96,69 @@ class TestThetasAnalyzer(unittest.TestCase):
 
     def tearDown(self):
         del self.analyzer
+
+
+from math import log, sin, asin, tan, sinh, asinh, sqrt, pow, atan
+
+    def center(x):
+        '''Centers thetas in the interval [0,pi] symmetrically
+        with respect to point pi/2'''
+        return x + 0.175584
+
+    def func(x):
+        return 0.5 * np.pi + atan(center(x))
+
+    def transform(seq, fn):
+        return [fn(item) for item in seq]
+
+    def seq_norm(seq_a, seq_b):
+        distances = ((item_b - item_a) ** 2 for item_a, item_b in zip(seq_a, seq_b))
+        return sqrt(sum(distances))
+
+class TestFindingThetaGeneratingFunction(unittest.TestCase):
+    '''Mostly just visual tests to experiment how to build the GDFT from
+    the function approximation with permutation matrices.
+    Not unit/integration/system tests by any measure!'''
+
+    def setUp(self):
+        self.seq_finder = SequenceFinder()
+
+
+
+    def tearDown(self):
+        del self.seq_finder
+
+
+
+
+    transformed_seq = transform(normalized_thetas[0:], center)
+
+    print(sorted(transformed_seq))
+
+    '''for n in range(8):
+        print(finder.nth_diff(transformed_seq, n))
+        print(finder.nth_diff(sorted(transformed_seq), n))'''
+
+    generated_thetas = [0.5 * np.pi + 1.135 * atan(n - 3.63) for n in range(8)]
+    print("l^2-norm for the ordered thetas", seq_norm(generated_thetas, sorted(transformed_seq)))
+
+    # perm = permutation_matrix(8, orderings=[0, 2, 7, 6, 4, 3, 5, 1])
+    perm = permutation_matrix(8, orderings=[0, 3, 7, 6, 4, 2, 5, 1])
+    permutated_thetas = perm.dot(generated_thetas)
+
+    print("l^2 norm metric", seq_norm(transformed_seq, permutated_thetas))
+
+    gdft = gdft_matrix(8, permutated_thetas)
+    correlations = ThetasAnalyzer(8).get_correlations(gdft)
+    print(correlations.avg_auto_corr)
+    print(transformed_seq)
+    print(permutated_thetas)
+
+    gdft = gdft_matrix(16, thetas_16gdft)
+    print(gdft.shape)
+    correlations = ThetasAnalyzer(16).get_correlations(gdft)
+    print(correlations.avg_auto_corr)
+    print(correlations)
 
 
 class TestRootGenerator(unittest.TestCase):

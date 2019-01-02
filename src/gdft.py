@@ -42,7 +42,7 @@ def non_orthogonal_gdft_matrix(dim, thetas, gammas):
 @timer
 def permutation_matrix(dim, orderings=None):
     perm = np.zeros((dim, dim))
-    for index, order in enumerate(orderings):
+    for index, order in enumerate(orderings[0:dim]):
         perm[index, order] = 1
 
     return perm

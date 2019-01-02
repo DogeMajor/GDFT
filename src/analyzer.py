@@ -20,6 +20,8 @@ def extract_thetas_records(path, file_name):
 
 Polynomes = namedtuple('Polynomes', 'polynomes theta_vecs')
 SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram')
+SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
+
 
 class ThetasAnalyzer(object):
 
@@ -55,6 +57,16 @@ class ThetasAnalyzer(object):
     def fit_polynomes(self, thetas, grade):
         polynomes = [self._fit_polynome(theta_vec, grade) for theta_vec in thetas]
         return Polynomes(polynomes=polynomes, theta_vecs=thetas)
+
+    def _fit_polynome_to(self, all_thetas, grade):
+        thetas = np.core.records.fromarrays(all_thetas)
+        length = thetas.shape[1]
+        print(length)
+        args = np.array(list(range(length)))
+
+
+    def fit_sorted_polynomes(self, sorted_thetas):
+
 
     def sort_thetas(self, theta_vecs, groups):
         kmeans_results = self._classify_thetas(theta_vecs, groups)
