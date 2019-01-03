@@ -91,36 +91,6 @@ class ThetasAnalyzer(object):
         return Counter(k_means_results[1])
 
 
-class RootGenerator(object):
-
-    def __init__(self, dim):
-        self._dim = dim
-
-    def ellipsis_height(self, x):
-        x0 = (self._dim - 1)/2
-        x_length = 0.5*(self._dim / 2 - 1)
-        return np.sqrt(1 - ((x-x0)**2)/x_length**2)
-
-    def get_imag(self, _real):
-        return - 1 / np.sqrt(np.pi) * _real + np.pi
-
-    def polynome_root(self, x):
-
-            #return x + 1j * self.ellipsis_height(x)
-        return x + 1j * self.get_imag(x)
-
-
-    def polynome_roots(self, root_type="bigger"):
-        pi_multiples = int((self._dim - 1)/np.pi)
-        real_roots = [0 + 0*1j, self._dim - 1 - pi_multiples*np.pi, self._dim - 1 + 0*1j]
-        start, stop = -1, int(self._dim / 2)
-        if root_type == "bigger":
-            start, stop = int(self._dim / 2), int(self._dim)
-
-        pos_roots = [self.polynome_root(n) for n in range(start, stop)]
-        conjugate_roots = [pos_root.conjugate() for pos_root in pos_roots if pos_root.imag != 0]
-        return pos_roots + conjugate_roots
-
 class GDFTBuilder(object):
 
     def __init__(self, dim):

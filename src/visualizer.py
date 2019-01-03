@@ -37,10 +37,24 @@ def fit_polynome(thetas, grade):
     f = np.poly1d(z)
     return f
 
+def fit_cheby(thetas, grade):
+    args, thetas = generate_points(thetas)
+    cheb = np.polynomial.chebyshev.Chebyshev.fit(args, thetas, grade)
+    #cheb = np.polynomial.chebyshev.Chebyshev(z)
+    #print(z)
+    print(cheb)
+    return cheb
+    #coeffs = np.polynomial.chebyshev.cheb2poly(cheb.coef)
+    #f = np.polynomial.Polynomial(coeffs)
+    print(roots)
+    return np.poly1d(roots, True)
+
 def plot_fitted_polynome(pol_fn, thetas):
     args, thetas = generate_points(thetas)
     x_new = np.linspace(args[0], args[-1], 50)
     y_new = pol_fn(x_new)
+    print("ynew", y_new)
+    print("ynew", type(y_new))
     plt.plot(args, thetas, 'o', x_new, y_new)
 
 def plot_angles(thetas):
@@ -84,6 +98,13 @@ new_kmean_thetas = [[0.29941173, 2.89847069, 0.36766799, 2.03652784, 2.92300659,
        [3.01110803, 0.40223826, 2.92323331, 1.24455925, 0.3482716,
         0.23436835, 2.20397707, 3.02027523]]
 
+class Test(object):
+
+    def __repr__(self):
+        class_name = type(self).__name__
+        return '{}({!r}, {!r})'.format(class_name, *self)
+
+
 if __name__ == "__main__":
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_15_38.json")
     theta_collections = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
@@ -114,9 +135,12 @@ if __name__ == "__main__":
         #plot_fitted_polynome(polynome, theta)
         plot_angles(theta)'''
 
-    #for theta in fitted_polynomes.theta_vecs[0:30]:
-    for theta in sorted_thetas.thetas[0]:
-        plot_angles(np.sort(theta))
+    for theta in fitted_polynomes.theta_vecs[0:10]:
+    #for theta in sorted_thetas.thetas[1][0:2]:
+        plot_angles(theta)
+        pol_fn = fit_cheby(theta, 15)
+        print(pol_fn)
+        #plot_fitted_polynome(pol_fn, theta)
         #print(theta)
 
     #plot_fitted_polynome(unordered_thetas[0], 7)

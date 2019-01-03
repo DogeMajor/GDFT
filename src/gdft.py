@@ -39,10 +39,9 @@ def non_orthogonal_gdft_matrix(dim, thetas, gammas):
     g2 = g_matrix(gammas)
     return g1.dot(dft_mat.dot(g2))
 
-@timer
 def permutation_matrix(dim, orderings=None):
     perm = np.zeros((dim, dim))
     for index, order in enumerate(orderings[0:dim]):
-        perm[index, order] = 1
+        perm[order, index] = 1
 
     return perm
