@@ -1,22 +1,21 @@
 import time
-import datetime
 from collections import namedtuple, Counter
 import numpy as np
 
 from scipy.cluster.vq import kmeans2
-from utils import *
+from utils import extract_thetas_records
 from gdft import *
 from correlations import *
 
 np.random.seed(int(time.time()))
 
 
-def extract_thetas_records(path, file_name):
+'''def extract_thetas_records(path, file_name):
     dao = DAO(path)
     content = dao.read(file_name)
     theta_vecs = [np.array(result["theta_vec"]) for result in content["results"]]
     corrs = [result["correlation"] for result in content["results"]]
-    return Thetas(thetas=theta_vecs, correlations=corrs)
+    return Thetas(thetas=theta_vecs, correlations=corrs)'''
 
 Polynomes = namedtuple('Polynomes', 'polynomes theta_vecs')
 SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram')

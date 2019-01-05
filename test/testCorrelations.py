@@ -1,13 +1,12 @@
 import sys
+import unittest
+import timeit
+import numpy as np
+
 sys.path.append("../src")
 sys.path.append("src/")
-import unittest
-import numpy as np
-from numpy.linalg import inv
-from gdft import *
-from correlations import *
-
-GDFT_MAT = np.array([[1, -1], [-1, -1]], dtype=np.complex128)
+from gdft import dft_matrix
+from correlations import Correlation
 
 
 class TestCorrelation(unittest.TestCase):
@@ -31,12 +30,22 @@ class TestCorrelation(unittest.TestCase):
         self.assertEqual(self.correlation._aperiodic_corr_fn(0, 1, 1), c_tensor[0, 1, 1])
         self.assertEqual(self.correlation._aperiodic_corr_fn(1, 0, 2), c_tensor[1, 0, 2])
 
-    def test_corr_tensor_building_for_speed(self):
-        correlation = Correlation(dft_matrix(50))
-        corr_tensor = correlation.correlation_tensor()
-
     def tearDown(self):
         del self.correlation
+
+
+SETUP = '''from gdft import gdft_matrix, dft_matrix
+from correlations import Correlation
+get_corr_tensor = Correlation(dft_matrix(50)).correlation_tensor'''
+
+
+class SpeedTests(unittest.TestCase):
+
+    def test_how_quickly_correlations_are_computed(self):
+        tot_time = timeit.timeit("get_corr_tensor()", setup=SETUP,
+                                 number=1)
+        print("corr_tensor for dft 50x50:", tot_time, " s")
+        self.assertTrue(tot_time < 3)
 
 
 if __name__ == '__main__':

@@ -1,18 +1,7 @@
 import numpy as np
-from scipy.linalg import expm
-
-from utils import timer
-
 '''Numpy's fromfunction doesn't work at all in the way it
 is described in the np docs. It only calls the fn once and passes
 indices to it as a matrix of the shape defined in the args.'''
-
-def pos_acf_mask(shape):
-    N = shape[0]
-    def pos_corr(i, j, k):
-        k = k - N + 1
-        return np.logical_and(k > 0, k <= N - 1)
-    return np.fromfunction(pos_corr, shape, dtype=int)
 
 
 class Correlation(object):
@@ -54,70 +43,27 @@ class Correlation(object):
         return d/N
 
 
-#---------correlation analyzers / calculators --------------
+#---------correlation analyzer functions --------------
 
-def get_squared_sum(c):
-    return np.sum(c * np.conjugate(c))
-
-def get_max_length(c):
-    abs_c = abs(c)
-    return abs_c.max()
-
-def reduce_tensor(c, cond, calc):
-    masked_c = c * cond(c)
-    return calc(masked_c)
+def get_squared_sum(tensor):
+    return np.sum(tensor * np.conjugate(tensor))
 
 
-#----auto correlation-------------------------------------
+def get_max_length(tensor):
+    abs_tensor = abs(tensor)
+    return abs_tensor.max()
+
 
 def is_auto_corr(shape):
     length = shape[0]
-    ac_mask = np.fromfunction(lambda i, j, k: np.logical_and(i == j, k != length - 1), shape, dtype=int)
+    function = lambda i, j, k: np.logical_and(i == j, k != length - 1)
+    ac_mask = np.fromfunction(function, shape, dtype=int)
     return ac_mask
+
 
 def is_cross_corr(shape):
     cc_mask = np.fromfunction(lambda i, j, k: i != j, shape, dtype=int)
     return cc_mask
-
-def max_auto_correlation(c_tensor):
-    return reduce_tensor(c_tensor, is_auto_corr, get_max_length)
-
-def avg_auto_correlation(c_tensor):
-    length = c_tensor.shape[0]
-    return reduce_tensor(c_tensor, is_auto_corr, get_squared_sum) / length
-
-
-#----cross correlation-------------------------------------
-
-def max_cross_correlation(c_tensor):
-    return reduce_tensor(c_tensor, is_cross_corr, get_max_length)
-
-def avg_cross_correlation(c_tensor):
-    shape = c_tensor.shape
-    length = shape[0] * (shape[0] - 1)
-    return reduce_tensor(c_tensor, is_cross_corr, get_squared_sum) / length
-
-
-#------------------------Merit factors--------------------
-
-def merit_factor(c_tensor, alpha):
-    shape = c_tensor.shape
-    mid_index = int(shape[2]/2)
-    abs_diags = abs(c_tensor[alpha, alpha, :])
-    diags_squared = np.power(abs_diags, 2)
-    denominator = diags_squared[mid_index]
-    nominator = np.sum(diags_squared) - denominator
-    return denominator/nominator
-
-def merit_factors(c_tensor):
-    shape = c_tensor.shape[0]
-    gen = (merit_factor(c_tensor, i) for i in range(shape))
-    return np.fromiter(gen, np.complex128)
-
-def avg_merit_factor(c_tensor):
-    m_factors = merit_factors(c_tensor)
-    return m_factors.mean(axis=0)
-
 
 
 class CorrelationAnalyzer(object):

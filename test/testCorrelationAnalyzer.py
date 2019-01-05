@@ -1,10 +1,9 @@
 import sys
+import unittest
 sys.path.append("../src")
 sys.path.append("src/")
-import unittest
-import numpy as np
-from gdft import *
-from correlations import *
+from gdft import dft_matrix
+from correlations import Correlation, CorrelationAnalyzer
 
 
 class TestCorrelationAnalyzer(unittest.TestCase):

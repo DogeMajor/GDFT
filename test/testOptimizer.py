@@ -1,19 +1,20 @@
 import sys
-sys.path.append("../src")
-sys.path.append("src/")
 import unittest
 import numpy as np
-from tools import *
-from gdft import *
-from correlations import *
-from optimizer import *
+sys.path.append("../src")
+sys.path.append("src/")
+from tools import AlmostEqualMatrices
+from gdft import gdft_matrix, dft_matrix, non_orthogonal_gdft_matrix
+from correlations import Correlation, CorrelationAnalyzer
+from optimizer import Optimizer
+
 
 GDFT_MAT = np.array([[1, -1], [-1, -1]], dtype=np.complex128)
+
 
 class TestOptimizer(unittest.TestCase):
 
     def setUp(self):
-        #self.corrs = Correlation(dft_matrix(2)).correlation_tensor()
         self.optimizer = Optimizer(8)
 
     def test_get_correlations(self):
@@ -24,21 +25,16 @@ class TestOptimizer(unittest.TestCase):
                           correlations.avg_merit_factor],
                          [0.5 + 0*1j, 0.5 + 0*1j, 0.5 + 0*1j, 0.5 + 0*1j, 2.0 + 0*1j])
 
-    def test_get_random_gdft(self):
-        gdft = self.optimizer.get_random_gdft(8)
-        self.assertTrue(abs(np.mean(gdft)) < 0.30)
-
     def test_calc_correlation(self):
         c_tensor = Correlation(dft_matrix(8)).correlation_tensor()
-        c_tensor2 = Correlation(gdft_matrix(8, np.zeros(8))).correlation_tensor()
         params = np.zeros(8)
         avg_auto_c = self.optimizer._corr_fns["avg_auto_corr"]
-        R_ac = self.optimizer._calc_correlation(params, avg_auto_c)
+        average_auto_correlation = self.optimizer._calc_correlation(params, avg_auto_c)
 
         analyzer = CorrelationAnalyzer(8)
         analyzer.set_corr_tensor(c_tensor)
-        self.assertEqual(R_ac, analyzer.avg_auto_corr())
-        self.assertAlmostEqual(4.375, R_ac)
+        self.assertEqual(average_auto_correlation, analyzer.avg_auto_corr())
+        self.assertAlmostEqual(4.375, average_auto_correlation)
 
     def test_corr_deps_on_params(self):
         thetas = np.array([0.39141802, 0.4717793, 0.49257769, 0.52124477, 2.28552077,
@@ -57,24 +53,23 @@ class TestOptimizer(unittest.TestCase):
         self.assertNotEqual(new_gdft[0, 0], gdft[0, 0])
         self.assertTrue(AlmostEqualMatrices(np.dot(gdft, np.conjugate(gdft)), 8*np.identity(8)))
 
-
     def test_optimize_avg_auto_corr(self):
 
         thetas0, _, _ = self.optimizer._optimize_corr_fn("avg_auto_corr")
-        thetas, R_ac, derivative = self.optimizer._optimize_corr_fn("avg_auto_corr", init_guess=thetas0)
+        thetas, average_auto_correlation, _ = self.optimizer._optimize_corr_fn("avg_auto_corr",
+                                                                               init_guess=thetas0)
         self.assertTrue(0.5 < thetas.mean() < 3.0)
         self.assertTrue(1.0 < thetas.var() < 2.0)
-        self.assertTrue(R_ac < 0.4)
-
+        self.assertTrue(average_auto_correlation < 0.4)
 
     def test_optimize_avg_cross_corr_with_cycles(self):
-        thetas, R_ac, _ = self.optimizer.optimize_corr_fn("avg_auto_corr", stop_criteria=0.10)
+        thetas, average_auto_correlation, _ = self.optimizer.optimize_corr_fn("avg_auto_corr",
+                                                                              stop_criteria=0.10)
         self.assertTrue(1.0 < thetas.mean() < 2.0)
         self.assertTrue(1.0 < thetas.var() < 2.0)
-        self.assertAlmostEqual(R_ac, 0.0857, places=4)
+        self.assertAlmostEqual(average_auto_correlation, 0.0857, places=4)
 
     def tearDown(self):
-        #del self.corrs
         del self.optimizer
 
 
