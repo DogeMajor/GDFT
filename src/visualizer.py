@@ -53,7 +53,6 @@ def plot_fitted_polynome(pol_fn, thetas):
     args, thetas = generate_points(thetas)
     x_new = np.linspace(args[0], args[-1], 50)
     y_new = pol_fn(x_new)
-    print("ynew", y_new)
     print("ynew", type(y_new))
     plt.plot(args, thetas, 'o', x_new, y_new)
 

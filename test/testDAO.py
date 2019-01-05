@@ -1,13 +1,12 @@
-import sys
-sys.path.append("../src")
-sys.path.append("src/")
 import os
 import unittest
 import time
-import json
+import sys
 import numpy as np
-from tools import *
-from dao import *
+sys.path.append("../src")
+sys.path.append("src/")
+from tools import EqualMatrices
+from dao import DAO, NumpyEncoder, ComplexDecoder
 
 np.random.seed(int(time.time()))
 
@@ -23,8 +22,7 @@ class TestDAO(unittest.TestCase):
         retrieved_content = dao.read("julinfo.json")
         self.assertEqual(retrieved_content['balance'], balance)
         os.remove("../data/julinfo.json")
-        cont = dao.read("julinfo.json")
-        self.assertEqual(cont, None)
+        self.assertTrue('julinfo.json' not in os.listdir('../data/'))
 
     def test_read(self):
         dao = DAO("../data/")
@@ -65,7 +63,6 @@ class TestDAO(unittest.TestCase):
         self.assertEqual(list(matrix),
                          list(np.array([1 + 1j, 2 - 2 * 1j, 3 - 3 * 1j])))
 
-
     def test_saving_complex_numpy_vector(self):
         dao = DAO("../data/")
         vector = np.array([1+1j, 2-2*1j, 3-3*1j])
@@ -77,7 +74,6 @@ class TestDAO(unittest.TestCase):
         retrieved_vec = retrieved_content['vector']
         self.assertEqual(list(retrieved_vec), list(vector))
         os.remove("../data/vector_info.json")
-
 
     def test_saving_complex_numpy_matrix(self):
         dao = DAO("../data/")

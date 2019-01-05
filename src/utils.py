@@ -1,7 +1,12 @@
 import time
 import datetime
 from collections import namedtuple
-from dao import *
+import numpy as np
+from dao import DAO
+
+'''General functions / decorator to help the dev process and
+to take care of file handling + administrative processes.'''
+
 
 def timer(function):
     def timer_wrapper(*args, **kwargs):
@@ -12,6 +17,7 @@ def timer(function):
         return result
     return timer_wrapper
 
+
 def show(function):
     def inner_fn(self, *args, **kwargs):
         fn_name = function.__name__
@@ -19,6 +25,7 @@ def show(function):
         print("Using {0} of class {1}".format(fn_name, cl_name))
         return function(self, *args, **kwargs)
     return inner_fn
+
 
 def datetime_encoder(obj):
     if isinstance(obj, datetime.datetime):
@@ -39,6 +46,7 @@ def save_as_json(function):
 
 
 Thetas = namedtuple('Thetas', 'thetas correlations')
+
 
 def extract_thetas_records(path, file_name):
     dao = DAO(path)
