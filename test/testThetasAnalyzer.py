@@ -167,19 +167,6 @@ class TestGDFTBuilder(unittest.TestCase):
     def tearDown(self):
         del self.builder
 
-def to_real(seq):
-    return [item.real for item in seq]
-
-def to_imag(seq):
-    return [item.imag for item in seq]
-
-def filter_zeros(seq):
-    return [item for item in seq if item != 0]
-
-def to_slopes(seq):
-    reals = filter_zeros(to_real(seq))
-    imags = filter_zeros(to_imag(seq))
-
 
 if __name__ == '__main__':
     #pass

@@ -1,21 +1,13 @@
 import time
 from collections import namedtuple, Counter
+from math import atan
 import numpy as np
-
 from scipy.cluster.vq import kmeans2
 from utils import extract_thetas_records
-from gdft import *
-from correlations import *
+from gdft import gdft_matrix
+from correlations import Correlation, CorrelationAnalyzer
 
 np.random.seed(int(time.time()))
-
-
-'''def extract_thetas_records(path, file_name):
-    dao = DAO(path)
-    content = dao.read(file_name)
-    theta_vecs = [np.array(result["theta_vec"]) for result in content["results"]]
-    corrs = [result["correlation"] for result in content["results"]]
-    return Thetas(thetas=theta_vecs, correlations=corrs)'''
 
 Polynomes = namedtuple('Polynomes', 'polynomes theta_vecs')
 SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram')
@@ -49,7 +41,7 @@ class ThetasAnalyzer(object):
         return args, theta_vec
 
     def _fit_polynome(self, theta_vec, grade):
-        args, thetas = self._generate_points(theta_vec)
+        args, _ = self._generate_points(theta_vec)
         z = np.polyfit(args, theta_vec, grade)
         return np.poly1d(z)
 
@@ -63,10 +55,8 @@ class ThetasAnalyzer(object):
         print(length)
         args = np.array(list(range(length)))
 
-
     def fit_sorted_polynomes(self, sorted_thetas):
         pass
-
 
     def sort_thetas(self, theta_vecs, groups):
         kmeans_results = self._classify_thetas(theta_vecs, groups)
@@ -90,19 +80,17 @@ class ThetasAnalyzer(object):
         return Counter(k_means_results[1])
 
 
+def generate_thetas(dim):
+    if dim <= 8:
+        return [0.5 * np.pi + 1.135 * atan(n - 3.63) for n in range(dim)]
+    return [0.5 * np.pi + 1.0 * atan(n - (n*dim/8) * 3.75) for n in range(dim)]
+
+
 class GDFTBuilder(object):
 
     def __init__(self, dim):
         self._dim = dim
 
-    def _get_polynome(self):
-        generator = RootGenerator(self._dim)
-        roots = generator.polynome_roots()
-        return np.poly1d(roots, True)
-
     def build(self):
-        polynome = self._get_polynome()
-        print(polynome)
-        shifts = np.array([polynome(n) for n in range(self._dim)])
+        shifts = np.array(generate_thetas(self._dim))
         return gdft_matrix(self._dim, shifts)
-

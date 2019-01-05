@@ -4,8 +4,6 @@ class SequenceFinder(object):
     def __init__(self):
         pass
 
-
-
     def _to_integers(self, seq, scaling=1):
         abs_seq = [abs(item) for item in seq]
         min_val = min(abs_seq)
