@@ -24,7 +24,7 @@ class ComplexDecoder(object):
         if "ComplexNumber" in obj:
             return self.complex_number_decoder(obj)
 
-        elif "ComplexArray" in obj:
+        if "ComplexArray" in obj:
             return self.complex_array_decoder(obj)
         return obj
 
@@ -38,7 +38,6 @@ class NumpyEncoder(json.JSONEncoder):
 
     def complex_array_encoder(self, array):
         return {"ComplexArray": {"Re": list(array.real), "Im": list(array.imag)}}
-
 
     def default(self, obj):
         if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
@@ -62,12 +61,14 @@ class NumpyEncoder(json.JSONEncoder):
 
 
 class DAO(object):
+    '''Writes json files of records in numpy format and reads
+    jsons into numpy/list formats'''
 
     def __init__(self, path):
         self._path = path
 
     def read(self, file_name, path=None):
-        if path == None:
+        if path is None:
             path = self._path
         try:
             with codecs.open(path+file_name, 'r', 'utf-8') as file_object:
@@ -76,13 +77,14 @@ class DAO(object):
                 return json.loads(raw_data, object_hook=decoder.decode)
         except IOError:
             print('Can\'t read the file called {}'.format(path+file_name))
-
+            raise
 
     def write(self, file_name, content, path=None):
-        if path == None:
+        if path is None:
             path = self._path
         try:
             with open(path+file_name, 'w') as file_object:
                 json.dump(content, file_object, ensure_ascii=False, cls=NumpyEncoder)
         except IOError:
             print('Can\'t write the file {}'.format(path+file_name))
+            raise

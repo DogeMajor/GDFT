@@ -1,25 +1,18 @@
 import time
-import datetime
 from collections import namedtuple, Counter
+from math import atan
 import numpy as np
-
 from scipy.cluster.vq import kmeans2
-from utils import *
-from gdft import *
-from correlations import *
+from utils import extract_thetas_records
+from gdft import gdft_matrix
+from correlations import Correlation, CorrelationAnalyzer
 
 np.random.seed(int(time.time()))
 
-
-def extract_thetas_records(path, file_name):
-    dao = DAO(path)
-    content = dao.read(file_name)
-    theta_vecs = [np.array(result["theta_vec"]) for result in content["results"]]
-    corrs = [result["correlation"] for result in content["results"]]
-    return Thetas(thetas=theta_vecs, correlations=corrs)
-
 Polynomes = namedtuple('Polynomes', 'polynomes theta_vecs')
 SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram')
+SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
+
 
 class ThetasAnalyzer(object):
 
@@ -48,13 +41,22 @@ class ThetasAnalyzer(object):
         return args, theta_vec
 
     def _fit_polynome(self, theta_vec, grade):
-        args, thetas = self._generate_points(theta_vec)
+        args, _ = self._generate_points(theta_vec)
         z = np.polyfit(args, theta_vec, grade)
         return np.poly1d(z)
 
     def fit_polynomes(self, thetas, grade):
         polynomes = [self._fit_polynome(theta_vec, grade) for theta_vec in thetas]
         return Polynomes(polynomes=polynomes, theta_vecs=thetas)
+
+    def _fit_polynome_to(self, all_thetas, grade):
+        thetas = np.core.records.fromarrays(all_thetas)
+        length = thetas.shape[1]
+        print(length)
+        args = np.array(list(range(length)))
+
+    def fit_sorted_polynomes(self, sorted_thetas):
+        pass
 
     def sort_thetas(self, theta_vecs, groups):
         kmeans_results = self._classify_thetas(theta_vecs, groups)
@@ -78,49 +80,17 @@ class ThetasAnalyzer(object):
         return Counter(k_means_results[1])
 
 
-class RootGenerator(object):
+def generate_thetas(dim):
+    if dim <= 8:
+        return [0.5 * np.pi + 1.135 * atan(n - 3.63) for n in range(dim)]
+    return [0.5 * np.pi + 1.0 * atan(n - (n*dim/8) * 3.75) for n in range(dim)]
 
-    def __init__(self, dim):
-        self._dim = dim
-
-    def ellipsis_height(self, x):
-        x0 = (self._dim - 1)/2
-        x_length = 0.5*(self._dim / 2 - 1)
-        return np.sqrt(1 - ((x-x0)**2)/x_length**2)
-
-    def get_imag(self, _real):
-        return - 1 / np.sqrt(np.pi) * _real + np.pi
-
-    def polynome_root(self, x):
-
-            #return x + 1j * self.ellipsis_height(x)
-        return x + 1j * self.get_imag(x)
-
-
-    def polynome_roots(self, root_type="bigger"):
-        pi_multiples = int((self._dim - 1)/np.pi)
-        real_roots = [0 + 0*1j, self._dim - 1 - pi_multiples*np.pi, self._dim - 1 + 0*1j]
-        start, stop = -1, int(self._dim / 2)
-        if root_type == "bigger":
-            start, stop = int(self._dim / 2), int(self._dim)
-
-        pos_roots = [self.polynome_root(n) for n in range(start, stop)]
-        conjugate_roots = [pos_root.conjugate() for pos_root in pos_roots if pos_root.imag != 0]
-        return pos_roots + conjugate_roots
 
 class GDFTBuilder(object):
 
     def __init__(self, dim):
         self._dim = dim
 
-    def _get_polynome(self):
-        generator = RootGenerator(self._dim)
-        roots = generator.polynome_roots()
-        return np.poly1d(roots, True)
-
     def build(self):
-        polynome = self._get_polynome()
-        print(polynome)
-        shifts = np.array([polynome(n) for n in range(self._dim)])
+        shifts = np.array(generate_thetas(self._dim))
         return gdft_matrix(self._dim, shifts)
-

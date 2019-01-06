@@ -46,6 +46,12 @@ class TestGDFT(unittest.TestCase):
         self.assertTrue(AlmostEqualMatrices(np.array([[-1, 1], [1, 1]], dtype=np.complex128), gdft_mat))
         self.assertTrue(AlmostEqualMatrices(g1.dot(dft.dot(g1)), gdft_mat))
 
+    def test_permutation_matrix(self):
+        perm = permutation_matrix(2, orderings=[1, 0])
+        self.assertTrue(EqualMatrices(perm, np.array([[0, 1], [1, 0]])))
+        perm = permutation_matrix(4, orderings=[1, 0, 3, 2, 4])#Works even when someone feeds a too long vector
+        self.assertTrue(EqualMatrices(perm, np.array([[0, 1, 0, 0], [1, 0, 0, 0],
+                                                      [0, 0, 0, 1], [0, 0, 1, 0]])))
 
     def tearDown(self):
         pass
@@ -65,13 +71,13 @@ class SpeedTests(unittest.TestCase):
         tot_time = timeit.timeit("create_small_gdft_matrix()", setup="from __main__ import create_small_gdft_matrix",
                                  number=10000)
         print("gdft 8x8:", tot_time, " s")
-        self.assertTrue(tot_time < 0.6)
+        self.assertTrue(tot_time < 0.7)
 
     def test_constructing_gdft_mat_with_dim1000(self):
         tot_time = timeit.timeit("create_big_gdft_matrix()", setup="from __main__ import create_big_gdft_matrix",
                                  number=1)
         print("gdft 1000x1000:", tot_time, "s")
-        self.assertTrue(tot_time < 1.2)
+        self.assertTrue(tot_time < 1.5)
 
 
 if __name__ == '__main__':
