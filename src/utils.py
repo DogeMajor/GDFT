@@ -1,6 +1,7 @@
 import time
 import datetime
 from collections import namedtuple
+from math import sqrt
 import numpy as np
 from dao import DAO
 
@@ -54,3 +55,7 @@ def extract_thetas_records(path, file_name):
     theta_vecs = [np.array(result["theta_vec"]) for result in content["results"]]
     corrs = [result["correlation"] for result in content["results"]]
     return Thetas(thetas=theta_vecs, correlations=corrs)
+
+def seq_norm(seq_a, seq_b):
+    distances = ((item_b - item_a) ** 2 for item_a, item_b in zip(seq_a, seq_b))
+    return sqrt(sum(distances))

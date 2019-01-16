@@ -11,16 +11,14 @@ from analyzer import *
 from sequencefinder import SequenceFinder
 
 #------Test data-----------------------------------------------------------------------------
-thetas16x30 = extract_thetas_records("data/", "30thetas_16x16__1-1_21_14.json")
+
+thetas16x30 = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
 
 normalized_thetas = np.array([-2.98774983e-09, 8.18550897e-01, 2.79042360e+00, 2.67879537e+00,
                               1.78476702e+00, 1.08366030e-01, 2.63164508e+00, 2.50189183e-02])
 
 poly1 = [-7.48008226e-03,  1.73918516e-01, -1.61022589e+00,  7.60466637e+00,
          -1.93129846e+01,  2.45161101e+01, -1.05913241e+01,  3.61686052e-01]
-
-poly2 = [-7.47996332e-03,  1.92602532e-01, -2.00262320e+00,  1.07213698e+01,
-         -3.09003179e+01,  4.47562012e+01, -2.53956497e+01,  3.03837966e+00]
 
 thetas_16gdft = np.array([0.47918196, 3.14159265, 0.37415556, 2.32611506, 0.77481029, 3.08069088,
                           2.36308541, 0.66752458, 2.7953271, 3.07615731, 0.29459556, 0.30038568,
@@ -148,21 +146,6 @@ class TestGDFTBuilder(unittest.TestCase):
         correlations = ThetasAnalyzer(8).get_correlations(gdft)
         print(correlations)
 
-    def test_build_by_calclulating_roots_by_hand(self):
-        generator = RootGenerator(8)
-        roots = [0, 7, 7-2*np.pi]
-        complex_root_feeds = [7-2*np.pi + (3/5)*np.pi, 7-2*np.pi + (4/5)*np.pi]
-        for x in complex_root_feeds:
-            roots.append(generator.polynome_root(x))
-            roots.append(generator.polynome_root(x).conjugate())
-        poly = np.poly1d(roots, True)
-        thetas = [poly(n) for n in range(8)]
-        print("Thetas", thetas)
-        gdft = gdft_matrix(8, np.array(thetas))
-        should_be_identity = gdft.dot(np.conjugate(gdft))
-        self.assertTrue(AlmostEqualMatrices(should_be_identity, 8*np.eye(8)))
-        correlations = ThetasAnalyzer(8).get_correlations(gdft)
-        print(correlations)
 
     def tearDown(self):
         del self.builder

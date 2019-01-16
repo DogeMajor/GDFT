@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from utils import extract_thetas_records
+from utils import extract_thetas_records, seq_norm
+from gdft import dft_matrix
 from analyzer import ThetasAnalyzer
 
 T = 2*np.pi
@@ -8,9 +9,22 @@ T = 2*np.pi
 plt.grid(True)
 
 
+def orderings_dist(thetas):
+    orderings = np.argsort(thetas)
+    natural_order = list(range(thetas.shape[0]))
+    return seq_norm(natural_order, orderings) / thetas.shape[0]
+
+def find_best_orderings(thetas_collections):
+    records = [(theta, corr) for theta, corr in zip(thetas_collections.thetas, theta_collections.correlations)]
+    def dist(item):
+        return orderings_dist(item[0])
+    return sorted(records, key=dist)
+
 def to_coords(thetas):
     return np.cos(thetas), np.sin(thetas)
 
+def transform_coords(thetas):
+    return np.cos(thetas)
 
 def rotate_to_center(thetas, deg_angle):
     angle = deg_angle * (np.pi / 180)
@@ -30,17 +44,15 @@ def fit_polynome(thetas, grade):
     return f
 
 
-def fit_cheby(thetas, grade):
+def fit_cheby(thetas, grade, window=[-0.1*np.pi, 1.1*np.pi]):
     args, thetas = generate_points(thetas)
-    cheb = np.polynomial.chebyshev.Chebyshev.fit(args, thetas, grade)
+    length = thetas.shape[0]
+    cheb = np.polynomial.chebyshev.Chebyshev.fit(args, thetas, grade, domain=[-2, length+1], window=window)
     #cheb = np.polynomial.chebyshev.Chebyshev(z)
     #print(z)
     print(cheb)
     return cheb
-    #coeffs = np.polynomial.chebyshev.cheb2poly(cheb.coef)
-    #f = np.polynomial.Polynomial(coeffs)
-    print(roots)
-    return np.poly1d(roots, True)
+
 
 
 def plot_fitted_polynome(pol_fn, thetas):
@@ -104,17 +116,23 @@ new_kmean_thetas = [[0.29941173, 2.89847069, 0.36766799, 2.03652784,
 
 if __name__ == "__main__":
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_15_38.json")
-    theta_collections = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
+    #theta_collections = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_11_58.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "10thetas_16x16__12-26_19_4.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "100thetas_4x4__12-26_16_6.json")
-    #theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
+    theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
     #theta_collections = extract_thetas_records("../data/", "results_2018-12-24 23_33.json")
-    thetas_analyzer = ThetasAnalyzer(16)
+    thetas_analyzer = ThetasAnalyzer(8)
     sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
     #print(sorted_thetas)
-    fitted_polynomes = thetas_analyzer.fit_polynomes(theta_collections.thetas, 15)
+    fitted_polynomes = thetas_analyzer.fit_polynomes(theta_collections.thetas, 7)
     #print(fitted_polynomes)
+    best_thetas = find_best_orderings(theta_collections)
+    print(best_thetas)
+    for item in best_thetas[0:]:
+        print(np.argsort(item[0]))
+        print(orderings_dist(item[0]))
+
 
     '''new_thetas = [thetas for thetas in theta_collections.thetas]
     print(new_thetas[0])
@@ -131,14 +149,14 @@ if __name__ == "__main__":
     '''for polynome, theta in zip(fitted_polynomes.polynomes, fitted_polynomes.theta_vecs):#kmean_thetas[:-3]:
         #plot_fitted_polynome(polynome, theta)
         plot_angles(theta)'''
+    '''dft = dft_matrix(8)
+    print(np.dot(dft, np.ones(8)))
+    #for theta in fitted_polynomes.theta_vecs[0:10]:
+    for theta in sorted_thetas.thetas[0]:
 
-    for theta in fitted_polynomes.theta_vecs[0:10]:
-    #for theta in sorted_thetas.thetas[1][0:2]:
-        plot_angles(theta)
+        print("Fourier transform of theta", dft.dot(theta))
         pol_fn = fit_cheby(theta, 15)
-        print(pol_fn)
-        #plot_fitted_polynome(pol_fn, theta)
-        #print(theta)
+        plot_fitted_polynome(pol_fn, theta)'''
 
     #plot_fitted_polynome(unordered_thetas[0], 7)
     #for polynome, theta in zip(fitted_polynomes.polynomes[1:4], fitted_polynomes.theta_vecs):#grouped_thetas[0]:
