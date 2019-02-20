@@ -2,8 +2,9 @@ import sys
 sys.path.append("../src")
 sys.path.append("src/")
 import unittest
+from random import shuffle
 import numpy as np
-from utils import extract_thetas_records
+from utils import extract_thetas_records, small_els_to, big_els_to, approximate_matrix
 from tools import *
 from gdft import *
 from correlations import *
@@ -150,6 +151,99 @@ class TestGDFTBuilder(unittest.TestCase):
     def tearDown(self):
         del self.builder
 
+
+class TestApproximatingMatrix(unittest.TestCase):
+
+    def setUp(self):
+        self.matrix = np.array([[0.09, -0.01], [0.99, 1.15]])
+        self.complex_matrix = np.array([[0.02+1j*0.02, -0.01], [0.99-1j*0.001, 1.15+1j*0.04]], dtype=np.complex128)
+
+    def test_small_els_to(self):
+        result = small_els_to(self.matrix, replace_val=0, cutoff=0.10)
+        self.assertTrue(EqualMatrices(result, np.array([[0, 0], [0.99, 1.15]])))
+        AssertAlmostEqualMatrices(np.array([[0, 0], [0.113, 1.15]]), np.array([[0, 0], [0.11, 1.15]]), decimals=2)
+
+    def test_approximate_matrix(self):
+        result = approximate_matrix(self.matrix, tol=0.02)
+        AssertAlmostEqualMatrices(result, np.array([[0.09, 0], [1, 1.15]]), decimals=2)
+
+        AssertAlmostEqualMatrices(approximate_matrix(self.complex_matrix, tol=0.1),
+                                  np.array([[0, 0], [1, 1.15+1j*0.04]], dtype=np.complex128), decimals=2)
+
+    def tearDown(self):
+        del self.matrix
+
+
+class TestSymmetryAnalyzer(unittest.TestCase):
+
+    def setUp(self):
+        self.analyzer = SymmetryAnalyzer(16)
+        self.gdft = gdft_matrix(16, thetas_16gdft)
+
+    def test_get_correlations(self):
+        corrs = self.analyzer.get_correlations(self.gdft)
+
+    def test_get_similarities(self):
+        mat = np.identity(16, np.complex128)
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, mat.dot(self.gdft), 0.01),
+                         [True, True, True, True, True])
+        mat = np.ones((16, 16), np.complex128)
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, mat.dot(self.gdft), 0.01),
+                         [False, False, False, False, False])
+
+    def test_get_symmetry(self):
+        mat = np.identity(16, np.complex128)
+        self.assertTrue(self.analyzer.get_symmetry(self.gdft, mat.dot(self.gdft), 0.01))
+        mat = np.ones((16, 16), np.complex128)
+        self.assertFalse(self.analyzer.get_symmetry(self.gdft, mat.dot(self.gdft), 0.01))
+
+
+    def tearDown(self):
+        del self.analyzer
+
+
+THETAS4 = np.array([2.23852351, 2.26862803, 0.47525598, 3.14159265])
+THETAS8 = np.array([0.15404388, 2.74832147, 0.21274025, 1.87681229, 2.75850199, 2.85781138, 0.87359988, 0.04272007])
+
+class TestSymmetry(unittest.TestCase):
+
+    def setUp(self):
+        self.analyzer = SymmetryAnalyzer(8)
+        self.gdft = gdft_matrix(8, THETAS8)
+
+    def test_similarity_breaking(self):
+        new_gdft = gdft_matrix(8, sorted(THETAS8)) #Ordering matters!!
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, new_gdft, 0.01),
+                         [False, False, False, False, False])
+
+    def test_similarity_preservation(self):
+        thetas = THETAS8+0.42 #adding a constant preserves corrs!
+        new_gdft = gdft_matrix(8, thetas)
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, new_gdft, 0.01),
+                         [True, True, True, True, True])
+
+    def test_reversed_order(self):
+        orderings = list(range(8))
+        perms = permutation_matrix(8, orderings=orderings[::-1])
+        thetas = perms.dot(THETAS8)
+        new_gdft = gdft_matrix(8, thetas)
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, new_gdft, 0.01),
+                         [True, True, True, True, True])
+
+    def test_permutations(self):
+        for i in range(10000):
+            orderings = list(range(8))
+            shuffle(orderings)
+            perms = permutation_matrix(8, orderings=orderings)
+            thetas = perms.dot(THETAS8)
+            new_gdft = gdft_matrix(8, thetas)
+            similarities = self.analyzer.get_similarities(self.gdft, new_gdft, 0.01)
+            if sum(map(float, similarities)) > 0:
+                print(similarities)
+                print(orderings)
+
+    def tearDown(self):
+        del self.analyzer
 
 if __name__ == '__main__':
     #pass

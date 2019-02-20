@@ -59,3 +59,26 @@ def extract_thetas_records(path, file_name):
 def seq_norm(seq_a, seq_b):
     distances = ((item_b - item_a) ** 2 for item_a, item_b in zip(seq_a, seq_b))
     return sqrt(sum(distances))
+
+
+def to_phase(matrix):
+    return np.angle(matrix)
+
+def small_els_to(unitary_matrix, replace_val=0, cutoff=0.1):
+    unitary_matrix[np.absolute(unitary_matrix) < cutoff] = replace_val
+    return unitary_matrix
+
+def big_els_to(unitary_matrix, replace_val=1, cutoff=0.1):
+    unitary_matrix[np.absolute(unitary_matrix-replace_val) < cutoff] = replace_val
+    return unitary_matrix
+
+def approximate_matrix(unitary_matrix, tol=0.1):
+    unitary_matrix = small_els_to(unitary_matrix, replace_val=0, cutoff=tol)
+    return big_els_to(unitary_matrix, replace_val=1, cutoff=tol)
+
+def approximate_phases(matrix, tol=0.1*np.pi):
+    phases = to_phase(matrix)
+    phases = small_els_to(phases, replace_val=0, cutoff=tol)
+    phases = big_els_to(phases, replace_val=2*np.pi, cutoff=tol)
+    np.place(phases, phases==2*np.pi, 0)
+    return phases
