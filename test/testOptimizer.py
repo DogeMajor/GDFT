@@ -51,7 +51,7 @@ class TestOptimizer(unittest.TestCase):
         for new_corr, old_corr in zip(new_correlations, old_correlations):
             self.assertAlmostEqual(new_corr, old_corr, 2)
         self.assertNotEqual(new_gdft[0, 0], gdft[0, 0])
-        AssertAlmostEqualMatrices(np.dot(gdft, np.conjugate(gdft)), 8*np.identity(8))
+        AssertAlmostEqualMatrices(np.dot(gdft, np.transpose(np.conjugate(gdft))), 8*np.identity(8))
 
     def test_optimize_avg_auto_corr(self):
 
