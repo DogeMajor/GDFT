@@ -3,8 +3,8 @@ import unittest
 import numpy as np
 sys.path.append("../src")
 sys.path.append("src/")
-from tools import AlmostEqualMatrices
-from gdft import gdft_matrix, dft_matrix, non_orthogonal_gdft_matrix
+from tools import AssertAlmostEqualMatrices
+from gdft import gdft_matrix, dft_matrix, two_param_gdft_matrix
 from correlations import Correlation, CorrelationAnalyzer
 from optimizer import Optimizer
 
@@ -46,12 +46,12 @@ class TestOptimizer(unittest.TestCase):
         gdft = gdft_matrix(8, thetas)
         old_correlations = self.optimizer.get_correlations(gdft)
         gammas = np.ones(8)
-        new_gdft = non_orthogonal_gdft_matrix(8, thetas, gammas)
+        new_gdft = two_param_gdft_matrix(8, thetas, gammas)
         new_correlations = self.optimizer.get_correlations(new_gdft)
         for new_corr, old_corr in zip(new_correlations, old_correlations):
             self.assertAlmostEqual(new_corr, old_corr, 2)
         self.assertNotEqual(new_gdft[0, 0], gdft[0, 0])
-        self.assertTrue(AlmostEqualMatrices(np.dot(gdft, np.conjugate(gdft)), 8*np.identity(8)))
+        AssertAlmostEqualMatrices(np.dot(gdft, np.conjugate(gdft)), 8*np.identity(8))
 
     def test_optimize_avg_auto_corr(self):
 

@@ -19,13 +19,14 @@ def find_best_orderings(thetas_collections):
     return sorted(records, key=dist)
 
 
-
-def to_coords(thetas):
+def complex_to_coords(thetas):
     length = np.absolute(thetas)
     return length*np.cos(thetas), length*np.sin(thetas)
 
-def transform_coords(thetas):
-    return np.cos(thetas)
+
+def to_coords(thetas):
+    return np.cos(thetas), np.sin(thetas)
+
 
 def rotate_to_center(thetas, deg_angle):
     angle = deg_angle * (np.pi / 180)
@@ -97,6 +98,14 @@ def polar_plot_angles(thetas):
     x, y = to_coords(thetas)
     plt.plot(x, y, 'o')
 
+def polar_plot_numbered_angles(thetas):
+    x_coords, y_coords = to_coords(thetas)
+    coords = list(zip(x_coords, y_coords))
+    print(coords)
+    for index, (x, y) in enumerate(coords):
+        plt.plot(x, y, 'o')
+        plt.text(0.9*x, 0.9*y, str(index))
+
 
 def plot_polynome_roots(polynome, max_root_len=None):
     if max_root_len is None:
@@ -147,8 +156,20 @@ if __name__ == "__main__":
     #theta_collections = thetas = extract_thetas_records("../data/", "100thetas_4x4__12-26_16_6.json")
     theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
     #theta_collections = extract_thetas_records("../data/", "results_2018-12-24 23_33.json")
-    #thetas_analyzer = ThetasAnalyzer(4)
-    #sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
+    thetas_analyzer = ThetasAnalyzer(8)
+    sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
+    thetas0 = sorted_thetas.thetas[0]
+    results0 = thetas_analyzer.fit_polynomes(sorted_thetas.thetas[0], 7)
+    results = thetas_analyzer.fit_polynomes(theta_collections.thetas, 7)
+    #for poly, theta in zip(results0.polynomes, results0.theta_vecs):
+    #    plot_fitted_polynome(poly, theta)
+
+    all_poly_coeffs = (poly.c for poly in results0.polynomes)
+    avg_coeffs = sum(all_poly_coeffs) / len(results0.polynomes)
+    print(avg_coeffs)
+    print(results0.polynomes[0:1])
+    poly = np.poly1d(avg_coeffs)
+    #plot_fitted_polynome(poly, results0.theta_vecs[0])
     #print(sorted_thetas)
     #print(fitted_polynomes)
 
@@ -159,9 +180,14 @@ if __name__ == "__main__":
     #    print(np.argsort(item[0]))
     #    print(orderings_dist(item[0]))
 
-    for thetas in theta_collections.thetas[0:3]:
-        polar_plot_angles(thetas)
+    '''for thetas in theta_collections.thetas[0:1]:
+        #polar_plot_angles(thetas)
+        polar_plot_numbered_angles(thetas)'''
 
+    polar_plot_numbered_angles(theta_collections.thetas[2])
+    print(theta_collections.thetas[2], theta_collections.correlations[2])
+    theta_fourier = np.fft.fft(theta_collections.thetas[2])
+    print(np.abs(theta_fourier))
     '''new_thetas = [thetas for thetas in theta_collections.thetas]
     print(new_thetas[0])
     results = classify_thetas(new_thetas, 5)
@@ -190,4 +216,7 @@ if __name__ == "__main__":
         #print(approximate_phases(mat, 0.01*np.pi)/np.pi)'''
 
     plt.show()
+    coeff_8 = np.array([-7.47998864e-03,  1.73916258e-01, -1.61020449e+00,  7.60456544e+00,
+                        -1.93127379e+01,  2.45158151e+01, -1.05428434e+01,  2.47251476e-01])
 
+    coeff_4 = np.array([1.04719702, -4.05332898,  2.84656905, 2.63384441])

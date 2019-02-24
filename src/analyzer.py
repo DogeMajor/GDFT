@@ -79,11 +79,15 @@ class ThetasAnalyzer(object):
         return Counter(k_means_results[1])
 
 
-def generate_thetas(dim):
+def generate_thetas_v1(dim):
     if dim <= 8:
         return [0.5 * np.pi + 1.135 * atan(n - 3.63) for n in range(dim)]
     return [0.5 * np.pi + 1.0 * atan(n - (dim/8) * 3.75) for n in range(dim)]
 
+def generate_thetas(dim):
+    poly = np.poly1d([-4.88506, 5.82857, -1.23057, 0.22106, -0.0184515])
+    print(poly)
+    return [poly(n) for n in range(dim)]
 
 class GDFTBuilder(object):
 

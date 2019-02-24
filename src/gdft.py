@@ -31,7 +31,7 @@ def gdft_matrix(dim, thetas):
     return g1.dot(dft_mat.dot(g1))
 
 
-def non_orthogonal_gdft_matrix(dim, thetas, gammas):
+def two_param_gdft_matrix(dim, thetas, gammas):
     dft_mat = dft_matrix(dim)
     g1 = g_matrix(thetas)
     g2 = g_matrix(gammas)

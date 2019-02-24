@@ -56,7 +56,7 @@ from math import log, sin, asin, tan, sinh, asinh, sqrt, pow, atan
 
 def center(x):
     '''Centers thetas in the interval [0,pi] symmetrically
-    with respect to point pi/2'''
+    with respect to imaginary axis'''
     return x + 0.175584
 
 def func(x):
@@ -105,6 +105,7 @@ class TestFindingThetaGeneratingFunction(unittest.TestCase):
                              2.63799845, 0.2003406]
         gdft = gdft_matrix(8, permutated_thetas)
         correlations = ThetasAnalyzer(8).get_correlations(gdft)
+        print(correlations)
         self.assertTrue(correlations.avg_auto_corr < 0.12)
 
     def test_generate_thetas_16(self):
@@ -143,7 +144,7 @@ class TestGDFTBuilder(unittest.TestCase):
     def test_build(self):
         gdft = self.builder.build()
         should_be_identity = gdft.dot(np.conjugate(gdft))
-        self.assertTrue(AlmostEqualMatrices(should_be_identity, 8*np.eye(8)))
+        AssertAlmostEqualMatrices(should_be_identity, 8*np.eye(8))
         correlations = ThetasAnalyzer(8).get_correlations(gdft)
         print(correlations)
 
@@ -210,6 +211,16 @@ class TestSymmetry(unittest.TestCase):
     def setUp(self):
         self.analyzer = SymmetryAnalyzer(8)
         self.gdft = gdft_matrix(8, THETAS8)
+
+    def test_dependency_on_G2(self):
+        gammas = np.random.rand(8, 1)
+        print(gammas)
+        new_gdft = two_param_gdft_matrix(8, THETAS8, gammas)  # Correlations are not dependent on gammas!!
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, new_gdft, 0.01),
+                         [True, True, True, True, True])
+        should_be_8_matrix = new_gdft.dot(new_gdft.conjugate().transpose())
+
+        AssertAlmostEqualMatrices(should_be_8_matrix, 8*np.identity(8))
 
     def test_similarity_breaking(self):
         new_gdft = gdft_matrix(8, sorted(THETAS8)) #Ordering matters!!
