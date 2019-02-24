@@ -1,11 +1,27 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from utils import extract_thetas_records
+from utils import extract_thetas_records, seq_norm, approximate_matrix, approximate_phases
+from gdft import dft_matrix, gdft_matrix
 from analyzer import ThetasAnalyzer
 
-T = 2*np.pi
-
 plt.grid(True)
+
+
+def orderings_dist(thetas):
+    orderings = np.argsort(thetas)
+    natural_order = list(range(thetas.shape[0]))
+    return seq_norm(natural_order, orderings) / thetas.shape[0]
+
+def find_best_orderings(thetas_collections):
+    records = [(theta, corr) for theta, corr in zip(thetas_collections.thetas, theta_collections.correlations)]
+    def dist(item):
+        return orderings_dist(item[0])
+    return sorted(records, key=dist)
+
+
+def complex_to_coords(thetas):
+    length = np.absolute(thetas)
+    return length*np.cos(thetas), length*np.sin(thetas)
 
 
 def to_coords(thetas):
@@ -23,6 +39,30 @@ def generate_points(thetas):
     return args, thetas
 
 
+def angle_dist(theta_collection, partition=None):
+    if partition is None:
+        partition = theta_collection[0].shape[0]
+    dist = {key: 0 for key in range(partition+1)}
+    divider = np.pi/partition
+    print("dist", dist, divider)
+    for theta_vecs in theta_collection:
+        for theta in theta_vecs:
+            key = int(theta / divider)
+            dist[key] += 1
+    return dist
+
+def angle_probabilities(theta_collection, partition=None):
+    angle_distr = angle_dist(theta_collection, partition)
+    length = sum(angle_distr.values())
+    return {key: value / length for key, value in angle_distr.items()}
+
+
+def plot_eigenvalues(theta):
+    gdft = gdft_matrix(theta.shape[0], theta)
+    eig_vals = np.linalg.eig(gdft)[0]
+    plt.plot(eig_vals.real, eig_vals.imag, 'x')
+
+
 def fit_polynome(thetas, grade):
     args, thetas = generate_points(thetas)
     z = np.polyfit(args, thetas, grade)
@@ -30,17 +70,15 @@ def fit_polynome(thetas, grade):
     return f
 
 
-def fit_cheby(thetas, grade):
+def fit_cheby(thetas, grade, window=[-0.1*np.pi, 1.1*np.pi]):
     args, thetas = generate_points(thetas)
-    cheb = np.polynomial.chebyshev.Chebyshev.fit(args, thetas, grade)
+    length = thetas.shape[0]
+    cheb = np.polynomial.chebyshev.Chebyshev.fit(args, thetas, grade, domain=[-2, length+1], window=window)
     #cheb = np.polynomial.chebyshev.Chebyshev(z)
     #print(z)
     print(cheb)
     return cheb
-    #coeffs = np.polynomial.chebyshev.cheb2poly(cheb.coef)
-    #f = np.polynomial.Polynomial(coeffs)
-    print(roots)
-    return np.poly1d(roots, True)
+
 
 
 def plot_fitted_polynome(pol_fn, thetas):
@@ -59,6 +97,14 @@ def plot_angles(thetas):
 def polar_plot_angles(thetas):
     x, y = to_coords(thetas)
     plt.plot(x, y, 'o')
+
+def polar_plot_numbered_angles(thetas):
+    x_coords, y_coords = to_coords(thetas)
+    coords = list(zip(x_coords, y_coords))
+    print(coords)
+    for index, (x, y) in enumerate(coords):
+        plt.plot(x, y, 'o')
+        plt.text(0.9*x, 0.9*y, str(index))
 
 
 def plot_polynome_roots(polynome, max_root_len=None):
@@ -104,18 +150,44 @@ new_kmean_thetas = [[0.29941173, 2.89847069, 0.36766799, 2.03652784,
 
 if __name__ == "__main__":
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_15_38.json")
-    theta_collections = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
+    #theta_collections = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_11_58.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "10thetas_16x16__12-26_19_4.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "100thetas_4x4__12-26_16_6.json")
-    #theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
+    theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
     #theta_collections = extract_thetas_records("../data/", "results_2018-12-24 23_33.json")
-    thetas_analyzer = ThetasAnalyzer(16)
+    thetas_analyzer = ThetasAnalyzer(8)
     sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
+    thetas0 = sorted_thetas.thetas[0]
+    results0 = thetas_analyzer.fit_polynomes(sorted_thetas.thetas[0], 7)
+    results = thetas_analyzer.fit_polynomes(theta_collections.thetas, 7)
+    #for poly, theta in zip(results0.polynomes, results0.theta_vecs):
+    #    plot_fitted_polynome(poly, theta)
+
+    all_poly_coeffs = (poly.c for poly in results0.polynomes)
+    avg_coeffs = sum(all_poly_coeffs) / len(results0.polynomes)
+    print(avg_coeffs)
+    print(results0.polynomes[0:1])
+    poly = np.poly1d(avg_coeffs)
+    #plot_fitted_polynome(poly, results0.theta_vecs[0])
     #print(sorted_thetas)
-    fitted_polynomes = thetas_analyzer.fit_polynomes(theta_collections.thetas, 15)
     #print(fitted_polynomes)
 
+    #best_thetas = find_best_orderings(theta_collections)
+    #print(best_thetas)
+
+    #for item in best_thetas[0:]:
+    #    print(np.argsort(item[0]))
+    #    print(orderings_dist(item[0]))
+
+    '''for thetas in theta_collections.thetas[0:1]:
+        #polar_plot_angles(thetas)
+        polar_plot_numbered_angles(thetas)'''
+
+    polar_plot_numbered_angles(theta_collections.thetas[2])
+    print(theta_collections.thetas[2], theta_collections.correlations[2])
+    theta_fourier = np.fft.fft(theta_collections.thetas[2])
+    print(np.abs(theta_fourier))
     '''new_thetas = [thetas for thetas in theta_collections.thetas]
     print(new_thetas[0])
     results = classify_thetas(new_thetas, 5)
@@ -125,6 +197,8 @@ if __name__ == "__main__":
     print(to_histogram(results))
     print(results[0])'''
 
+    #print(angle_dist(theta_collections.thetas, partition=10))
+    #print(angle_probabilities(theta_collections.thetas, partition=10))
     #for k_mean_theta in sorted_thetas.thetas[0]:
     #    polar_plot_angles(k_mean_theta)
 
@@ -132,34 +206,17 @@ if __name__ == "__main__":
         #plot_fitted_polynome(polynome, theta)
         plot_angles(theta)'''
 
-    for theta in fitted_polynomes.theta_vecs[0:10]:
-    #for theta in sorted_thetas.thetas[1][0:2]:
-        plot_angles(theta)
-        pol_fn = fit_cheby(theta, 15)
-        print(pol_fn)
-        #plot_fitted_polynome(pol_fn, theta)
-        #print(theta)
+    '''for theta in theta_collections.thetas[0:10]:
+        mat = gdft_matrix(8, theta)
+        #print(approximate_matrix(mat, tol=0.5))
+        #print(np.absolute(mat-1))
+        eigs = np.linalg.eig(mat)
+        print(theta)
+        plot_eigenvalues(theta)
+        #print(approximate_phases(mat, 0.01*np.pi)/np.pi)'''
 
-    #plot_fitted_polynome(unordered_thetas[0], 7)
-    #for polynome, theta in zip(fitted_polynomes.polynomes[1:4], fitted_polynomes.theta_vecs):#grouped_thetas[0]:
-    #    plot_polynome_roots(polynome)
-
-    '''for theta in theta_collections.thetas[3:5]:# + theta_collections.thetas[6:8]:
-        #plot_angles(theta)
-        polar_plot_angles(theta)
-        print(rotate_to_center(theta, 0.25169209*180/np.pi))'''
-
-    #plot_angles(np.array([0.09465623, 0.41877879, 3.02807566, 2.90387726, 1.99285297, 0.94911141,
-    #                      2.64581432, 0.20322705]))
-    #for theta in theta_collections.thetas[8:10]:# + theta_collections.thetas[6:8]:
-    #    plot_angles(theta)
-        #polar_plot_angles(theta)
-        #print(rotate_to_center(theta, 0.25169209*180/np.pi))
-
-    #plot_polynome_roots(polynome)
-
-    '''plot_fn(cand_fn2, 8)
-    for thetas in unordered_thetas:
-        print(thetas)
-        #print(16*(1/np.pi)*(thetas-0.5*np.pi))'''
     plt.show()
+    coeff_8 = np.array([-7.47998864e-03,  1.73916258e-01, -1.61020449e+00,  7.60456544e+00,
+                        -1.93127379e+01,  2.45158151e+01, -1.05428434e+01,  2.47251476e-01])
+
+    coeff_4 = np.array([1.04719702, -4.05332898,  2.84656905, 2.63384441])

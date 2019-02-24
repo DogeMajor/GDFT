@@ -55,5 +55,6 @@ venv.bak/
 .mypy_cache/
 
 data/
+test/testdata
 
 .idea/*

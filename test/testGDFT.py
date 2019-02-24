@@ -7,7 +7,7 @@ sys.path.append("../src")
 sys.path.append("src/")
 
 from utils import *
-from tools import EqualMatrices, AlmostEqualMatrices
+from tools import EqualMatrices, AssertAlmostEqualMatrices
 from gdft import *
 
 dft2 = np.array([[1,1],[1,-1]], dtype=np.complex128)
@@ -21,14 +21,14 @@ class TestGDFT(unittest.TestCase):
 
     def testDFTMatrix(self):
         dft = dft_matrix(2)
-        self.assertTrue(AlmostEqualMatrices(dft, dft2))
+        AssertAlmostEqualMatrices(dft, dft2)
         self.assertAlmostEqual(det(dft), -2.0)
 
     def testRandomUnitaryMatrix(self):
         unitary_mat = random_unitary_matrix(4)
         self.assertAlmostEqual(abs(det(unitary_mat)), 1)
         identity = np.dot(unitary_mat, np.conjugate(unitary_mat))
-        self.assertTrue(AlmostEqualMatrices(np.identity(4), identity))
+        AssertAlmostEqualMatrices(np.identity(4), identity)
 
     def testGMatrix(self):
         g_mat = g_matrix([np.pi/2, -np.pi/2])
@@ -43,8 +43,8 @@ class TestGDFT(unittest.TestCase):
         dft = dft_matrix(2)
         g1 = g_matrix(thetas)
         g2 = g_matrix(-3*thetas)
-        self.assertTrue(AlmostEqualMatrices(np.array([[-1, 1], [1, 1]], dtype=np.complex128), gdft_mat))
-        self.assertTrue(AlmostEqualMatrices(g1.dot(dft.dot(g1)), gdft_mat))
+        AssertAlmostEqualMatrices(np.array([[-1, 1], [1, 1]], dtype=np.complex128), gdft_mat)
+        AssertAlmostEqualMatrices(g1.dot(dft.dot(g1)), gdft_mat)
 
     def test_permutation_matrix(self):
         perm = permutation_matrix(2, orderings=[1, 0])

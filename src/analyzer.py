@@ -1,6 +1,6 @@
 import time
 from collections import namedtuple, Counter
-from math import atan
+from math import atan, isclose
 import numpy as np
 from scipy.cluster.vq import kmeans2
 from utils import extract_thetas_records
@@ -12,7 +12,7 @@ np.random.seed(int(time.time()))
 Polynomes = namedtuple('Polynomes', 'polynomes theta_vecs')
 SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram')
 SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
-
+Correlations = namedtuple('Correlations', 'max_auto_corr avg_auto_corr max_cross_corr avg_cross_corr avg_merit_factor')
 
 class ThetasAnalyzer(object):
 
@@ -28,7 +28,6 @@ class ThetasAnalyzer(object):
     def get_correlations(self, gdft):
         corr_obj = Correlation(gdft)
         self._analyzer.set_corr_tensor(corr_obj.correlation_tensor())
-        Correlations = namedtuple('Correlations', self._corr_fns.keys())
         corrs = {fn_name: corr_fn() for fn_name, corr_fn in self._corr_fns.items()}
         return Correlations(**corrs)
 
@@ -80,11 +79,15 @@ class ThetasAnalyzer(object):
         return Counter(k_means_results[1])
 
 
-def generate_thetas(dim):
+def generate_thetas_v1(dim):
     if dim <= 8:
         return [0.5 * np.pi + 1.135 * atan(n - 3.63) for n in range(dim)]
-    return [0.5 * np.pi + 1.0 * atan(n - (n*dim/8) * 3.75) for n in range(dim)]
+    return [0.5 * np.pi + 1.0 * atan(n - (dim/8) * 3.75) for n in range(dim)]
 
+def generate_thetas(dim):
+    poly = np.poly1d([-4.88506, 5.82857, -1.23057, 0.22106, -0.0184515])
+    print(poly)
+    return [poly(n) for n in range(dim)]
 
 class GDFTBuilder(object):
 
@@ -94,3 +97,33 @@ class GDFTBuilder(object):
     def build(self):
         shifts = np.array(generate_thetas(self._dim))
         return gdft_matrix(self._dim, shifts)
+
+
+class SymmetryAnalyzer(object):
+
+    def __init__(self, dim):
+        self._dim =dim
+        self._corr_analyzer = CorrelationAnalyzer(self._dim)
+
+        self._corr_fns = {"max_auto_corr": self._corr_analyzer.max_auto_corr,
+                          "avg_auto_corr": self._corr_analyzer.avg_auto_corr,
+                          "max_cross_corr": self._corr_analyzer.max_cross_corr,
+                          "avg_cross_corr": self._corr_analyzer.avg_cross_corr,
+                          "avg_merit_factor": self._corr_analyzer.avg_merit_factor}
+
+    def get_correlations(self, gdft):
+        corr_obj = Correlation(gdft)
+        self._corr_analyzer.set_corr_tensor(corr_obj.correlation_tensor())
+        corrs = {fn_name: corr_fn() for fn_name, corr_fn in self._corr_fns.items()}
+        return Correlations(**corrs)
+
+
+    def get_similarities(self, old_gdft, new_gdft, rel_tol=10e-9):
+        old_correlations = self.get_correlations(old_gdft)
+        new_correlations = self.get_correlations(new_gdft)
+        similarities = (isclose(old_corr, new_corr) for old_corr, new_corr in zip(old_correlations, new_correlations))
+        return list(similarities)
+
+    def get_symmetry(self, old_gdft, new_gdft, rel_tol=10e-9):
+        similarities = self.get_similarities(old_gdft, new_gdft, rel_tol=rel_tol)
+        return sum(similarities) == len(similarities)

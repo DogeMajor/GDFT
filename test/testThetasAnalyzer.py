@@ -2,8 +2,9 @@ import sys
 sys.path.append("../src")
 sys.path.append("src/")
 import unittest
+from random import shuffle
 import numpy as np
-from utils import extract_thetas_records
+from utils import extract_thetas_records, small_els_to, big_els_to, approximate_matrix
 from tools import *
 from gdft import *
 from correlations import *
@@ -11,16 +12,14 @@ from analyzer import *
 from sequencefinder import SequenceFinder
 
 #------Test data-----------------------------------------------------------------------------
-thetas16x30 = extract_thetas_records("data/", "30thetas_16x16__1-1_21_14.json")
+
+thetas16x30 = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
 
 normalized_thetas = np.array([-2.98774983e-09, 8.18550897e-01, 2.79042360e+00, 2.67879537e+00,
                               1.78476702e+00, 1.08366030e-01, 2.63164508e+00, 2.50189183e-02])
 
 poly1 = [-7.48008226e-03,  1.73918516e-01, -1.61022589e+00,  7.60466637e+00,
          -1.93129846e+01,  2.45161101e+01, -1.05913241e+01,  3.61686052e-01]
-
-poly2 = [-7.47996332e-03,  1.92602532e-01, -2.00262320e+00,  1.07213698e+01,
-         -3.09003179e+01,  4.47562012e+01, -2.53956497e+01,  3.03837966e+00]
 
 thetas_16gdft = np.array([0.47918196, 3.14159265, 0.37415556, 2.32611506, 0.77481029, 3.08069088,
                           2.36308541, 0.66752458, 2.7953271, 3.07615731, 0.29459556, 0.30038568,
@@ -57,7 +56,7 @@ from math import log, sin, asin, tan, sinh, asinh, sqrt, pow, atan
 
 def center(x):
     '''Centers thetas in the interval [0,pi] symmetrically
-    with respect to point pi/2'''
+    with respect to imaginary axis'''
     return x + 0.175584
 
 def func(x):
@@ -106,6 +105,7 @@ class TestFindingThetaGeneratingFunction(unittest.TestCase):
                              2.63799845, 0.2003406]
         gdft = gdft_matrix(8, permutated_thetas)
         correlations = ThetasAnalyzer(8).get_correlations(gdft)
+        print(correlations)
         self.assertTrue(correlations.avg_auto_corr < 0.12)
 
     def test_generate_thetas_16(self):
@@ -144,29 +144,117 @@ class TestGDFTBuilder(unittest.TestCase):
     def test_build(self):
         gdft = self.builder.build()
         should_be_identity = gdft.dot(np.conjugate(gdft))
-        self.assertTrue(AlmostEqualMatrices(should_be_identity, 8*np.eye(8)))
+        AssertAlmostEqualMatrices(should_be_identity, 8*np.eye(8))
         correlations = ThetasAnalyzer(8).get_correlations(gdft)
         print(correlations)
 
-    def test_build_by_calclulating_roots_by_hand(self):
-        generator = RootGenerator(8)
-        roots = [0, 7, 7-2*np.pi]
-        complex_root_feeds = [7-2*np.pi + (3/5)*np.pi, 7-2*np.pi + (4/5)*np.pi]
-        for x in complex_root_feeds:
-            roots.append(generator.polynome_root(x))
-            roots.append(generator.polynome_root(x).conjugate())
-        poly = np.poly1d(roots, True)
-        thetas = [poly(n) for n in range(8)]
-        print("Thetas", thetas)
-        gdft = gdft_matrix(8, np.array(thetas))
-        should_be_identity = gdft.dot(np.conjugate(gdft))
-        self.assertTrue(AlmostEqualMatrices(should_be_identity, 8*np.eye(8)))
-        correlations = ThetasAnalyzer(8).get_correlations(gdft)
-        print(correlations)
 
     def tearDown(self):
         del self.builder
 
+
+class TestApproximatingMatrix(unittest.TestCase):
+
+    def setUp(self):
+        self.matrix = np.array([[0.09, -0.01], [0.99, 1.15]])
+        self.complex_matrix = np.array([[0.02+1j*0.02, -0.01], [0.99-1j*0.001, 1.15+1j*0.04]], dtype=np.complex128)
+
+    def test_small_els_to(self):
+        result = small_els_to(self.matrix, replace_val=0, cutoff=0.10)
+        self.assertTrue(EqualMatrices(result, np.array([[0, 0], [0.99, 1.15]])))
+        AssertAlmostEqualMatrices(np.array([[0, 0], [0.113, 1.15]]), np.array([[0, 0], [0.11, 1.15]]), decimals=2)
+
+    def test_approximate_matrix(self):
+        result = approximate_matrix(self.matrix, tol=0.02)
+        AssertAlmostEqualMatrices(result, np.array([[0.09, 0], [1, 1.15]]), decimals=2)
+
+        AssertAlmostEqualMatrices(approximate_matrix(self.complex_matrix, tol=0.1),
+                                  np.array([[0, 0], [1, 1.15+1j*0.04]], dtype=np.complex128), decimals=2)
+
+    def tearDown(self):
+        del self.matrix
+
+
+class TestSymmetryAnalyzer(unittest.TestCase):
+
+    def setUp(self):
+        self.analyzer = SymmetryAnalyzer(16)
+        self.gdft = gdft_matrix(16, thetas_16gdft)
+
+    def test_get_correlations(self):
+        corrs = self.analyzer.get_correlations(self.gdft)
+
+    def test_get_similarities(self):
+        mat = np.identity(16, np.complex128)
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, mat.dot(self.gdft), 0.01),
+                         [True, True, True, True, True])
+        mat = np.ones((16, 16), np.complex128)
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, mat.dot(self.gdft), 0.01),
+                         [False, False, False, False, False])
+
+    def test_get_symmetry(self):
+        mat = np.identity(16, np.complex128)
+        self.assertTrue(self.analyzer.get_symmetry(self.gdft, mat.dot(self.gdft), 0.01))
+        mat = np.ones((16, 16), np.complex128)
+        self.assertFalse(self.analyzer.get_symmetry(self.gdft, mat.dot(self.gdft), 0.01))
+
+
+    def tearDown(self):
+        del self.analyzer
+
+
+THETAS4 = np.array([2.23852351, 2.26862803, 0.47525598, 3.14159265])
+THETAS8 = np.array([0.15404388, 2.74832147, 0.21274025, 1.87681229, 2.75850199, 2.85781138, 0.87359988, 0.04272007])
+
+class TestSymmetry(unittest.TestCase):
+
+    def setUp(self):
+        self.analyzer = SymmetryAnalyzer(8)
+        self.gdft = gdft_matrix(8, THETAS8)
+
+    def test_dependency_on_G2(self):
+        gammas = np.random.rand(8, 1)
+        print(gammas)
+        new_gdft = two_param_gdft_matrix(8, THETAS8, gammas)  # Correlations are not dependent on gammas!!
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, new_gdft, 0.01),
+                         [True, True, True, True, True])
+        should_be_8_matrix = new_gdft.dot(new_gdft.conjugate().transpose())
+
+        AssertAlmostEqualMatrices(should_be_8_matrix, 8*np.identity(8))
+
+    def test_similarity_breaking(self):
+        new_gdft = gdft_matrix(8, sorted(THETAS8)) #Ordering matters!!
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, new_gdft, 0.01),
+                         [False, False, False, False, False])
+
+    def test_similarity_preservation(self):
+        thetas = THETAS8+0.42 #adding a constant preserves corrs!
+        new_gdft = gdft_matrix(8, thetas)
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, new_gdft, 0.01),
+                         [True, True, True, True, True])
+
+    def test_reversed_order(self):
+        orderings = list(range(8))
+        perms = permutation_matrix(8, orderings=orderings[::-1])
+        thetas = perms.dot(THETAS8)
+        new_gdft = gdft_matrix(8, thetas)
+        self.assertEqual(self.analyzer.get_similarities(self.gdft, new_gdft, 0.01),
+                         [True, True, True, True, True])
+
+    def test_permutations(self):
+        for i in range(10000):
+            orderings = list(range(8))
+            shuffle(orderings)
+            perms = permutation_matrix(8, orderings=orderings)
+            thetas = perms.dot(THETAS8)
+            new_gdft = gdft_matrix(8, thetas)
+            similarities = self.analyzer.get_similarities(self.gdft, new_gdft, 0.01)
+            if sum(map(float, similarities)) > 0:
+                print(similarities)
+                print(orderings)
+
+    def tearDown(self):
+        del self.analyzer
 
 if __name__ == '__main__':
     #pass

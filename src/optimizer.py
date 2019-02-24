@@ -97,9 +97,8 @@ class Runner(object):
         dao.write(file_name + date_string + ".json", results)
 
 if __name__ == "__main__":
-    pass
-    #runner = Runner(16)
-    #results = runner.optimize("avg_auto_corr", 30, stop_criteria=0.12)
-    #runner.save_results("30thetas_16x16__", results)
+    runner = Runner(4)
+    results = runner.optimize("avg_auto_corr", 30, stop_criteria=0.19)
+    runner.save_results("30thetas_4x4__", results)
     #thetas = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
     #print(thetas)
