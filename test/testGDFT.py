@@ -10,9 +10,9 @@ from utils import *
 from tools import EqualMatrices, AssertAlmostEqualMatrices
 from gdft import *
 
-dft2 = np.array([[1,1],[1,-1]], dtype=np.complex128)
+dft2 = np.array([[1, 1], [1, -1]], dtype=np.complex128)
 
-GDFT_MAT = np.array([[1,-1],[-1,-1]], dtype=np.complex128)
+GDFT_MAT = np.array([[1, -1], [-1, -1]], dtype=np.complex128)
 
 class TestGDFT(unittest.TestCase):
 
@@ -42,9 +42,8 @@ class TestGDFT(unittest.TestCase):
         gdft_mat = gdft_matrix(2, thetas)
         dft = dft_matrix(2)
         g1 = g_matrix(thetas)
-        g2 = g_matrix(-3*thetas)
-        AssertAlmostEqualMatrices(np.array([[-1, 1], [1, 1]], dtype=np.complex128), gdft_mat)
-        AssertAlmostEqualMatrices(g1.dot(dft.dot(g1)), gdft_mat)
+        AssertAlmostEqualMatrices(gdft_mat, np.array([[-1j, -1j], [1j, -1j]], dtype=np.complex128))
+        AssertAlmostEqualMatrices(g1.dot(dft), gdft_mat)
 
     def test_permutation_matrix(self):
         perm = permutation_matrix(2, orderings=[1, 0])
@@ -70,14 +69,14 @@ class SpeedTests(unittest.TestCase):
     def test_constructing_gdft_mat_with_dim8(self):
         tot_time = timeit.timeit("create_small_gdft_matrix()", setup="from __main__ import create_small_gdft_matrix",
                                  number=10000)
-        print("gdft 8x8:", tot_time, " s")
-        self.assertTrue(tot_time < 0.7)
+        print("gdft 8x8, 10000 iterations:", tot_time, " s")
+        self.assertTrue(tot_time < 0.4)
 
     def test_constructing_gdft_mat_with_dim1000(self):
         tot_time = timeit.timeit("create_big_gdft_matrix()", setup="from __main__ import create_big_gdft_matrix",
                                  number=1)
-        print("gdft 1000x1000:", tot_time, "s")
-        self.assertTrue(tot_time < 1.5)
+        print("gdft 1000x1000, one iteration:", tot_time, "s")
+        self.assertTrue(tot_time < 0.6)
 
 
 if __name__ == '__main__':

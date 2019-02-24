@@ -27,8 +27,9 @@ def g_matrix(phase_shifts):
 
 def gdft_matrix(dim, thetas):
     dft_mat = dft_matrix(dim)
-    g1 = g_matrix(thetas)
-    return g1.dot(dft_mat.dot(g1))
+    gen = (exp(1j * theta) for theta in thetas)
+    phase_shifts = np.fromiter(gen, np.complex128)
+    return (dft_mat.T * phase_shifts).T
 
 
 def two_param_gdft_matrix(dim, thetas, gammas):
