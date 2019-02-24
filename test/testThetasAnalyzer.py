@@ -13,7 +13,7 @@ from sequencefinder import SequenceFinder
 
 #------Test data-----------------------------------------------------------------------------
 
-thetas16x30 = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
+thetas16x30 = extract_thetas_records("data/", "30thetas_16x16__1-1_21_14.json")
 
 normalized_thetas = np.array([-2.98774983e-09, 8.18550897e-01, 2.79042360e+00, 2.67879537e+00,
                               1.78476702e+00, 1.08366030e-01, 2.63164508e+00, 2.50189183e-02])
@@ -143,7 +143,7 @@ class TestGDFTBuilder(unittest.TestCase):
 
     def test_build(self):
         gdft = self.builder.build()
-        should_be_identity = gdft.dot(np.conjugate(gdft))
+        should_be_identity = gdft.dot(np.conjugate(gdft.T))
         AssertAlmostEqualMatrices(should_be_identity, 8*np.eye(8))
         correlations = ThetasAnalyzer(8).get_correlations(gdft)
         print(correlations)
@@ -242,7 +242,7 @@ class TestSymmetry(unittest.TestCase):
                          [True, True, True, True, True])
 
     def test_permutations(self):
-        for i in range(10000):
+        for i in range(100):
             orderings = list(range(8))
             shuffle(orderings)
             perms = permutation_matrix(8, orderings=orderings)

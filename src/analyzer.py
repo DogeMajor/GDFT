@@ -12,24 +12,15 @@ np.random.seed(int(time.time()))
 Polynomes = namedtuple('Polynomes', 'polynomes theta_vecs')
 SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram')
 SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
-Correlations = namedtuple('Correlations', 'max_auto_corr avg_auto_corr max_cross_corr avg_cross_corr avg_merit_factor')
 
 class ThetasAnalyzer(object):
 
     def __init__(self, dim):
         self._dim = dim
-        self._analyzer = CorrelationAnalyzer(dim)
-        self._corr_fns = {"max_auto_corr": self._analyzer.max_auto_corr,
-                          "avg_auto_corr": self._analyzer.avg_auto_corr,
-                          "max_cross_corr": self._analyzer.max_cross_corr,
-                          "avg_cross_corr": self._analyzer.avg_cross_corr,
-                          "avg_merit_factor": self._analyzer.avg_merit_factor}
+        self._corr_analyzer = CorrelationAnalyzer(dim)
 
     def get_correlations(self, gdft):
-        corr_obj = Correlation(gdft)
-        self._analyzer.set_corr_tensor(corr_obj.correlation_tensor())
-        corrs = {fn_name: corr_fn() for fn_name, corr_fn in self._corr_fns.items()}
-        return Correlations(**corrs)
+        return self._corr_analyzer.get_correlations(gdft)
 
     def get_theta_vecs(self, path, file_name):
         return extract_thetas_records(path, file_name)
@@ -105,18 +96,8 @@ class SymmetryAnalyzer(object):
         self._dim =dim
         self._corr_analyzer = CorrelationAnalyzer(self._dim)
 
-        self._corr_fns = {"max_auto_corr": self._corr_analyzer.max_auto_corr,
-                          "avg_auto_corr": self._corr_analyzer.avg_auto_corr,
-                          "max_cross_corr": self._corr_analyzer.max_cross_corr,
-                          "avg_cross_corr": self._corr_analyzer.avg_cross_corr,
-                          "avg_merit_factor": self._corr_analyzer.avg_merit_factor}
-
     def get_correlations(self, gdft):
-        corr_obj = Correlation(gdft)
-        self._corr_analyzer.set_corr_tensor(corr_obj.correlation_tensor())
-        corrs = {fn_name: corr_fn() for fn_name, corr_fn in self._corr_fns.items()}
-        return Correlations(**corrs)
-
+        return self._corr_analyzer.get_correlations(gdft)
 
     def get_similarities(self, old_gdft, new_gdft, rel_tol=10e-9):
         old_correlations = self.get_correlations(old_gdft)

@@ -19,18 +19,13 @@ class Optimizer(object):
     def __init__(self, dim):
         self._dim = dim
         self._analyzer = CorrelationAnalyzer(dim)
-        self._corr_fns = {"max_auto_corr": self._analyzer.max_auto_corr,
-                          "avg_auto_corr": self._analyzer.avg_auto_corr,
-                          "max_cross_corr": self._analyzer.max_cross_corr,
-                          "avg_cross_corr": self._analyzer.avg_cross_corr,
-                          "avg_merit_factor": self._analyzer.avg_merit_factor}
+
+    @property
+    def correlation_functions(self):
+        return self._analyzer._corr_fns
 
     def get_correlations(self, gdft):
-        corr_obj = Correlation(gdft)
-        self._analyzer.set_corr_tensor(corr_obj.correlation_tensor())
-        Correlations = namedtuple('Correlations', self._corr_fns.keys())
-        corrs = {fn_name: corr_fn() for fn_name, corr_fn in self._corr_fns.items()}
-        return Correlations(**corrs)
+        return self._analyzer.get_correlations(gdft)
 
     def _calc_correlation(self, params, corr_fn):
         gdft = gdft_matrix(self._dim, params)
@@ -45,7 +40,7 @@ class Optimizer(object):
             init_guess = thetas0
 
         bnds = tuple((0, np.pi) for n in range(self._dim))
-        corr_fn = self._corr_fns[corr_fn_name]
+        corr_fn = self.correlation_functions[corr_fn_name]
 
         def output_fn(_params):
             return self._calc_correlation(_params, corr_fn)
@@ -93,12 +88,12 @@ class Runner(object):
 
     def save_results(self, file_name, results):
         date_string = datetime_encoder(datetime.datetime.now())
-        dao = DAO("../data/")
+        dao = DAO("data/")
         dao.write(file_name + date_string + ".json", results)
 
 if __name__ == "__main__":
-    runner = Runner(4)
-    results = runner.optimize("avg_auto_corr", 30, stop_criteria=0.19)
-    runner.save_results("30thetas_4x4__", results)
+    runner = Runner(8)
+    results = runner.optimize("avg_auto_corr", 30, stop_criteria=0.087)
+    runner.save_results("30thetas_8x8__", results)
     #thetas = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
     #print(thetas)
