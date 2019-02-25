@@ -45,7 +45,7 @@ class SpeedTests(unittest.TestCase):
         tot_time = timeit.timeit("get_corr_tensor()", setup=SETUP,
                                  number=1)
         print("corr_tensor for dft 50x50:", tot_time, " s")
-        self.assertTrue(tot_time < 3)
+        self.assertTrue(tot_time < 1.8)
 
 
 if __name__ == '__main__':

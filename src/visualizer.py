@@ -197,8 +197,14 @@ if __name__ == "__main__":
     print(to_histogram(results))
     print(results[0])'''
 
-    #print(angle_dist(theta_collections.thetas, partition=10))
-    #print(angle_probabilities(theta_collections.thetas, partition=10))
+    print(angle_dist(theta_collections.thetas, partition=10))
+    print(angle_probabilities(theta_collections.thetas, partition=10))
+    print(angle_probabilities(theta_collections.thetas, partition=20))
+
+    def generate_thetas(dim):
+        return np.array([np.pi*np.random.beta(0.5, 0.5) for i in range(dim)])
+    random_thetas = [generate_thetas(8) for i in range(100)]
+    print(angle_probabilities(random_thetas, partition=20))
     #for k_mean_theta in sorted_thetas.thetas[0]:
     #    polar_plot_angles(k_mean_theta)
 

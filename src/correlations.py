@@ -1,4 +1,6 @@
+from collections import namedtuple
 import numpy as np
+
 '''Numpy's fromfunction doesn't work at all in the way it
 is described in the np docs. It only calls the fn once and passes
 indices to it as a matrix of the shape defined in the args.'''
@@ -54,16 +56,19 @@ def get_max_length(tensor):
     return abs_tensor.max()
 
 
-def is_auto_corr(shape):
+def is_auto_corr_mask(shape):
     length = shape[0]
     function = lambda i, j, k: np.logical_and(i == j, k != length - 1)
     ac_mask = np.fromfunction(function, shape, dtype=int)
     return ac_mask
 
 
-def is_cross_corr(shape):
+def is_cross_corr_mask(shape):
     cc_mask = np.fromfunction(lambda i, j, k: i != j, shape, dtype=int)
     return cc_mask
+
+
+Correlations = namedtuple('Correlations', 'max_auto_corr avg_auto_corr max_cross_corr avg_cross_corr avg_merit_factor')
 
 
 class CorrelationAnalyzer(object):
@@ -71,8 +76,19 @@ class CorrelationAnalyzer(object):
     def __init__(self, dim):
         self._shape = (dim, dim, 2 * dim - 1)
         self._corr_tensor = None
-        self._auto_corr_mask = is_auto_corr(self._shape)
-        self._cross_corr_mask = is_cross_corr(self._shape)
+        self._auto_corr_mask = is_auto_corr_mask(self._shape)
+        self._cross_corr_mask = is_cross_corr_mask(self._shape)
+        self._corr_fns = {"max_auto_corr": self.max_auto_corr,
+                          "avg_auto_corr": self.avg_auto_corr,
+                          "max_cross_corr": self.max_cross_corr,
+                          "avg_cross_corr": self.avg_cross_corr,
+                          "avg_merit_factor": self.avg_merit_factor}
+
+    def get_correlations(self, gdft):
+        corr_obj = Correlation(gdft)
+        self.set_corr_tensor(corr_obj.correlation_tensor())
+        corrs = {fn_name: corr_fn() for fn_name, corr_fn in self._corr_fns.items()}
+        return Correlations(**corrs)
 
     def set_corr_tensor(self, c_tensor):
         self._corr_tensor = c_tensor

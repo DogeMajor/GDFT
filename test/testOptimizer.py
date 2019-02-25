@@ -28,7 +28,7 @@ class TestOptimizer(unittest.TestCase):
     def test_calc_correlation(self):
         c_tensor = Correlation(dft_matrix(8)).correlation_tensor()
         params = np.zeros(8)
-        avg_auto_c = self.optimizer._corr_fns["avg_auto_corr"]
+        avg_auto_c = self.optimizer.correlation_functions["avg_auto_corr"]
         average_auto_correlation = self.optimizer._calc_correlation(params, avg_auto_c)
 
         analyzer = CorrelationAnalyzer(8)
