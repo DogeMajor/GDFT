@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy import linalg
 from utils import extract_thetas_records, seq_norm, approximate_matrix, approximate_phases
 from gdft import dft_matrix, gdft_matrix
 from analyzer import ThetasAnalyzer
@@ -70,17 +71,6 @@ def fit_polynome(thetas, grade):
     return f
 
 
-def fit_cheby(thetas, grade, window=[-0.1*np.pi, 1.1*np.pi]):
-    args, thetas = generate_points(thetas)
-    length = thetas.shape[0]
-    cheb = np.polynomial.chebyshev.Chebyshev.fit(args, thetas, grade, domain=[-2, length+1], window=window)
-    #cheb = np.polynomial.chebyshev.Chebyshev(z)
-    #print(z)
-    print(cheb)
-    return cheb
-
-
-
 def plot_fitted_polynome(pol_fn, thetas):
     args, thetas = generate_points(thetas)
     x_new = np.linspace(args[0], args[-1], 50)
@@ -101,7 +91,6 @@ def polar_plot_angles(thetas):
 def polar_plot_numbered_angles(thetas):
     x_coords, y_coords = to_coords(thetas)
     coords = list(zip(x_coords, y_coords))
-    print(coords)
     for index, (x, y) in enumerate(coords):
         plt.plot(x, y, 'o')
         plt.text(0.9*x, 0.9*y, str(index))
@@ -164,11 +153,25 @@ if __name__ == "__main__":
     #for poly, theta in zip(results0.polynomes, results0.theta_vecs):
     #    plot_fitted_polynome(poly, theta)
 
-    all_poly_coeffs = (poly.c for poly in results0.polynomes)
-    avg_coeffs = sum(all_poly_coeffs) / len(results0.polynomes)
-    print(avg_coeffs)
-    print(results0.polynomes[0:1])
-    poly = np.poly1d(avg_coeffs)
+    cov_mat = thetas_analyzer.get_covariance_matrix(0, sorted_thetas)
+    #print(cov_mat)
+    cov_mat, avgs = thetas_analyzer.get_gaussian_params(0, sorted_thetas)
+    print(cov_mat, avgs)
+    print(linalg.det(cov_mat))
+    #print(linalg.inv(cov_mat))
+    eigen_values, eigen_vectors = linalg.eig(cov_mat)
+    print(cov_mat.shape)
+    print(np.linalg.matrix_rank(cov_mat))
+    print("eigenvalues", eigen_values)
+    print("eigenvectors", eigen_vectors)
+
+    print(thetas_analyzer.entropy(cov_mat))
+    new_eigen_values, new_eigen_vectors = thetas_analyzer._pca_reduction(cov_mat, cutoff_ratio=0.01)
+    print(new_eigen_values, new_eigen_vectors)
+    print(eigen_vectors.dot(np.diagflat(eigen_values).dot(eigen_vectors.T)))
+    #print(eigen_vectors * eigen_values)
+    print(cov_mat)
+    #print(la)
     #plot_fitted_polynome(poly, results0.theta_vecs[0])
     #print(sorted_thetas)
     #print(fitted_polynomes)
@@ -184,10 +187,7 @@ if __name__ == "__main__":
         #polar_plot_angles(thetas)
         polar_plot_numbered_angles(thetas)'''
 
-    polar_plot_numbered_angles(theta_collections.thetas[2])
-    print(theta_collections.thetas[2], theta_collections.correlations[2])
-    theta_fourier = np.fft.fft(theta_collections.thetas[2])
-    print(np.abs(theta_fourier))
+    #polar_plot_numbered_angles(theta_collections.thetas[2])
     '''new_thetas = [thetas for thetas in theta_collections.thetas]
     print(new_thetas[0])
     results = classify_thetas(new_thetas, 5)
@@ -197,14 +197,11 @@ if __name__ == "__main__":
     print(to_histogram(results))
     print(results[0])'''
 
-    print(angle_dist(theta_collections.thetas, partition=10))
-    print(angle_probabilities(theta_collections.thetas, partition=10))
-    print(angle_probabilities(theta_collections.thetas, partition=20))
+    #print(angle_dist(theta_collections.thetas, partition=10))
+    #print(angle_probabilities(theta_collections.thetas, partition=10))
+    #print(angle_probabilities(theta_collections.thetas, partition=20))
 
-    def generate_thetas(dim):
-        return np.array([np.pi*np.random.beta(0.5, 0.5) for i in range(dim)])
-    random_thetas = [generate_thetas(8) for i in range(100)]
-    print(angle_probabilities(random_thetas, partition=20))
+
     #for k_mean_theta in sorted_thetas.thetas[0]:
     #    polar_plot_angles(k_mean_theta)
 
@@ -221,8 +218,8 @@ if __name__ == "__main__":
         plot_eigenvalues(theta)
         #print(approximate_phases(mat, 0.01*np.pi)/np.pi)'''
 
-    plt.show()
-    coeff_8 = np.array([-7.47998864e-03,  1.73916258e-01, -1.61020449e+00,  7.60456544e+00,
-                        -1.93127379e+01,  2.45158151e+01, -1.05428434e+01,  2.47251476e-01])
+    #plt.show()
+    coeff_8 = np.array([-7.47998864e-03, 1.73916258e-01, -1.61020449e+00, 7.60456544e+00,
+                        -1.93127379e+01, 2.45158151e+01, -1.05428434e+01, 2.47251476e-01])
 
-    coeff_4 = np.array([1.04719702, -4.05332898,  2.84656905, 2.63384441])
+    coeff_4 = np.array([1.04719702, -4.05332898, 2.84656905, 2.63384441])

@@ -27,25 +27,46 @@ thetas_16gdft = np.array([0.47918196, 3.14159265, 0.37415556, 2.32611506, 0.7748
 
 orderings_example = np.array([9, 10, 13, 4, 12, 2, 0, 7, 6, 1, 11, 5, 8, 3, 14, 15])
 
+COV_MAT = np.array([[0.02, 0.04], [0.04, 0.08]])
 
 class TestThetasAnalyzer(unittest.TestCase):
 
     def setUp(self):
-        self.analyzer = ThetasAnalyzer(16)
+        self.analyzer = ThetasAnalyzer(2)
 
     def test_arg_orderings(self):
         orderings_mat = np.zeros((30, 16))
         for row, theta in enumerate(thetas16x30.thetas):
             orderings_mat[row, :] = theta.argsort()
 
-        print(orderings_mat[np.logical_and(orderings_mat[:, 15] == 15, orderings_mat[:, 14] == 14)])
-        print(orderings_mat.mean(axis=0))
+        #print(orderings_mat[np.logical_and(orderings_mat[:, 15] == 15, orderings_mat[:, 14] == 14)])
+        #print(orderings_mat.mean(axis=0))
 
     def test_finiding_seqs_in_thetas(self):
         finder = SequenceFinder()
         for theta in thetas16x30.thetas:
             theta = 16*(theta-np.pi/2)/np.pi
-            print(2*np.array(finder.nth_diff(theta, 0)))
+            #print(2*np.array(finder.nth_diff(theta, 0)))
+
+    def test_sort_thetas(self):
+        sorted_thetas = self.analyzer.sort_thetas([[1, 2.05], [-3.05, -4]], 2)
+        AssertAlmostEqualMatrices(np.sort(sorted_thetas.labels, axis=0), np.array([[-3.05, -4.], [1, 2.05]]))
+        self.assertEqual(sorted(list(sorted_thetas.histogram.values())), [1, 1])
+
+    def test_get_covariance_matrix(self):
+        sorted_thetas = SortedThetas(thetas={0: [np.array([1, 2.2]), np.array([1.2, 2.6])],
+                                             1: [np.array([3, 4])]},
+                                     labels=np.array([[1.1, 2.25], [3, 4]]),
+                                     histogram={0: 2, 1: 1})
+        matA = np.array([[1, 2], [3, 5]])
+        cov_mat = self.analyzer.get_covariance_matrix(0, sorted_thetas)
+        AssertAlmostEqualMatrices(cov_mat, COV_MAT)
+
+    def test_pca_reduction(self):
+        eig_values, eig_vectors = self.analyzer._pca_reduction(COV_MAT, cutoff_ratio=0.05)
+        self.assertEqual(eig_values, np.array([[0.1]]))
+        AssertAlmostEqualMatrices(eig_vectors, np.array([[-0.4472136], [-0.89442719]]))
+
 
     def tearDown(self):
         del self.analyzer
@@ -255,6 +276,7 @@ class TestSymmetry(unittest.TestCase):
 
     def tearDown(self):
         del self.analyzer
+
 
 if __name__ == '__main__':
     #pass

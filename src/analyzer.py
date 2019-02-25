@@ -2,7 +2,9 @@ import time
 from collections import namedtuple, Counter
 from math import atan, isclose
 import numpy as np
+from numpy import linalg
 from scipy.cluster.vq import kmeans2
+from scipy.stats import gaussian_kde
 from utils import extract_thetas_records
 from gdft import gdft_matrix
 from correlations import Correlation, CorrelationAnalyzer
@@ -22,9 +24,6 @@ class ThetasAnalyzer(object):
     def get_correlations(self, gdft):
         return self._corr_analyzer.get_correlations(gdft)
 
-    def get_theta_vecs(self, path, file_name):
-        return extract_thetas_records(path, file_name)
-
     def _generate_points(self, theta_vec):
         length = theta_vec.shape[0]
         args = np.array(list(range(length)))
@@ -38,15 +37,6 @@ class ThetasAnalyzer(object):
     def fit_polynomes(self, thetas, grade):
         polynomes = [self._fit_polynome(theta_vec, grade) for theta_vec in thetas]
         return Polynomes(polynomes=polynomes, theta_vecs=thetas)
-
-    def _fit_polynome_to(self, all_thetas, grade):
-        thetas = np.core.records.fromarrays(all_thetas)
-        length = thetas.shape[1]
-        print(length)
-        args = np.array(list(range(length)))
-
-    def fit_sorted_polynomes(self, sorted_thetas):
-        pass
 
     def sort_thetas(self, theta_vecs, groups):
         kmeans_results = self._classify_thetas(theta_vecs, groups)
@@ -69,8 +59,20 @@ class ThetasAnalyzer(object):
     def _to_histogram(self, k_means_results):
         return Counter(k_means_results[1])
 
-    def get_covariance(self, label_no, sorted_thetas):
-        return "To be finished!"
+    def get_covariance_matrix(self, label_no, sorted_thetas):
+        shape = (len(sorted_thetas.thetas[label_no]), self._dim)
+        thetas_matrix = np.concatenate(sorted_thetas.thetas[label_no]).reshape(shape)
+        cov_mat = np.cov(thetas_matrix.T)
+        return cov_mat
+
+    def _pca_reduction(self, cov_matrix, cutoff_ratio=0):
+        eigen_values, eigen_vectors = linalg.eig(cov_matrix)
+        max_eig = max(np.abs(eigen_values))
+        mask = [index for index, eig in enumerate(eigen_values) if np.abs(eig)/max_eig > cutoff_ratio]
+        return np.diagflat(eigen_values[mask]), eigen_vectors[:, mask]
+
+    def entropy(self, cov_matrix):
+        return 0.5 * (self._dim + self._dim * np.log(np.pi*2) + np.log(np.linalg.det(cov_matrix)))
 
 
 def generate_thetas_v1(dim):
