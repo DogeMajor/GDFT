@@ -1,5 +1,6 @@
 import time
 import datetime
+import multiprocessing
 from collections import namedtuple
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
@@ -7,8 +8,7 @@ from utils import timer, datetime_encoder
 from dao import DAO
 from gdft import gdft_matrix
 from correlations import Correlation, CorrelationAnalyzer
-
-np.random.seed(int(time.time()))
+#np.random.seed(int(time.time()))
 
 '''Optimizes gdft-matrix generating phase shifts with respect to
 a chosen correlation measure. Utilizes SciPy's fmin_l_bfgs_b optimizer,
@@ -36,9 +36,7 @@ class Optimizer(object):
 
     def _optimize_corr_fn(self, corr_fn_name, init_guess=None):
         if init_guess is None:
-            thetas0 = np.random.uniform(0, 2 * np.pi, self._dim)
-            init_guess = thetas0
-
+            init_guess = np.pi * np.random.beta(0.5, 0.5, self._dim)
         bnds = tuple((0, np.pi) for n in range(self._dim))
         corr_fn = self.correlation_functions[corr_fn_name]
 
@@ -53,7 +51,7 @@ class Optimizer(object):
         results = self._optimize_corr_fn(corr_fn_name, init_guess)
         for n in range(cycles):
             new_results = self._optimize_corr_fn(corr_fn_name, init_guess)
-            print(corr_fn_name, new_results[1])
+            #print(corr_fn_name, new_results[1])
             if new_results[1] < results[1]:
                 results = new_results
             if stop_criteria and results[1] < stop_criteria:
@@ -75,15 +73,26 @@ class Runner(object):
     def __init__(self, dim):
         self._optimizer = Optimizer(dim)
 
+    def task(self, index, corr_fn_name, results, stop_criteria):
+        params = self._optimizer.optimize_corr_fn(corr_fn_name, stop_criteria)
+        results[index] = self._optimizer.get_params_summary(params)
+
     @timer
     def optimize(self, corr_fn_name, epochs, stop_criteria=None):
         date = datetime_encoder(datetime.datetime.now())
         results = {"info": "Optimizer results for "+corr_fn_name+" at time "+date}
-        results["results"] = []
-        for n in range(epochs):
-            params = self._optimizer.optimize_corr_fn(corr_fn_name, stop_criteria)
-            summary = self._optimizer.get_params_summary(params)
-            results["results"].append(summary)
+        manager = multiprocessing.Manager()
+        res = manager.dict()
+        jobs = []
+        func = self._optimizer.optimize_corr_fn
+        for epoch in range(epochs):
+            proc = multiprocessing.Process(target=self.task, args=(epoch, corr_fn_name, res, stop_criteria))
+            jobs.append(proc)
+            proc.start()
+
+        for proc in jobs:
+            proc.join()
+        results["results"] = list(res.values())
         return results
 
     def save_results(self, file_name, results):
@@ -91,9 +100,11 @@ class Runner(object):
         dao = DAO("data/")
         dao.write(file_name + date_string + ".json", results)
 
+
 if __name__ == "__main__":
+
     runner = Runner(8)
-    results = runner.optimize("avg_auto_corr", 30, stop_criteria=0.087)
-    runner.save_results("30thetas_8x8__", results)
-    #thetas = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
+    output = runner.optimize("avg_auto_corr", 5, stop_criteria=0.087)
+    #runner.save_results("30thetas_8x8__", results)
+    #thetas = extract_thetas_records("../data/", "thetas_16x16__1-1_21_14.json")
     #print(thetas)
