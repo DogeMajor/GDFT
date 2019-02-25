@@ -75,14 +75,14 @@ class Runner(object):
 
     def task(self, index, corr_fn_name, results, stop_criteria):
         params = self._optimizer.optimize_corr_fn(corr_fn_name, stop_criteria)
-        results[index] = self._optimizer.get_params_summary(params)
+        results.append(self._optimizer.get_params_summary(params))
 
     @timer
     def optimize(self, corr_fn_name, epochs, stop_criteria=None):
         date = datetime_encoder(datetime.datetime.now())
         results = {"info": "Optimizer results for "+corr_fn_name+" at time "+date}
         manager = multiprocessing.Manager()
-        res = manager.dict()
+        res = manager.list()
         jobs = []
         func = self._optimizer.optimize_corr_fn
         for epoch in range(epochs):
@@ -92,7 +92,8 @@ class Runner(object):
 
         for proc in jobs:
             proc.join()
-        results["results"] = list(res.values())
+        results["results"] = res
+        print(res)
         return results
 
     def save_results(self, file_name, results):

@@ -69,6 +69,9 @@ class ThetasAnalyzer(object):
     def _to_histogram(self, k_means_results):
         return Counter(k_means_results[1])
 
+    def get_covariance(self, label_no, sorted_thetas):
+        return "To be finished!"
+
 
 def generate_thetas_v1(dim):
     if dim <= 8:
