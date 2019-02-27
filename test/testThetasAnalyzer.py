@@ -4,6 +4,7 @@ sys.path.append("src/")
 import unittest
 from random import shuffle
 import numpy as np
+from scipy import linalg
 from utils import extract_thetas_records, small_els_to, big_els_to, approximate_matrix
 from tools import *
 from gdft import *
@@ -14,6 +15,7 @@ from sequencefinder import SequenceFinder
 #------Test data-----------------------------------------------------------------------------
 
 thetas16x30 = extract_thetas_records("data/", "30thetas_16x16__1-1_21_14.json")
+theta8x100 = extract_thetas_records("data/", "100thetas12-26_1_26.json")
 
 normalized_thetas = np.array([-2.98774983e-09, 8.18550897e-01, 2.79042360e+00, 2.67879537e+00,
                               1.78476702e+00, 1.08366030e-01, 2.63164508e+00, 2.50189183e-02])
@@ -29,6 +31,8 @@ orderings_example = np.array([9, 10, 13, 4, 12, 2, 0, 7, 6, 1, 11, 5, 8, 3, 14, 
 
 COV_MAT = np.array([[0.02, 0.04], [0.04, 0.08]])
 
+THETAS = [np.array([1, 2.2]), np.array([1.2, 2.6]), np.array([3, 4])]
+
 class TestThetasAnalyzer(unittest.TestCase):
 
     def setUp(self):
@@ -42,7 +46,7 @@ class TestThetasAnalyzer(unittest.TestCase):
         #print(orderings_mat[np.logical_and(orderings_mat[:, 15] == 15, orderings_mat[:, 14] == 14)])
         #print(orderings_mat.mean(axis=0))
 
-    def test_finiding_seqs_in_thetas(self):
+    def test_finding_seqs_in_thetas(self):
         finder = SequenceFinder()
         for theta in thetas16x30.thetas:
             theta = 16*(theta-np.pi/2)/np.pi
@@ -53,20 +57,89 @@ class TestThetasAnalyzer(unittest.TestCase):
         AssertAlmostEqualMatrices(np.sort(sorted_thetas.labels, axis=0), np.array([[-3.05, -4.], [1, 2.05]]))
         self.assertEqual(sorted(list(sorted_thetas.histogram.values())), [1, 1])
 
-    def test_get_covariance_matrix(self):
+    def test_get_covariance(self):
         sorted_thetas = SortedThetas(thetas={0: [np.array([1, 2.2]), np.array([1.2, 2.6])],
                                              1: [np.array([3, 4])]},
                                      labels=np.array([[1.1, 2.25], [3, 4]]),
                                      histogram={0: 2, 1: 1})
         matA = np.array([[1, 2], [3, 5]])
-        cov_mat = self.analyzer.get_covariance_matrix(0, sorted_thetas)
+        cov_mat = self.analyzer.get_covariance(0, sorted_thetas)
         AssertAlmostEqualMatrices(cov_mat, COV_MAT)
 
-    def test_pca_reduction(self):
-        eig_values, eig_vectors = self.analyzer._pca_reduction(COV_MAT, cutoff_ratio=0.05)
+    def test_get_total_covariance(self):
+        cov_mat = self.analyzer.get_total_covariance(THETAS)
+        AssertAlmostEqualMatrices(cov_mat, np.array([[1.21333333, 1.03333333], [1.03333333, 0.89333333]]))
+
+    def test_pca_reduction_eig(self):
+        eig_values, eig_vectors = self.analyzer._pca_reduction_eig(COV_MAT, cutoff_ratio=0.05)
         self.assertEqual(eig_values, np.array([[0.1]]))
         AssertAlmostEqualMatrices(eig_vectors, np.array([[-0.4472136], [-0.89442719]]))
 
+    def test_construct_diagonalized_cov_mat(self):#OK
+        analyzer = ThetasAnalyzer(8)
+        diags, w = analyzer.get_cov_svd(theta8x100.thetas)
+        data_matrix = analyzer.to_data_matrix(theta8x100.thetas, subtract_avgs=True)
+        U, sing_mat, W = analyzer.get_svd(data_matrix)
+        new_data_matrix = np.dot(data_matrix, W)
+        new_cov_mat = np.cov(new_data_matrix)
+        AssertAlmostEqualMatrices(np.dot(sing_mat.T, sing_mat), new_cov_mat)
+        should_be_zero = new_cov_mat
+        np.fill_diagonal(should_be_zero, 0)
+        AssertAlmostEqualMatrices(np.zeros((8, 8)), should_be_zero)
+
+    def test_finding_svd(self):#OK
+        analyzer = ThetasAnalyzer(8)
+        data_matrix = analyzer.to_data_matrix(theta8x100.thetas, subtract_avgs=True)
+        rows, cols = data_matrix.shape
+        U, singular_values, W = linalg.svd(data_matrix)
+        #recomputed_data_matrix = np.dot(U[:, :cols] * singular_values, W) #The shortest and quickest way
+        diags = np.diagflat(singular_values)
+        sing_mat = np.zeros(data_matrix.shape)
+        sing_mat[0:diags.shape[0], 0:diags.shape[1]] = diags
+        recomputed_data_matrix = np.dot(U, sing_mat.dot(W))
+        AssertAlmostEqualMatrices(recomputed_data_matrix, data_matrix)
+
+    def test_get_cov_svd(self):
+        analyzer = ThetasAnalyzer(8)
+        data_matrix = analyzer.to_data_matrix(theta8x100.thetas, subtract_avgs=True)
+        cov_matrix = np.cov(data_matrix.T)
+        u, sing_mat, w = analyzer.get_svd(cov_matrix)
+        diagonalized_cov, W = analyzer.get_cov_svd(theta8x100.thetas)
+        # AssertAlmostEqualMatrices(diagonalized_cov, sing_mat)
+        print((W.T).shape)
+        print(diagonalized_cov.shape)
+        print(W.shape)
+        reconstructed_cov_mat = (W).dot(diagonalized_cov.dot(W.T))
+        should_be_zero = reconstructed_cov_mat - cov_matrix
+        # print(should_be_zero)
+        AssertAlmostEqualMatrices(reconstructed_cov_mat, cov_matrix)
+
+    def test_if_cov_svd_and_eig_are_same(self): #They should be if cov_mat is of full rank
+        analyzer = ThetasAnalyzer(8)
+        data_matrix = analyzer.to_data_matrix(theta8x100.thetas, subtract_avgs=True)
+        cov_matrix = np.cov(data_matrix.T)
+        u, sing_mat, w = analyzer.get_svd(cov_matrix)
+        eigen_values, eigen_vectors = linalg.eig(cov_matrix)
+        orderings = np.argsort(eigen_values)
+        print(orderings)
+        perm = permutation_matrix(8, orderings=orderings[::-1])
+        #print(perm)
+        print(eigen_values.dot(perm))
+        sorted_eigen_values = np.sort(eigen_values, axis=0)
+        eig_val_mat = np.diagflat(sorted_eigen_values[::-1])
+        AssertAlmostEqualMatrices(eig_val_mat, sing_mat)
+
+    def test_distance_of_pca_decomp(self): #They should be if cov_mat is of full rank
+        analyzer = ThetasAnalyzer(8)
+        data_matrix = analyzer.to_data_matrix(theta8x100.thetas, subtract_avgs=True)
+        cov_matrix = np.cov(data_matrix.T)
+        u, sing_mat, w = analyzer.get_svd(cov_matrix)
+        eigen_values, eigen_vectors = linalg.eig(cov_matrix)
+        sorted_eigen_values = np.sort(eigen_values, axis=0)
+        eig_val_mat = np.diagflat(sorted_eigen_values)
+        print(sorted_eigen_values, eigen_values)
+
+        #AssertAlmostEqualMatrices(eig_val_mat, sing_mat)
 
     def tearDown(self):
         del self.analyzer

@@ -153,15 +153,12 @@ if __name__ == "__main__":
     #for poly, theta in zip(results0.polynomes, results0.theta_vecs):
     #    plot_fitted_polynome(poly, theta)
 
-    cov_mat = thetas_analyzer.get_covariance_matrix(0, sorted_thetas)
+    cov_mat = thetas_analyzer.get_covariance(0, sorted_thetas)
     #print(cov_mat)
-    cov_mat, avgs = thetas_analyzer.get_gaussian_params(0, sorted_thetas)
-    print(cov_mat, avgs)
-    print(linalg.det(cov_mat))
+
     #print(linalg.inv(cov_mat))
     eigen_values, eigen_vectors = linalg.eig(cov_mat)
-    print(cov_mat.shape)
-    print(np.linalg.matrix_rank(cov_mat))
+
     print("eigenvalues", eigen_values)
     print("eigenvectors", eigen_vectors)
 
@@ -171,54 +168,21 @@ if __name__ == "__main__":
     print(eigen_vectors.dot(np.diagflat(eigen_values).dot(eigen_vectors.T)))
     #print(eigen_vectors * eigen_values)
     print(cov_mat)
-    #print(la)
-    #plot_fitted_polynome(poly, results0.theta_vecs[0])
-    #print(sorted_thetas)
-    #print(fitted_polynomes)
+    print(new_eigen_values.shape)
+    print(new_eigen_vectors.shape)
+    print(eigen_vectors.dot(eigen_vectors.T))
+    print(new_eigen_vectors.dot(new_eigen_vectors.T))
 
-    #best_thetas = find_best_orderings(theta_collections)
-    #print(best_thetas)
+    #print(print(new_eigen_vectors.dot(np.diagflat(new_eigen_values).dot(new_eigen_vectors.T))))
 
-    #for item in best_thetas[0:]:
-    #    print(np.argsort(item[0]))
-    #    print(orderings_dist(item[0]))
-
-    '''for thetas in theta_collections.thetas[0:1]:
-        #polar_plot_angles(thetas)
-        polar_plot_numbered_angles(thetas)'''
-
-    #polar_plot_numbered_angles(theta_collections.thetas[2])
-    '''new_thetas = [thetas for thetas in theta_collections.thetas]
-    print(new_thetas[0])
-    results = classify_thetas(new_thetas, 5)
-    print(results)
-    grouped_thetas = group_by_label(new_thetas, results)
-    print(grouped_thetas)
-    print(to_histogram(results))
-    print(results[0])'''
-
-    #print(angle_dist(theta_collections.thetas, partition=10))
-    #print(angle_probabilities(theta_collections.thetas, partition=10))
-    #print(angle_probabilities(theta_collections.thetas, partition=20))
-
-
-    #for k_mean_theta in sorted_thetas.thetas[0]:
-    #    polar_plot_angles(k_mean_theta)
-
-    '''for polynome, theta in zip(fitted_polynomes.polynomes, fitted_polynomes.theta_vecs):#kmean_thetas[:-3]:
-        #plot_fitted_polynome(polynome, theta)
-        plot_angles(theta)'''
-
-    '''for theta in theta_collections.thetas[0:10]:
-        mat = gdft_matrix(8, theta)
-        #print(approximate_matrix(mat, tol=0.5))
-        #print(np.absolute(mat-1))
-        eigs = np.linalg.eig(mat)
-        print(theta)
-        plot_eigenvalues(theta)
-        #print(approximate_phases(mat, 0.01*np.pi)/np.pi)'''
-
-    #plt.show()
+    data_matrix = thetas_analyzer.to_data_matrix(theta_collections.thetas)
+    print(data_matrix.shape)
+    U, sing_values, W = linalg.svd(data_matrix)
+    print(sing_values)
+    print(eigen_values)
+    new_data_matrix = data_matrix.dot(W.T)
+    new_cov_matrix = np.cov(new_data_matrix.T)
+    print(new_cov_matrix)
     coeff_8 = np.array([-7.47998864e-03, 1.73916258e-01, -1.61020449e+00, 7.60456544e+00,
                         -1.93127379e+01, 2.45158151e+01, -1.05428434e+01, 2.47251476e-01])
 

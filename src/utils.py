@@ -80,5 +80,5 @@ def approximate_phases(matrix, tol=0.1*np.pi):
     phases = to_phase(matrix)
     phases = small_els_to(phases, replace_val=0, cutoff=tol)
     phases = big_els_to(phases, replace_val=2*np.pi, cutoff=tol)
-    np.place(phases, phases==2*np.pi, 0)
+    np.place(phases, phases == 2*np.pi, 0)
     return phases

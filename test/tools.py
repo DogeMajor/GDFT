@@ -5,11 +5,10 @@ import numpy as np
 def EqualMatrices(matA, matB):
     if matA.shape != matB.shape:
         return False
-    return (matA==matB).all()
+    return (matA == matB).all()
 
 
 def AssertAlmostEqualMatrices(matA, matB, decimals=7):
-    are_equal = True
     if matA.shape != matB.shape:
         return False
     return np.testing.assert_almost_equal(matA, matB, decimal=decimals)
