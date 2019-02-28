@@ -76,11 +76,11 @@ class ThetasAnalyzer(object):
         return U, sing_mat, W
 
 
-    def get_cov_svd(self, thetas):
-        data_matrix = self.to_data_matrix(thetas, subtract_avgs=True)
-        _, sing_mat, w = self.get_svd(data_matrix)
-        diag_cov = np.dot(sing_mat.T, sing_mat)
-        return diag_cov, w
+    def get_cov_svd(self, cov_matrix):
+        '''If using eigenvalue decomposition we'll need to order
+        the matrices in descending manner, with svd there's no need for that!'''
+        U, sing_vals, W = linalg.svd(cov_matrix)
+        return U, np.diag_flat(sing_vals)
 
     def get_total_covariance(self, thetas):
         shape = (len(thetas), self._dim)
@@ -92,17 +92,38 @@ class ThetasAnalyzer(object):
         return self.get_total_covariance(thetas)
 
     def _pca_reduction_eig(self, cov_matrix, cutoff_ratio=0):
+        '''Assumptions: rank is dim and the eig_vals and vecs
+        are not generally in descending order in np.eig!'''
         eigen_values, eigen_vectors = linalg.eig(cov_matrix)
-
         max_eig = max(np.abs(eigen_values))
         eigen_values, eigen_vectors = linalg.eig(cov_matrix)
         orderings = np.argsort(eigen_values)
-        print(orderings)
-        perm = permutation_matrix(8, orderings=orderings[::-1])
-        ordered_eig_vals = orderings.dot(perm)
-        ordered_eig_vecs = orderings.dot(perm)
-        mask = [index for index, eig in enumerate(ordered_eigen_values) if np.abs(eig)/max_eig > cutoff_ratio]
-        return np.diagflat(ordered_eigen_values[mask]), ordered_eigen_vectors[:, mask]
+        perm = permutation_matrix(self._dim, orderings=orderings[::-1])
+        ordered_eig_vals = eigen_values.dot(perm)
+        ordered_eig_vecs = eigen_vectors.dot(perm)
+        mask = [index for index, eig in enumerate(ordered_eig_vals) if np.abs(eig)/max_eig > cutoff_ratio]
+        return np.diagflat(ordered_eig_vals[mask]), ordered_eig_vecs[:, mask]
+
+    def _pca_reduction_svd(self, cov_matrix, cutoff_ratio=0):
+        U, sing_vals, W = linalg.svd(cov_matrix)
+        max_eig = max(np.abs(sing_vals))
+        mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_eig > cutoff_ratio]
+        return U[:, mask], np.diagflat(sing_vals[mask]), W[:, mask]
+
+    def _pca_reduction(self, cov_matrix, cutoff_ratio=0):
+        U, sing_vals, _ = self._pca_reduction_svd(cov_matrix, cutoff_ratio=cutoff_ratio)
+        return U, sing_vals
+
+    def cov_pca_reduction(self, label_no, sorted_thetas, cutoff_ratio=0):
+        cov_matrix = self.get_covariance(label_no, sorted_thetas)
+        return self._pca_reduction(cov_matrix, cutoff_ratio=cutoff_ratio)
+
+    def cov_pca_reductions(self, sorted_thetas, cutoff_ratio=0):
+        def is_empty(val):
+            return val == []
+        non_empty_labels = (key for key, val in sorted_thetas.thetas.items() if not is_empty(val))
+        return {key: self.cov_pca_reduction(key, sorted_thetas, cutoff_ratio=cutoff_ratio)
+                for key in non_empty_labels}
 
     def entropy(self, cov_matrix):
         return 0.5 * (self._dim + self._dim * np.log(np.pi*2) + np.log(np.linalg.det(cov_matrix)))

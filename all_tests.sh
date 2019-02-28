@@ -8,3 +8,4 @@ python test/testCorrelationAnalyzer.py
 python test/testDAO.py
 python test/testSequenceFinder.py
 python test/testOptimizer.py
+python test/testThetasAnalyzer.py TestThetasAnalyzer
