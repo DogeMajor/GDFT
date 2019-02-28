@@ -4,10 +4,8 @@ from math import atan, isclose
 import numpy as np
 from numpy import linalg
 from scipy.cluster.vq import kmeans2
-from scipy.stats import gaussian_kde
-from utils import extract_thetas_records
-from gdft import gdft_matrix, permutation_matrix
-from correlations import Correlation, CorrelationAnalyzer
+from gdft import gdft_matrix
+from correlations import CorrelationAnalyzer
 
 np.random.seed(int(time.time()))
 
@@ -42,7 +40,7 @@ class ThetasAnalyzer(object):
         kmeans_results = self._classify_thetas(theta_vecs, groups)
         grouped_theta_vecs = self.group_by_label(theta_vecs, kmeans_results)
         return SortedThetas(thetas=grouped_theta_vecs, labels=kmeans_results[0],
-                            histogram=self._to_histogram(kmeans_results))
+                            histogram=self._kmeans_to_histogram(kmeans_results))
 
     def _classify_thetas(self, theta_vecs, groups):
         return kmeans2(theta_vecs, groups)
@@ -56,7 +54,7 @@ class ThetasAnalyzer(object):
 
         return sorted_thetas
 
-    def _to_histogram(self, k_means_results):
+    def _kmeans_to_histogram(self, k_means_results):
         return Counter(k_means_results[1])
 
     def to_data_matrix(self, thetas, subtract_avgs=False):
@@ -75,12 +73,9 @@ class ThetasAnalyzer(object):
         sing_mat[0:diags.shape[0], 0:diags.shape[1]] = diags
         return U, sing_mat, W
 
-
-    def get_cov_svd(self, cov_matrix):
-        '''If using eigenvalue decomposition we'll need to order
-        the matrices in descending manner, with svd there's no need for that!'''
+    def get_cov_svd(self, cov_matrix): #For testing - same as
         U, sing_vals, W = linalg.svd(cov_matrix)
-        return U, np.diag_flat(sing_vals)
+        return U, np.diagflat(sing_vals)
 
     def get_total_covariance(self, thetas):
         shape = (len(thetas), self._dim)
@@ -91,32 +86,16 @@ class ThetasAnalyzer(object):
         thetas = sorted_thetas.thetas[label_no]
         return self.get_total_covariance(thetas)
 
-    def _pca_reduction_eig(self, cov_matrix, cutoff_ratio=0):
-        '''Assumptions: rank is dim and the eig_vals and vecs
-        are not generally in descending order in np.eig!'''
-        eigen_values, eigen_vectors = linalg.eig(cov_matrix)
-        max_eig = max(np.abs(eigen_values))
-        eigen_values, eigen_vectors = linalg.eig(cov_matrix)
-        orderings = np.argsort(eigen_values)
-        perm = permutation_matrix(self._dim, orderings=orderings[::-1])
-        ordered_eig_vals = eigen_values.dot(perm)
-        ordered_eig_vecs = eigen_vectors.dot(perm)
-        mask = [index for index, eig in enumerate(ordered_eig_vals) if np.abs(eig)/max_eig > cutoff_ratio]
-        return np.diagflat(ordered_eig_vals[mask]), ordered_eig_vecs[:, mask]
-
     def _pca_reduction_svd(self, cov_matrix, cutoff_ratio=0):
         U, sing_vals, W = linalg.svd(cov_matrix)
         max_eig = max(np.abs(sing_vals))
         mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_eig > cutoff_ratio]
         return U[:, mask], np.diagflat(sing_vals[mask]), W[:, mask]
 
-    def _pca_reduction(self, cov_matrix, cutoff_ratio=0):
-        U, sing_vals, _ = self._pca_reduction_svd(cov_matrix, cutoff_ratio=cutoff_ratio)
-        return U, sing_vals
-
     def cov_pca_reduction(self, label_no, sorted_thetas, cutoff_ratio=0):
         cov_matrix = self.get_covariance(label_no, sorted_thetas)
-        return self._pca_reduction(cov_matrix, cutoff_ratio=cutoff_ratio)
+        U, sing_vals, _ = self._pca_reduction_svd(cov_matrix, cutoff_ratio=cutoff_ratio)
+        return U, sing_vals
 
     def cov_pca_reductions(self, sorted_thetas, cutoff_ratio=0):
         def is_empty(val):
@@ -152,7 +131,7 @@ class GDFTBuilder(object):
 class SymmetryAnalyzer(object):
 
     def __init__(self, dim):
-        self._dim =dim
+        self._dim = dim
         self._corr_analyzer = CorrelationAnalyzer(self._dim)
 
     def get_correlations(self, gdft):
@@ -161,7 +140,8 @@ class SymmetryAnalyzer(object):
     def get_similarities(self, old_gdft, new_gdft, rel_tol=10e-9):
         old_correlations = self.get_correlations(old_gdft)
         new_correlations = self.get_correlations(new_gdft)
-        similarities = (isclose(old_corr, new_corr) for old_corr, new_corr in zip(old_correlations, new_correlations))
+        similarities = (isclose(old_corr, new_corr) for old_corr, new_corr
+                        in zip(old_correlations, new_correlations))
         return list(similarities)
 
     def get_symmetry(self, old_gdft, new_gdft, rel_tol=10e-9):
