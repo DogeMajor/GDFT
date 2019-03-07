@@ -38,10 +38,10 @@ class Correlation(object):
         mu = pos_mu - N + 1
 
         if 0 < mu <= N-1:
-            d = np.sum(self._gdft[:-mu, alpha] * self._conj_gdft[mu:, beta])
+            d = np.sum(self._gdft[alpha, :-mu] * self._conj_gdft[beta, mu:])
             return d / N
 
-        d = np.sum(self._gdft[-mu:, alpha] * self._conj_gdft[:N+mu, beta])
+        d = np.sum(self._gdft[alpha, -mu:] * self._conj_gdft[beta, :N+mu])
         return d/N
 
 
@@ -74,8 +74,11 @@ Correlations = namedtuple('Correlations', 'max_auto_corr avg_auto_corr max_cross
 class CorrelationAnalyzer(object):
 
     def __init__(self, dim):
+        '''There's an error here: the corr_fns store the OLD
+        fns with the old corr_tensor;
+        changing c_tensor doest not change the c_tensor in fns!!!'''
         self._shape = (dim, dim, 2 * dim - 1)
-        self._corr_tensor = None
+        #self._corr_tensor = None
         self._auto_corr_mask = is_auto_corr_mask(self._shape)
         self._cross_corr_mask = is_cross_corr_mask(self._shape)
         self._corr_fns = {"max_auto_corr": self.max_auto_corr,
@@ -86,46 +89,54 @@ class CorrelationAnalyzer(object):
 
     def get_correlations(self, gdft):
         corr_obj = Correlation(gdft)
-        self.set_corr_tensor(corr_obj.correlation_tensor())
-        corrs = {fn_name: corr_fn() for fn_name, corr_fn in self._corr_fns.items()}
-        return Correlations(**corrs)
+        corr_tensor = corr_obj.correlation_tensor()
+        #self.set_corr_tensor(corr_obj.correlation_tensor())
+        #print("Showing c-tensor -terms d_(0,0)[:] ", corr_tensor[0, 0, :])
+        #print("Showing c-tensor -term lengths |d_(0,0)[:]| ", np.abs(corr_tensor[0, 0, :]))
+        #corrs = {fn_name: corr_fn() for fn_name, corr_fn in self._corr_fns.items()}
+        #return Correlations(**corrs)
+        return Correlations(max_auto_corr=self.max_auto_corr(corr_tensor),
+                            avg_auto_corr=self.avg_auto_corr(corr_tensor),
+                            max_cross_corr=self.max_cross_corr(corr_tensor),
+                            avg_cross_corr=self.avg_cross_corr(corr_tensor),
+                            avg_merit_factor=self.avg_merit_factor(corr_tensor))
 
-    def set_corr_tensor(self, c_tensor):
-        self._corr_tensor = c_tensor
+    #def set_corr_tensor(self, c_tensor):
+    #    self._corr_tensor = c_tensor
 
-    def _reduce_corr_tensor(self, mask, calc_fn):
-        masked_corr = self._corr_tensor * mask
+    def _reduce_corr_tensor(self, mask, calc_fn, c_tensor):
+        masked_corr = c_tensor * mask
         return calc_fn(masked_corr)
 
-    def max_auto_corr(self):
-        return self._reduce_corr_tensor(self._auto_corr_mask, get_max_length)
+    def max_auto_corr(self, c_tensor):
+        return self._reduce_corr_tensor(self._auto_corr_mask, get_max_length, c_tensor)
 
-    def avg_auto_corr(self):
-        length = self._corr_tensor.shape[0]
-        return self._reduce_corr_tensor(self._auto_corr_mask, get_squared_sum) / length
+    def avg_auto_corr(self, c_tensor):
+        length = c_tensor.shape[0]
+        return self._reduce_corr_tensor(self._auto_corr_mask, get_squared_sum, c_tensor) / length
 
-    def max_cross_corr(self):
-        return self._reduce_corr_tensor(self._cross_corr_mask, get_max_length)
+    def max_cross_corr(self, c_tensor):
+        return self._reduce_corr_tensor(self._cross_corr_mask, get_max_length, c_tensor)
 
-    def avg_cross_corr(self):
-        shape = self._corr_tensor.shape
+    def avg_cross_corr(self, c_tensor):
+        shape = c_tensor.shape
         length = shape[0] * (shape[0] - 1)
-        return self._reduce_corr_tensor(self._cross_corr_mask, get_squared_sum) / length
+        return self._reduce_corr_tensor(self._cross_corr_mask, get_squared_sum, c_tensor) / length
 
-    def merit_factor(self, alpha):
-        shape = self._corr_tensor.shape
+    def merit_factor(self, alpha, c_tensor):
+        shape = c_tensor.shape
         mid_index = int(shape[2] / 2)
-        abs_diags = abs(self._corr_tensor[alpha, alpha, :])
+        abs_diags = abs(c_tensor[alpha, alpha, :])
         diags_squared = np.power(abs_diags, 2)
         denominator = diags_squared[mid_index]
         nominator = np.sum(diags_squared) - denominator
         return denominator / nominator
 
-    def merit_factors(self):
-        shape = self._corr_tensor.shape[0]
-        gen = (self.merit_factor(i) for i in range(shape))
+    def merit_factors(self, c_tensor):
+        shape = c_tensor.shape[0]
+        gen = (self.merit_factor(i, c_tensor) for i in range(shape))
         return np.fromiter(gen, np.complex128)
 
-    def avg_merit_factor(self):
-        m_factors = self.merit_factors()
+    def avg_merit_factor(self, c_tensor):
+        m_factors = self.merit_factors(c_tensor)
         return m_factors.mean(axis=0)

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import linalg
 from utils import extract_thetas_records, seq_norm, approximate_matrix, approximate_phases
-from gdft import dft_matrix, gdft_matrix
+from gdft import dft_matrix, gdft_matrix, two_param_gdft_matrix
 from analyzer import ThetasAnalyzer
 
 plt.grid(True)
@@ -110,6 +110,7 @@ def plot_fn(fn, dim):
     y_new = fn(x_new)
     plt.plot(x_new, y_new)
 
+
 kmean_thetas = [np.array([2.9135797, 0.39698846, 2.63539188, 1.42586124,
                           0.32580239, 0.41098031, 2.19474127, 3.05086212]),
                 np.array([2.92536849, 2.11414487, 0.14960736, 0.26858388,
@@ -138,52 +139,33 @@ new_kmean_thetas = [[0.29941173, 2.89847069, 0.36766799, 2.03652784,
 
 
 if __name__ == "__main__":
+    thetas_analyzer = ThetasAnalyzer(8)
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_15_38.json")
     #theta_collections = extract_thetas_records("../data/", "30thetas_16x16__1-1_21_14.json")
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_11_58.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "10thetas_16x16__12-26_19_4.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "100thetas_4x4__12-26_16_6.json")
-    theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
+    '''theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
     #theta_collections = extract_thetas_records("../data/", "results_2018-12-24 23_33.json")
-    thetas_analyzer = ThetasAnalyzer(8)
+    
     sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
     thetas0 = sorted_thetas.thetas[0]
-    results0 = thetas_analyzer.fit_polynomes(sorted_thetas.thetas[0], 7)
-    results = thetas_analyzer.fit_polynomes(theta_collections.thetas, 7)
-    #for poly, theta in zip(results0.polynomes, results0.theta_vecs):
-    #    plot_fitted_polynome(poly, theta)
-
-    cov_mat = thetas_analyzer.get_covariance(0, sorted_thetas)
-    #print(cov_mat)
-
-    #print(linalg.inv(cov_mat))
-    eigen_values, eigen_vectors = linalg.eig(cov_mat)
-
-    print("eigenvalues", eigen_values)
-    print("eigenvectors", eigen_vectors)
-
-    print(thetas_analyzer.entropy(cov_mat))
-    new_eigen_values, new_eigen_vectors = thetas_analyzer._pca_reduction(cov_mat, cutoff_ratio=0.01)
-    print(new_eigen_values, new_eigen_vectors)
-    print(eigen_vectors.dot(np.diagflat(eigen_values).dot(eigen_vectors.T)))
-    #print(eigen_vectors * eigen_values)
-    print(cov_mat)
-    print(new_eigen_values.shape)
-    print(new_eigen_vectors.shape)
-    print(eigen_vectors.dot(eigen_vectors.T))
-    print(new_eigen_vectors.dot(new_eigen_vectors.T))
-
-    #print(print(new_eigen_vectors.dot(np.diagflat(new_eigen_values).dot(new_eigen_vectors.T))))
-
     data_matrix = thetas_analyzer.to_data_matrix(theta_collections.thetas)
-    print(data_matrix.shape)
-    U, sing_values, W = linalg.svd(data_matrix)
-    print(sing_values)
-    print(eigen_values)
-    new_data_matrix = data_matrix.dot(W.T)
-    new_cov_matrix = np.cov(new_data_matrix.T)
-    print(new_cov_matrix)
-    coeff_8 = np.array([-7.47998864e-03, 1.73916258e-01, -1.61020449e+00, 7.60456544e+00,
-                        -1.93127379e+01, 2.45158151e+01, -1.05428434e+01, 2.47251476e-01])
+    reduced_cov_mats = thetas_analyzer.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.05)
+    print(len(reduced_cov_mats))
+    print(reduced_cov_mats)
 
-    coeff_4 = np.array([1.04719702, -4.05332898, 2.84656905, 2.63384441])
+    poly_coeff_8 = np.array([-7.47998864e-03, 1.73916258e-01, -1.61020449e+00, 7.60456544e+00,
+                             -1.93127379e+01, 2.45158151e+01, -1.05428434e+01, 2.47251476e-01])
+
+    poly_coeff_4 = np.array([1.04719702, -4.05332898, 2.84656905, 2.63384441])
+    '''
+    #THETAS8 = np.array([-3.12, -3.38, -3.2, -1.86, -1.27, 0.06, 0.25, -0.01])
+    THETAS8 = np.array([1.637, -0.79, -0.54, 2.01, 1.59, -0.83, 1.73, 2.44])
+
+    #gdft = gdft_matrix(8, THETAS8)
+    gdft = two_param_gdft_matrix(8, np.zeros(8), THETAS8)
+    correlations = thetas_analyzer.get_correlations(dft_matrix(8))
+    print(correlations)
+    '''Correlations(max_auto_corr=0.3814517374888245, avg_auto_corr=(1.0209859493694915+0j), 
+    max_cross_corr=0.5286804616397811, avg_cross_corr=(0.854144864375787+0j), avg_merit_factor=(0.9794454082522375+0j))'''

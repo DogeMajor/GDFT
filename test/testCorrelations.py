@@ -7,9 +7,11 @@ sys.path.append("../src")
 sys.path.append("src/")
 from gdft import dft_matrix
 from correlations import Correlation
+from tools import EqualMatrices
 
 
 class TestCorrelation(unittest.TestCase):
+    '''OBS! This only tests a symmetric case of matrix A'''
 
     def setUp(self):
         self.correlation = Correlation(dft_matrix(4))
@@ -30,6 +32,17 @@ class TestCorrelation(unittest.TestCase):
         self.assertEqual(self.correlation._aperiodic_corr_fn(0, 1, 1), c_tensor[0, 1, 1])
         self.assertEqual(self.correlation._aperiodic_corr_fn(1, 0, 2), c_tensor[1, 0, 2])
 
+    def test_asymmetric_c_tensor(self):
+        matrix = np.array([[1, 2], [3, 4]])
+        corr = Correlation(matrix)
+        c_tensor = corr.correlation_tensor()
+        self.assertTrue(EqualMatrices(c_tensor[0, 1, :], np.array([3, 5.5, 2])))
+
+        print(c_tensor[1, 0, :])
+        print(c_tensor[1, 1, :])
+
+
+
     def tearDown(self):
         del self.correlation
 
@@ -45,7 +58,7 @@ class SpeedTests(unittest.TestCase):
         tot_time = timeit.timeit("get_corr_tensor()", setup=SETUP,
                                  number=1)
         print("corr_tensor for dft 50x50:", tot_time, " s")
-        self.assertTrue(tot_time < 1.8)
+        self.assertTrue(tot_time < 1.9)
 
 
 if __name__ == '__main__':

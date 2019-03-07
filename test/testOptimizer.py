@@ -32,8 +32,9 @@ class TestOptimizer(unittest.TestCase):
         average_auto_correlation = self.optimizer._calc_correlation(params, avg_auto_c)
 
         analyzer = CorrelationAnalyzer(8)
-        analyzer.set_corr_tensor(c_tensor)
-        self.assertEqual(average_auto_correlation, analyzer.avg_auto_corr())
+
+        #analyzer.set_corr_tensor(c_tensor)
+        self.assertEqual(average_auto_correlation, analyzer.avg_auto_corr(c_tensor))
         self.assertAlmostEqual(4.375, average_auto_correlation)
 
     def test_corr_deps_on_params(self):

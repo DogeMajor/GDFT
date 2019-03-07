@@ -57,6 +57,8 @@ class ThetasAnalyzer(object):
     def _kmeans_to_histogram(self, k_means_results):
         return Counter(k_means_results[1])
 
+#------Analyze covariances in order to reduce dimensions with PCA--
+
     def to_data_matrix(self, thetas, subtract_avgs=False):
         '''Changes a list of 1-D numpy arrays into a data matrix'''
         shape = (len(thetas), self._dim)
@@ -66,16 +68,11 @@ class ThetasAnalyzer(object):
         return records
 
     def get_svd(self, data_matrix):
-        '''Returns U and W.T directly (NOT W!!) + singluar vals as a list'''
+        '''Returns U and W.T directly (NOT W!!) + singular vals
+        as a list'''
         U, sing_values, W = linalg.svd(data_matrix)
         diags = np.diagflat(sing_values)
-        sing_mat = np.zeros(data_matrix.shape) #[[Sing, 0],[0 0]] -type block matrix with
-        sing_mat[0:diags.shape[0], 0:diags.shape[1]] = diags
-        return U, sing_mat, W
-
-    def get_cov_svd(self, cov_matrix): #For testing - same as
-        U, sing_vals, W = linalg.svd(cov_matrix)
-        return U, np.diagflat(sing_vals)
+        return U, diags, W
 
     def get_total_covariance(self, thetas):
         shape = (len(thetas), self._dim)
