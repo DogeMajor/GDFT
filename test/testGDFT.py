@@ -33,16 +33,16 @@ class TestGDFT(unittest.TestCase):
         thetas = np.array([-.5 * np.pi, .5 * np.pi])
         gdft_mat = gdft_matrix(2, thetas)
         dft = dft_matrix(2)
-        g1 = g_matrix(thetas)
-        AssertAlmostEqualMatrices(gdft_mat, np.array([[-1j, -1j], [1j, -1j]], dtype=np.complex128))
-        AssertAlmostEqualMatrices(g1.dot(dft), gdft_mat)
+        g2 = g_matrix(thetas)
+        AssertAlmostEqualMatrices(gdft_mat, np.array([[-1j, 1j], [-1j, -1j]], dtype=np.complex128))
+        AssertAlmostEqualMatrices(dft.dot(g2), gdft_mat)
 
     def test_two_param_GDFTMatrix(self):
         thetas = np.array([-.5 * np.pi, .5 * np.pi])
-        gdft_mat = two_param_gdft_matrix(2, thetas, -3*thetas)
+        gdft_mat = two_param_gdft_matrix(2, -3*thetas, thetas)
         dft = dft_matrix(2)
-        g1 = g_matrix(thetas)
         g2 = g_matrix(-3*thetas)
+        g1 = g_matrix(thetas)
         AssertAlmostEqualMatrices(gdft_mat, np.array([[-1, 1], [1, 1]], dtype=np.complex128))
         AssertAlmostEqualMatrices(g1.dot(dft.dot(g2)), gdft_mat)
 

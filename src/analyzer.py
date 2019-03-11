@@ -2,10 +2,10 @@ import time
 from collections import namedtuple, Counter
 from math import atan, isclose
 import numpy as np
+from numpy import linalg
 from scipy.cluster.vq import kmeans2
-from utils import extract_thetas_records
 from gdft import gdft_matrix
-from correlations import Correlation, CorrelationAnalyzer
+from correlations import CorrelationAnalyzer
 
 np.random.seed(int(time.time()))
 
@@ -22,9 +22,6 @@ class ThetasAnalyzer(object):
     def get_correlations(self, gdft):
         return self._corr_analyzer.get_correlations(gdft)
 
-    def get_theta_vecs(self, path, file_name):
-        return extract_thetas_records(path, file_name)
-
     def _generate_points(self, theta_vec):
         length = theta_vec.shape[0]
         args = np.array(list(range(length)))
@@ -39,20 +36,11 @@ class ThetasAnalyzer(object):
         polynomes = [self._fit_polynome(theta_vec, grade) for theta_vec in thetas]
         return Polynomes(polynomes=polynomes, theta_vecs=thetas)
 
-    def _fit_polynome_to(self, all_thetas, grade):
-        thetas = np.core.records.fromarrays(all_thetas)
-        length = thetas.shape[1]
-        print(length)
-        args = np.array(list(range(length)))
-
-    def fit_sorted_polynomes(self, sorted_thetas):
-        pass
-
     def sort_thetas(self, theta_vecs, groups):
         kmeans_results = self._classify_thetas(theta_vecs, groups)
         grouped_theta_vecs = self.group_by_label(theta_vecs, kmeans_results)
         return SortedThetas(thetas=grouped_theta_vecs, labels=kmeans_results[0],
-                            histogram=self._to_histogram(kmeans_results))
+                            histogram=self._kmeans_to_histogram(kmeans_results))
 
     def _classify_thetas(self, theta_vecs, groups):
         return kmeans2(theta_vecs, groups)
@@ -66,11 +54,55 @@ class ThetasAnalyzer(object):
 
         return sorted_thetas
 
-    def _to_histogram(self, k_means_results):
+    def _kmeans_to_histogram(self, k_means_results):
         return Counter(k_means_results[1])
 
+#------Analyze covariances in order to reduce dimensions with PCA--
+
+    def to_data_matrix(self, thetas, subtract_avgs=False):
+        '''Changes a list of 1-D numpy arrays into a data matrix'''
+        shape = (len(thetas), self._dim)
+        records = np.concatenate(thetas).reshape(shape)
+        if subtract_avgs:
+            records = records - records.mean(axis=0)
+        return records
+
+    def get_svd(self, data_matrix):
+        '''Returns U and W.T directly (NOT W!!) + singular vals
+        as a list'''
+        U, sing_values, W = linalg.svd(data_matrix)
+        diags = np.diagflat(sing_values)
+        return U, diags, W
+
+    def get_total_covariance(self, thetas):
+        shape = (len(thetas), self._dim)
+        thetas_matrix = np.concatenate(thetas).reshape(shape)
+        return np.cov(thetas_matrix.T)
+
     def get_covariance(self, label_no, sorted_thetas):
-        return "To be finished!"
+        thetas = sorted_thetas.thetas[label_no]
+        return self.get_total_covariance(thetas)
+
+    def _pca_reduction_svd(self, cov_matrix, cutoff_ratio=0):
+        U, sing_vals, W = linalg.svd(cov_matrix)
+        max_eig = max(np.abs(sing_vals))
+        mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_eig > cutoff_ratio]
+        return U[:, mask], np.diagflat(sing_vals[mask]), W[:, mask]
+
+    def cov_pca_reduction(self, label_no, sorted_thetas, cutoff_ratio=0):
+        cov_matrix = self.get_covariance(label_no, sorted_thetas)
+        U, sing_vals, _ = self._pca_reduction_svd(cov_matrix, cutoff_ratio=cutoff_ratio)
+        return U, sing_vals
+
+    def cov_pca_reductions(self, sorted_thetas, cutoff_ratio=0):
+        def is_empty(val):
+            return val == []
+        non_empty_labels = (key for key, val in sorted_thetas.thetas.items() if not is_empty(val))
+        return {key: self.cov_pca_reduction(key, sorted_thetas, cutoff_ratio=cutoff_ratio)
+                for key in non_empty_labels}
+
+    def entropy(self, cov_matrix):
+        return 0.5 * (self._dim + self._dim * np.log(np.pi*2) + np.log(np.linalg.det(cov_matrix)))
 
 
 def generate_thetas_v1(dim):
@@ -96,7 +128,7 @@ class GDFTBuilder(object):
 class SymmetryAnalyzer(object):
 
     def __init__(self, dim):
-        self._dim =dim
+        self._dim = dim
         self._corr_analyzer = CorrelationAnalyzer(self._dim)
 
     def get_correlations(self, gdft):
@@ -105,7 +137,8 @@ class SymmetryAnalyzer(object):
     def get_similarities(self, old_gdft, new_gdft, rel_tol=10e-9):
         old_correlations = self.get_correlations(old_gdft)
         new_correlations = self.get_correlations(new_gdft)
-        similarities = (isclose(old_corr, new_corr) for old_corr, new_corr in zip(old_correlations, new_correlations))
+        similarities = (isclose(old_corr, new_corr) for old_corr, new_corr
+                        in zip(old_correlations, new_correlations))
         return list(similarities)
 
     def get_symmetry(self, old_gdft, new_gdft, rel_tol=10e-9):

@@ -24,7 +24,7 @@ def save_test_data(file_name, results):
     dao.write(file_name + date_string + ".json", results)
 
 class TestWithSmallSize(unittest.TestCase):
-    #Testing gdft builder with 4x4 matrices
+    #Testing gdft runner with 4x4 matrices
     def setUp(self):
         self.runner = Runner(4)
 
@@ -57,7 +57,7 @@ class TestWithSmallSize(unittest.TestCase):
         theta_collections = extract_thetas_records("testdata/", "10thetas_4x4__today.json")
         print(theta_collections.thetas)
         for theta in theta_collections.thetas:
-            plot_angles(sorted(theta))
+            plot_angles(np.array(sorted(theta)))
 
 
     def tearDown(self):

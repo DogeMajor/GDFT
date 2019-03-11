@@ -18,25 +18,25 @@ class Optimizer(object):
 
     def __init__(self, dim):
         self._dim = dim
-        self._analyzer = CorrelationAnalyzer(dim)
+        self._corr_analyzer = CorrelationAnalyzer(dim)
 
     @property
     def correlation_functions(self):
-        return self._analyzer._corr_fns
+        return self._corr_analyzer._corr_fns
 
     def get_correlations(self, gdft):
-        return self._analyzer.get_correlations(gdft)
+        return self._corr_analyzer.get_correlations(gdft)
 
     def _calc_correlation(self, params, corr_fn):
         gdft = gdft_matrix(self._dim, params)
         corr_obj = Correlation(gdft)
         c_tensor = corr_obj.correlation_tensor()
-        self._analyzer.set_corr_tensor(c_tensor)
-        return corr_fn()
+        return corr_fn(c_tensor)
 
     def _optimize_corr_fn(self, corr_fn_name, init_guess=None):
         if init_guess is None:
-            init_guess = np.pi * np.random.beta(0.5, 0.5, self._dim)
+            #init_guess = np.pi * np.random.beta(0.5, 0.5, self._dim)
+            init_guess = np.random.uniform(0, np.pi, self._dim)
         bnds = tuple((0, np.pi) for n in range(self._dim))
         corr_fn = self.correlation_functions[corr_fn_name]
 
@@ -92,8 +92,7 @@ class Runner(object):
 
         for proc in jobs:
             proc.join()
-        results["results"] = res
-        print(res)
+        results["results"] = list(res)
         return results
 
     def save_results(self, file_name, results):
@@ -105,7 +104,8 @@ class Runner(object):
 if __name__ == "__main__":
 
     runner = Runner(8)
-    output = runner.optimize("avg_auto_corr", 5, stop_criteria=0.087)
-    #runner.save_results("30thetas_8x8__", results)
+    results = runner.optimize("avg_auto_corr", 30, stop_criteria=0.087)
+    print(results)
+    runner.save_results("R_ac_30thetas_8x8__", results)
     #thetas = extract_thetas_records("../data/", "thetas_16x16__1-1_21_14.json")
     #print(thetas)

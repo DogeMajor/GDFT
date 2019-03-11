@@ -3,14 +3,13 @@ import numpy as np
 from scipy.linalg import expm
 
 '''Collection of functions to rapidly generate
-dgft, dft and permutation matrices.'''
+gdft, dft and permutation matrices.'''
 
 
 def dft_matrix(dim):
     W = exp(-1j * 2 * np.pi / dim)
     function = lambda i, j: np.power(W, np.multiply(i, j))
     return np.fromfunction(function, (dim, dim))
-
 
 def random_unitary_matrix(dim, scaling=10.0):
     gen = scaling * np.random.random((dim, dim))
@@ -29,14 +28,14 @@ def gdft_matrix(dim, thetas):
     dft_mat = dft_matrix(dim)
     gen = (exp(1j * theta) for theta in thetas)
     phase_shifts = np.fromiter(gen, np.complex128)
-    return (dft_mat.T * phase_shifts).T
+    return dft_mat * phase_shifts
 
 
-def two_param_gdft_matrix(dim, thetas, gammas):
+def two_param_gdft_matrix(dim, gammas, thetas):
     mat = gdft_matrix(dim, thetas)
     gen = (exp(1j * gamma) for gamma in gammas)
     gamma_shifts = np.fromiter(gen, np.complex128)
-    return mat * gamma_shifts
+    return (mat.T * gamma_shifts).T
 
 
 def permutation_matrix(dim, orderings=None):

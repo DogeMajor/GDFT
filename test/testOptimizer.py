@@ -32,8 +32,9 @@ class TestOptimizer(unittest.TestCase):
         average_auto_correlation = self.optimizer._calc_correlation(params, avg_auto_c)
 
         analyzer = CorrelationAnalyzer(8)
-        analyzer.set_corr_tensor(c_tensor)
-        self.assertEqual(average_auto_correlation, analyzer.avg_auto_corr())
+
+        #analyzer.set_corr_tensor(c_tensor)
+        self.assertEqual(average_auto_correlation, analyzer.avg_auto_corr(c_tensor))
         self.assertAlmostEqual(4.375, average_auto_correlation)
 
     def test_corr_deps_on_params(self):
@@ -46,7 +47,7 @@ class TestOptimizer(unittest.TestCase):
         gdft = gdft_matrix(8, thetas)
         old_correlations = self.optimizer.get_correlations(gdft)
         gammas = np.ones(8)
-        new_gdft = two_param_gdft_matrix(8, thetas, gammas)
+        new_gdft = two_param_gdft_matrix(8, gammas, thetas)
         new_correlations = self.optimizer.get_correlations(new_gdft)
         for new_corr, old_corr in zip(new_correlations, old_correlations):
             self.assertAlmostEqual(new_corr, old_corr, 2)
