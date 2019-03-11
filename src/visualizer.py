@@ -188,42 +188,43 @@ if __name__ == "__main__":
         return symmetries
 
 
-    def derivative(gdft, sigma, alpha, beta, mu):
+    def derivative(gdft, sigma, alpha, beta, pos_mu):
         N = gdft.shape[0]
-        is_positive = 0 < mu <= N-1
+        mu = pos_mu - N + 1
+        is_positive = 0 < mu <= N - 1
         is_negative = 1 - N <= mu <= 0
 
         def pos_val(sigma):
-            in_interval_1 = sigma <= min(N-mu-1, mu)
-            in_interval_2 = mu < sigma < N-mu-1
-            in_interval_3 = N-mu-1 < sigma < mu
-            in_interval_4 = sigma >= max(N-mu-1, mu)
+            in_interval_1 = sigma <= min(N - mu - 1, mu)
+            in_interval_2 = mu < sigma < N - mu - 1
+            in_interval_3 = N - mu - 1 < sigma < mu
+            in_interval_4 = sigma >= max(N - mu - 1, mu)
 
             if in_interval_1:
-                return (1j/N)*gdft[alpha, sigma]*np.conjugate(gdft[beta, sigma+mu])
-            if in_interval_2:
-                return (1j/N)*(gdft[alpha, sigma]*np.conjugate(gdft[beta, sigma+mu])
-                               - gdft[alpha, sigma-mu]*np.conjugate(gdft[beta, sigma]))
-            if in_interval_3:
-                return 0
-            if in_interval_4:
-                return (-1j/N)*gdft[alpha, sigma-mu]*np.conjugate(gdft[beta, sigma])
-
-        def neg_val(sigma):
-            in_interval_1 = sigma <= min(N + mu - 1, -mu)
-            in_interval_2 = -mu < sigma < N + mu - 1
-            in_interval_3 = N + mu - 1 < sigma < -mu
-            in_interval_4 = sigma >= max(N + mu - 1, -mu)
-
-            if in_interval_1:
-                return (-1j / N) * gdft[alpha, sigma-mu] * np.conjugate(gdft[beta, sigma])
+                return (1j / N) * gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
             if in_interval_2:
                 return (1j / N) * (gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
                                    - gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma]))
             if in_interval_3:
                 return 0
             if in_interval_4:
-                return (-1j / N) * gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma+mu])
+                return (-1j / N) * gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma])
+
+        def neg_val(sigma):
+            in_interval_1 = sigma <= min(N + mu - 1, -mu - 1)
+            in_interval_2 = -mu <= sigma < N + mu - 1
+            in_interval_3 = N + mu - 1 < sigma < -mu
+            in_interval_4 = sigma >= max(N + mu - 1, -mu)
+            # print(in_interval_1, in_interval_2, in_interval_3, in_interval_4)
+            if in_interval_1:
+                return (-1j / N) * gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma])
+            if in_interval_2:
+                return (1j / N) * (gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
+                                   - gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma]))
+            if in_interval_3:
+                return 0
+            if in_interval_4:
+                return (-1j / N) * gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
 
         if is_positive:
             return pos_val(sigma)
