@@ -1,9 +1,11 @@
+from copy import deepcopy
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import linalg
 from utils import extract_thetas_records, seq_norm, approximate_matrix, approximate_phases
 from gdft import dft_matrix, gdft_matrix, two_param_gdft_matrix
 from analyzer import ThetasAnalyzer
+from correlations import CorrelationAnalyzer, Correlation
 
 plt.grid(True)
 
@@ -12,6 +14,7 @@ def orderings_dist(thetas):
     orderings = np.argsort(thetas)
     natural_order = list(range(thetas.shape[0]))
     return seq_norm(natural_order, orderings) / thetas.shape[0]
+
 
 def find_best_orderings(thetas_collections):
     records = [(theta, corr) for theta, corr in zip(thetas_collections.thetas, theta_collections.correlations)]
@@ -52,6 +55,7 @@ def angle_dist(theta_collection, partition=None):
             dist[key] += 1
     return dist
 
+
 def angle_probabilities(theta_collection, partition=None):
     angle_distr = angle_dist(theta_collection, partition)
     length = sum(angle_distr.values())
@@ -87,6 +91,7 @@ def plot_angles(thetas):
 def polar_plot_angles(thetas):
     x, y = to_coords(thetas)
     plt.plot(x, y, 'o')
+
 
 def polar_plot_numbered_angles(thetas):
     x_coords, y_coords = to_coords(thetas)
@@ -145,15 +150,207 @@ if __name__ == "__main__":
     #theta_collections = extract_thetas_records("../data/", "10thetas_16x16__12-27_11_58.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "10thetas_16x16__12-26_19_4.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "100thetas_4x4__12-26_16_6.json")
-    '''theta_collections = extract_thetas_records("../data/", "100thetas12-26_1_26.json")
+
+    #theta_collections = extract_thetas_records("../data/", "R_ac_100thetas_8x8__3-7_14_39.json")
+    #theta_collections = extract_thetas_records("../data/", "d_ac_100thetas_8x8__3-7_15_10.json")
+    theta_collections = extract_thetas_records("../data/", "R_ac_30thetas_8x8__3-10_13_3.json")
+
     #theta_collections = extract_thetas_records("../data/", "results_2018-12-24 23_33.json")
     
-    sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
-    thetas0 = sorted_thetas.thetas[0]
-    data_matrix = thetas_analyzer.to_data_matrix(theta_collections.thetas)
-    reduced_cov_mats = thetas_analyzer.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.05)
-    print(len(reduced_cov_mats))
-    print(reduced_cov_mats)
+    #sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
+    #thetas0 = sorted_thetas.thetas[0]
+    #data_matrix = thetas_analyzer.to_data_matrix(theta_collections.thetas)
+    #reduced_cov_mats = thetas_analyzer.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.05)
+    #print(len(reduced_cov_mats))
+    #print(reduced_cov_mats)
+
+    '''for theta in thetas0:
+        polar_plot_angles(theta)
+        print(theta)
+
+    plt.show()'''
+    #theta = np.array([0.43641541, 1.21234458, 3.14159265, 2.98732434, 2.05067131, 0.33163315,
+    #                  2.81226277, 0.1630281])
+
+    def symm_checker(theta, mu, m=0):
+        N = theta.shape[0]
+
+        def get_component(sigma):
+            gets_addition = sigma + mu < N
+            gets_subtraction = sigma - mu < N
+            lhs = 0
+            if gets_addition and gets_subtraction:
+                lhs += 0.5*theta[sigma + mu]
+                lhs += 0.5 * theta[sigma - mu]
+            return theta[sigma] - lhs
+
+        symmetries = [get_component(index) for index, comp in enumerate(theta)]
+        return symmetries
+
+
+    def derivative(gdft, sigma, alpha, beta, mu):
+        N = gdft.shape[0]
+        is_positive = 0 < mu <= N-1
+        is_negative = 1 - N <= mu <= 0
+
+        def pos_val(sigma):
+            in_interval_1 = sigma <= min(N-mu-1, mu)
+            in_interval_2 = mu < sigma < N-mu-1
+            in_interval_3 = N-mu-1 < sigma < mu
+            in_interval_4 = sigma >= max(N-mu-1, mu)
+
+            if in_interval_1:
+                return (1j/N)*gdft[alpha, sigma]*np.conjugate(gdft[beta, sigma+mu])
+            if in_interval_2:
+                return (1j/N)*(gdft[alpha, sigma]*np.conjugate(gdft[beta, sigma+mu])
+                               - gdft[alpha, sigma-mu]*np.conjugate(gdft[beta, sigma]))
+            if in_interval_3:
+                return 0
+            if in_interval_4:
+                return (-1j/N)*gdft[alpha, sigma-mu]*np.conjugate(gdft[beta, sigma])
+
+        def neg_val(sigma):
+            in_interval_1 = sigma <= min(N + mu - 1, -mu)
+            in_interval_2 = -mu < sigma < N + mu - 1
+            in_interval_3 = N + mu - 1 < sigma < -mu
+            in_interval_4 = sigma >= max(N + mu - 1, -mu)
+
+            if in_interval_1:
+                return (-1j / N) * gdft[alpha, sigma-mu] * np.conjugate(gdft[beta, sigma])
+            if in_interval_2:
+                return (1j / N) * (gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
+                                   - gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma]))
+            if in_interval_3:
+                return 0
+            if in_interval_4:
+                return (-1j / N) * gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma+mu])
+
+        if is_positive:
+            return pos_val(sigma)
+
+        if is_negative:
+            return neg_val(sigma)
+
+
+    def gradient(gdft, alpha, beta, mu):
+        N = gdft.shape[0]
+        derivatives = [derivative(gdft, sigma, alpha, beta, mu) for sigma in range(N)]
+        return np.array(derivatives)
+
+    def derivative_Rac(sigma, gdft):
+        N = gdft.shape[0]
+        result = 0
+        corr_tensor = Correlation(gdft).correlation_tensor()
+        conj_tensor = np.conjugate(corr_tensor)
+        for alpha in range(N):
+            for mu in range(1, N):
+                first_term = derivative(gdft, sigma, alpha, alpha, mu)*conj_tensor[alpha, alpha, mu]
+                second_term = np.conjugate(derivative(gdft, sigma, alpha, alpha, mu)) * corr_tensor[alpha, alpha, mu]
+                result += first_term + second_term
+                #print(alpha, mu, result)
+        return result/N
+
+    def grad_Rac(gdft):
+        N = gdft.shape[0]
+        derivatives = [derivative_Rac(sigma, gdft) for sigma in range(N)]
+        return np.array(derivatives)
+
+    def difference(analyzer, theta, sigma, corr_name, h=0.00001):
+        N = theta.shape[0]
+        #print(sigma, h)
+        old_gdft = gdft_matrix(N, theta)
+        old_corr_tensor = Correlation(old_gdft).correlation_tensor()
+        old_corr = analyzer._corr_fns[corr_name](old_corr_tensor)
+        new_theta = deepcopy(theta)
+        new_theta[sigma] += h
+        new_gdft = gdft_matrix(N, new_theta)
+        new_corr_tensor = Correlation(new_gdft).correlation_tensor()
+        new_corr = analyzer._corr_fns[corr_name](new_corr_tensor)
+        return (new_corr-old_corr)/h
+
+    def grad(analyzer, theta, corr_name, step=0.00001):
+        diffs = [difference(analyzer, theta, index, corr_name, h=step) for index, _ in enumerate(theta)]
+        return np.array(diffs)
+
+
+    def diff_c_tensor(theta, sigma, h=0.00001):
+        N = theta.shape[0]
+        #print(sigma, h)
+        old_gdft = gdft_matrix(N, theta)
+        old_corr_tensor = Correlation(old_gdft).correlation_tensor()
+
+        new_theta = deepcopy(theta)
+        new_theta[sigma] += h
+        new_gdft = gdft_matrix(N, new_theta)
+        new_corr_tensor = Correlation(new_gdft).correlation_tensor()
+        return (new_corr_tensor-old_corr_tensor)/h
+
+    def diff_avg_corr(theta, sigma, h=0.00001):
+        N = theta.shape[0]
+        ct_diff = diff_c_tensor(theta, sigma, h=h)
+        conj_ct_diff = np.conjugate(ct_diff)
+        gdft = gdft_matrix(N, theta)
+        ct = Correlation(gdft).correlation_tensor()
+
+        def compute_term(a, mu):
+            return ct_diff[a, a, mu]*np.conjugate(ct[a, a, mu])+ct[a, a, mu]*conj_ct_diff[a, a, mu]
+
+        result = 0
+        for alpha in range(N):
+            for mu in range(N-1):
+                result += compute_term(alpha, mu)
+            for mu in range(N, 2*N-1):
+                result += compute_term(alpha, mu)
+
+        return result/N
+
+    #for n in range(8):
+    #    print(symm_checker(theta, n))
+    #
+    #theta8 = np.array([0.4364, 1.2123, 1.9882, 2.7641, 2.5646, 2.3651, 2.1656, 1.9661])
+    theta8 = theta_collections.thetas[1]
+    #print(theta8)
+    '''gdft = gdft_matrix(8, theta8)
+    corrs = thetas_analyzer.get_correlations(gdft)
+    print(corrs)
+    sigma = 0
+    alpha = beta = 0
+    mu = 1
+    print(derivative(gdft, sigma, alpha, beta, mu))
+    print(gradient(gdft, alpha, beta, mu))'''
+
+
+    corr_analyzer = CorrelationAnalyzer(8)
+    diffs = np.array([difference(corr_analyzer, theta8, ind, "avg_auto_corr", h=0.00001) for ind in range(8)])
+    print(diffs)
+    #num_grad = grad(corr_analyzer, theta8, "max_auto_corr", h=0.00001)
+    #print("max_auto_corr", num_grad)
+    #print("avg_auto_corr", grad(corr_analyzer, theta8, "avg_auto_corr", step=0.00001))
+    #[-6.55475674e-07+0.j -9.05941988e-07+0.j -1.09423581e-06+0.j -1.21858079e-06+0.j -1.21858079e-06+0.j -1.09423581e-06+0.j
+    #-9.05941988e-07+0.j -6.55475674e-07+0.j]
+    #theta3 = np.zeros(8)
+    #theta3[0:4] = np.arange(0, 4, 1)
+    #print(theta3)
+    #print("avg_auto_corr", grad(corr_analyzer, theta3, "avg_auto_corr", step=0.0001))
+
+    #diff_ct_0 = diff_c_tensor(theta8, 0, h=0.001)
+    #print(diff_ct_0)
+    avg_corr_diffs = np.array([diff_avg_corr(theta8, ind, h=0.00001) for ind in range(8)])
+    print(avg_corr_diffs)
+    #theta2 = theta_collections.thetas[10]
+    #print("avg_auto_corr", grad(corr_analyzer, theta2, "max_auto_corr", step=0.0001))
+    #diffs = [difference(corr_analyzer, theta8, index, "avg_auto_corr", h=0.001) for index in range(8)]
+    #print(diffs)
+    #print("max_cross_corr", grad(corr_analyzer, theta8, "max_cross_corr", h=0.00001))
+    #print("avg_cross_corr", grad(corr_analyzer, theta8, "avg_cross_corr", h=0.00001))
+    #print(symm_checker(new_theta, 1))
+
+    '''gdft = gdft_matrix(8, theta3)
+    avg_auto_corr_gradient = grad_Rac(gdft)
+    print(avg_auto_corr_gradient)
+    rac_der1 = derivative_Rac(1, gdft)
+    print(rac_der1)'''
+
 
     poly_coeff_8 = np.array([-7.47998864e-03, 1.73916258e-01, -1.61020449e+00, 7.60456544e+00,
                              -1.93127379e+01, 2.45158151e+01, -1.05428434e+01, 2.47251476e-01])
@@ -167,5 +364,6 @@ if __name__ == "__main__":
     gdft = two_param_gdft_matrix(8, np.zeros(8), THETAS8)
     correlations = thetas_analyzer.get_correlations(dft_matrix(8))
     print(correlations)
-    '''Correlations(max_auto_corr=0.3814517374888245, avg_auto_corr=(1.0209859493694915+0j), 
-    max_cross_corr=0.5286804616397811, avg_cross_corr=(0.854144864375787+0j), avg_merit_factor=(0.9794454082522375+0j))'''
+    '''
+    #Correlations(max_auto_corr=0.3814517374888245, avg_auto_corr=(1.0209859493694915+0j),
+    #max_cross_corr=0.5286804616397811, avg_cross_corr=(0.854144864375787+0j), avg_merit_factor=(0.9794454082522375+0j))'''

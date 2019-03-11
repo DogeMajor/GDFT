@@ -47,7 +47,7 @@ class TestOptimizer(unittest.TestCase):
         gdft = gdft_matrix(8, thetas)
         old_correlations = self.optimizer.get_correlations(gdft)
         gammas = np.ones(8)
-        new_gdft = two_param_gdft_matrix(8, thetas, gammas)
+        new_gdft = two_param_gdft_matrix(8, gammas, thetas)
         new_correlations = self.optimizer.get_correlations(new_gdft)
         for new_corr, old_corr in zip(new_correlations, old_correlations):
             self.assertAlmostEqual(new_corr, old_corr, 2)

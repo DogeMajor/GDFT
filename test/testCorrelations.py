@@ -38,11 +38,6 @@ class TestCorrelation(unittest.TestCase):
         c_tensor = corr.correlation_tensor()
         self.assertTrue(EqualMatrices(c_tensor[0, 1, :], np.array([3, 5.5, 2])))
 
-        print(c_tensor[1, 0, :])
-        print(c_tensor[1, 1, :])
-
-
-
     def tearDown(self):
         del self.correlation
 
@@ -58,7 +53,7 @@ class SpeedTests(unittest.TestCase):
         tot_time = timeit.timeit("get_corr_tensor()", setup=SETUP,
                                  number=1)
         print("corr_tensor for dft 50x50:", tot_time, " s")
-        self.assertTrue(tot_time < 1.9)
+        self.assertTrue(tot_time < 1.0)
 
 
 if __name__ == '__main__':

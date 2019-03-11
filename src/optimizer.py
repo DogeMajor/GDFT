@@ -31,13 +31,12 @@ class Optimizer(object):
         gdft = gdft_matrix(self._dim, params)
         corr_obj = Correlation(gdft)
         c_tensor = corr_obj.correlation_tensor()
-        #self._corr_analyzer.set_corr_tensor(c_tensor)
         return corr_fn(c_tensor)
 
     def _optimize_corr_fn(self, corr_fn_name, init_guess=None):
         if init_guess is None:
-            init_guess = np.pi * np.random.beta(0.5, 0.5, self._dim)
-            #init_guess = np.random.uniform(0, np.pi, self._dim)
+            #init_guess = np.pi * np.random.beta(0.5, 0.5, self._dim)
+            init_guess = np.random.uniform(0, np.pi, self._dim)
         bnds = tuple((0, np.pi) for n in range(self._dim))
         corr_fn = self.correlation_functions[corr_fn_name]
 
@@ -52,7 +51,7 @@ class Optimizer(object):
         results = self._optimize_corr_fn(corr_fn_name, init_guess)
         for n in range(cycles):
             new_results = self._optimize_corr_fn(corr_fn_name, init_guess)
-            print(corr_fn_name, new_results[1])
+            #print(corr_fn_name, new_results[1])
             if new_results[1] < results[1]:
                 results = new_results
             if stop_criteria and results[1] < stop_criteria:
@@ -104,9 +103,9 @@ class Runner(object):
 
 if __name__ == "__main__":
 
-    runner = Runner(16)
-    results = runner.optimize("avg_merit_factor", 10, stop_criteria=0.11)
+    runner = Runner(8)
+    results = runner.optimize("avg_auto_corr", 30, stop_criteria=0.087)
     print(results)
-    runner.save_results("avg_merit_10thetas_16x16__", results)
+    runner.save_results("R_ac_30thetas_8x8__", results)
     #thetas = extract_thetas_records("../data/", "thetas_16x16__1-1_21_14.json")
     #print(thetas)

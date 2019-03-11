@@ -28,9 +28,15 @@ class Correlation(object):
         N = self._dims[0]
         tensor = np.zeros((N, N, 2 * N - 1), dtype=np.complex128)
         for row in range(N):
-            for col in range(N):
+            for col in range(row, N):
                 for nu in range(2 * N - 1):
                     tensor[row, col, nu] = self._aperiodic_corr_fn(row, col, nu)
+
+        #Set the indices c_col_row : to same as conjugate of c_col_row : with reversed order!!!
+        for row in range(N):
+            for col in range(row):
+                tensor[row, col, :] = np.conjugate(tensor[col, row, ::-1])
+
         return tensor
 
     def _aperiodic_corr_fn(self, alpha, beta, pos_mu):
@@ -74,11 +80,7 @@ Correlations = namedtuple('Correlations', 'max_auto_corr avg_auto_corr max_cross
 class CorrelationAnalyzer(object):
 
     def __init__(self, dim):
-        '''There's an error here: the corr_fns store the OLD
-        fns with the old corr_tensor;
-        changing c_tensor doest not change the c_tensor in fns!!!'''
         self._shape = (dim, dim, 2 * dim - 1)
-        #self._corr_tensor = None
         self._auto_corr_mask = is_auto_corr_mask(self._shape)
         self._cross_corr_mask = is_cross_corr_mask(self._shape)
         self._corr_fns = {"max_auto_corr": self.max_auto_corr,
@@ -90,19 +92,8 @@ class CorrelationAnalyzer(object):
     def get_correlations(self, gdft):
         corr_obj = Correlation(gdft)
         corr_tensor = corr_obj.correlation_tensor()
-        #self.set_corr_tensor(corr_obj.correlation_tensor())
-        #print("Showing c-tensor -terms d_(0,0)[:] ", corr_tensor[0, 0, :])
-        #print("Showing c-tensor -term lengths |d_(0,0)[:]| ", np.abs(corr_tensor[0, 0, :]))
-        #corrs = {fn_name: corr_fn() for fn_name, corr_fn in self._corr_fns.items()}
-        #return Correlations(**corrs)
-        return Correlations(max_auto_corr=self.max_auto_corr(corr_tensor),
-                            avg_auto_corr=self.avg_auto_corr(corr_tensor),
-                            max_cross_corr=self.max_cross_corr(corr_tensor),
-                            avg_cross_corr=self.avg_cross_corr(corr_tensor),
-                            avg_merit_factor=self.avg_merit_factor(corr_tensor))
-
-    #def set_corr_tensor(self, c_tensor):
-    #    self._corr_tensor = c_tensor
+        corrs = {fn_name: corr_fn(corr_tensor) for fn_name, corr_fn in self._corr_fns.items()}
+        return Correlations(**corrs)
 
     def _reduce_corr_tensor(self, mask, calc_fn, c_tensor):
         masked_corr = c_tensor * mask

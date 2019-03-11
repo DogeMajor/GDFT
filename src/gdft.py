@@ -3,7 +3,7 @@ import numpy as np
 from scipy.linalg import expm
 
 '''Collection of functions to rapidly generate
-dgft, dft and permutation matrices.'''
+gdft, dft and permutation matrices.'''
 
 
 def dft_matrix(dim):
