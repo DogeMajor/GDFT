@@ -6,43 +6,28 @@ from analyzer import ThetasAnalyzer
 from correlations import CorrelationAnalyzer, Correlation
 
 
-def derivative(gdft, sigma, alpha, beta, pos_mu):
+def ct_derivative(gdft, sigma, alpha, beta, pos_mu): #OK
     N = gdft.shape[0]
     mu = pos_mu - N + 1
+
     is_positive = 0 < mu <= N - 1
     is_negative = 1 - N <= mu <= 0
 
     def pos_val(sigma):
-        in_interval_1 = sigma <= min(N - mu - 1, mu)
-        in_interval_2 = mu < sigma < N - mu - 1
-        in_interval_3 = N - mu - 1 < sigma < mu
-        in_interval_4 = sigma >= max(N - mu - 1, mu)
-
-        if in_interval_1:
-            return (1j / N) * gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
-        if in_interval_2:
-            return (1j / N) * (gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
-                               - gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma]))
-        if in_interval_3:
-            return 0
-        if in_interval_4:
-            return (-1j / N) * gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma])
+        res = 0
+        if sigma <= N-1-mu:
+            res += 1j*gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
+        if sigma >= mu:
+            res -= 1j*gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma])
+        return res/N
 
     def neg_val(sigma):
-        in_interval_1 = sigma <= min(N + mu - 1, -mu-1)
-        in_interval_2 = -mu <= sigma < N + mu - 1
-        in_interval_3 = N + mu - 1 < sigma < -mu
-        in_interval_4 = sigma >= max(N + mu - 1, -mu)
-        #print(in_interval_1, in_interval_2, in_interval_3, in_interval_4)
-        if in_interval_1:
-            return (-1j / N) * gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma])
-        if in_interval_2:
-            return (1j / N) * (gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
-                               - gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma]))
-        if in_interval_3:
-            return 0
-        if in_interval_4:
-            return (-1j / N) * gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
+        res = 0
+        if sigma >= -mu:
+            res += 1j*gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
+        if sigma <= N - 1 + mu:
+            res -= 1j*gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma])
+        return res/N
 
     if is_positive:
         return pos_val(sigma)
@@ -51,33 +36,33 @@ def derivative(gdft, sigma, alpha, beta, pos_mu):
         return neg_val(sigma)
 
 
-def gradient(gdft, alpha, beta, mu):
+def ct_gradient(gdft, alpha, beta, mu): #OK
     N = gdft.shape[0]
-    derivatives = [derivative(gdft, sigma, alpha, beta, mu) for sigma in range(N)]
+    derivatives = [ct_derivative(gdft, sigma, alpha, beta, mu) for sigma in range(N)]
     return np.array(derivatives)
 
 
-def derivative_Rac(sigma, gdft):
+def auto_corr_derivative(sigma, gdft): #OK
     N = gdft.shape[0]
     result = 0
     corr_tensor = Correlation(gdft).correlation_tensor()
     conj_tensor = np.conjugate(corr_tensor)
     for alpha in range(N):
         for mu in range(1, N):
-            first_term = derivative(gdft, sigma, alpha, alpha, mu) * conj_tensor[alpha, alpha, mu]
-            second_term = np.conjugate(derivative(gdft, sigma, alpha, alpha, mu)) * corr_tensor[alpha, alpha, mu]
+            first_term = ct_derivative(gdft, sigma, alpha, alpha, mu) * conj_tensor[alpha, alpha, mu]
+            second_term = np.conjugate(ct_derivative(gdft, sigma, alpha, alpha, mu)) * corr_tensor[alpha, alpha, mu]
             result += first_term + second_term
             # print(alpha, mu, result)
-    return result / N
+    return 2*result / N
 
 
-def grad_Rac(gdft):
+def auto_corr_gradient(gdft):
     N = gdft.shape[0]
-    derivatives = [derivative_Rac(sigma, gdft) for sigma in range(N)]
+    derivatives = [auto_corr_derivative(sigma, gdft) for sigma in range(N)]
     return np.array(derivatives)
 
 
-def difference(analyzer, theta, sigma, corr_name, h=0.00001):
+def corr_difference(analyzer, theta, sigma, corr_name, h=0.00001):
     N = theta.shape[0]
     # print(sigma, h)
     old_gdft = gdft_matrix(N, theta)
@@ -91,12 +76,12 @@ def difference(analyzer, theta, sigma, corr_name, h=0.00001):
     return (new_corr - old_corr) / h
 
 
-def grad(analyzer, theta, corr_name, step=0.00001):
-    diffs = [difference(analyzer, theta, index, corr_name, h=step) for index, _ in enumerate(theta)]
+def corr_differences(analyzer, theta, corr_name, step=0.00001):
+    diffs = [corr_difference(analyzer, theta, index, corr_name, h=step) for index, _ in enumerate(theta)]
     return np.array(diffs)
 
 
-def diff_c_tensor(theta, sigma, h=0.00001):
+def ct_difference(theta, sigma, h=0.00001):
     N = theta.shape[0]
     # print(sigma, h)
     old_gdft = gdft_matrix(N, theta)
@@ -109,9 +94,29 @@ def diff_c_tensor(theta, sigma, h=0.00001):
     return (new_corr_tensor - old_corr_tensor) / h
 
 
-def diff_avg_corr(theta, sigma, h=0.00001):
+def avg_corr_difference(theta, sigma, h=0.00001):
     N = theta.shape[0]
-    ct_diff = diff_c_tensor(theta, sigma, h=h)
+    ct_diff = ct_difference(theta, sigma, h=h)
+    conj_ct_diff = np.conjugate(ct_diff)
+    gdft = gdft_matrix(N, theta)
+    ct = Correlation(gdft).correlation_tensor()
+
+    def compute_term(a, mu):
+        return ct_diff[a, a, mu] * np.conjugate(ct[a, a, mu]) + ct[a, a, mu] * conj_ct_diff[a, a, mu]
+
+    result = 0
+    for alpha in range(N):
+        for mu in range(N - 1):
+            result += compute_term(alpha, mu)
+        for mu in range(N, 2 * N - 1):
+            result += compute_term(alpha, mu)
+
+    return result / N
+
+
+def avg_corr_derivative(theta, sigma, h=0.00001):
+    N = theta.shape[0]
+    ct_diff = ct_difference(theta, sigma, h=h)
     conj_ct_diff = np.conjugate(ct_diff)
     gdft = gdft_matrix(N, theta)
     ct = Correlation(gdft).correlation_tensor()

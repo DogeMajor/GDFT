@@ -67,40 +67,61 @@ class TestFiniteDifference(unittest.TestCase):
         corr_tensor = Correlation(self.dft).correlation_tensor()
         old_corr_tensor = Correlation(self.gdft).correlation_tensor()
         thetas = np.array([np.pi, 0.25*np.pi])
-        ct_diff0 = diff_c_tensor(thetas, 0, h=0.001)
+        ct_diff0 = ct_difference(thetas, 0, h=0.001)
         self.assertAlmostEqual(ct_diff0[0, 0, 0], -0.35337655+0.35373011j)
         self.assertAlmostEqual(ct_diff0[1, 1, 2], 0.35337655+0.35373011j)
         #print(diff_c_tensor(thetas, 0, h=0.001))
 
     def test_ct_derivative(self):
-        #derivative_ct000 = derivative(self.gdft, 0, 0, 0, 0)
-        #self.assertAlmostEqual(derivative_ct000, -0.3535533905932738+0.35355339059327373j)
-        #derivative_ct112 = derivative(self.gdft, 0, 1, 1, 2)
-        #self.assertAlmostEqual(derivative_ct112, 0.35355339059327384 + 0.3535533905932737j)
-        ct_diff0 = diff_c_tensor(self.thetas, 0, h=0.000001)
-        #derivative0_ct = np.zeros((2,2,3))
-        result = derivative(self.gdft, 0, 0, 0, 1)
-        #print(result)
-        '''for row in range(2):
-            for col in range(row, 2):
-                for nu in range(3):
-                    print("indices: {0}, {1}, {2} ".format(row, col, nu))
-                    print(ct_diff0[row, col, nu])
-                    print(derivative(self.gdft, 0, row, col, nu))'''
+        for sigma in range(8):
+            thetas8 = np.pi*np.array([1, 0.2, 0.15, -0.5, 2, 0.3, 0.45, -1.5])
+            ct_diff = ct_difference(thetas8, sigma, h=0.0000001)
+            gdft8 = gdft_matrix(8, thetas8)
+            errors = 0
+            for row in range(8):
+                for col in range(8):
+                    for nu in range(15):
+                        result_should_be = ct_derivative(gdft8, sigma, row, col, nu)
+                        '''if np.abs(ct_diff[row, col, nu] - result_should_be) > 0.01:
+                            errors += 1
+                            print("False!!!!")
+                            print("Theta index: {}".format(sigma))
+                            print("indices: {0}, {1}, {2} ".format(row, col, nu))
+                            print("Real mu: {}".format(nu-7))
+                            print(ct_diff[row, col, nu])
+                            print(result_should_be)'''
+                        self.assertAlmostEqual(ct_diff[row, col, nu], result_should_be)
+        print(errors)
 
-        thetas4 = np.pi*np.array([1, 0.25, 0.5, -0.5])
-        ct_diff = diff_c_tensor(thetas4, 0, h=0.00000001)
-        print(ct_diff.shape)
-        gdft4 = gdft_matrix(4, thetas4)
-        for row in range(4):
-            for col in range(4):
-                for nu in range(7):
-                    #print("indices: {0}, {1}, {2} ".format(row, col, nu))
-                    #print(ct_diff[row, col, nu])
-                    #print(derivative(gdft4, 0, row, col, nu))
-                    self.assertAlmostEqual(ct_diff[row, col, nu], derivative(gdft4, 0, row, col, nu))
+    def test_ct_gradient(self):
+        thetas8 = np.pi * np.array([1, 0.2, 0.15, -0.5, 2, 0.3, 0.45, -1.5])
+        gdft8 = gdft_matrix(8, thetas8)
+        for sigma in range(8):
+            ct_diff = ct_difference(thetas8, sigma, h=0.0000001)
+            grad_001 = ct_gradient(gdft8, 0, 0, 1)
+            self.assertAlmostEqual(grad_001[sigma], ct_diff[0, 0, 1])
 
+    def test_auto_corr_derivative(self):
+        thetas8 = np.pi * np.array([1, 0.2, 0.15, -0.5, 2, 0.3, 0.45, -1.5])
 
+        analyzer = CorrelationAnalyzer(8)
+        for sigma in range(8):
+            ac_diff = corr_difference(analyzer, thetas8, sigma, "avg_auto_corr", h=0.000001)
+            gdft8 = gdft_matrix(8, thetas8)
+            derivative_Rac0 = auto_corr_derivative(sigma, gdft8)
+            self.assertAlmostEqual(derivative_Rac0, ac_diff, 6)
+
+    def test_avg_corr_difference(self):
+        thetas8 = np.pi * np.array([1, 0.2, 0.15, -0.5, 2, 0.3, 0.45, -1.5])
+        gdft8 = gdft_matrix(8, thetas8)
+        avg_corr_difference(thetas8, 0, h=0.00001)
+
+    def test_corr_difference(self):
+        thetas8 = np.pi * np.array([1, 0.2, 0.15, -0.5, 2, 0.3, 0.45, -1.5])
+
+        analyzer = CorrelationAnalyzer(8)
+        ac_diff = corr_difference(analyzer, thetas8, 0, "avg_auto_corr", h=0.000001)
+        print(ac_diff)
 
     def tearDown(self):
         del self.dft
