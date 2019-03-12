@@ -10,6 +10,14 @@ from correlations import Correlation
 from temp import *
 from tools import EqualMatrices
 
+class GDFTTestCase(unittest.TestCase):
+
+    def assertAlmostEqualLists(self, first_list, second_list, places=7):
+        self.assertEqual(len(first_list), len(second_list))
+        for first_item, second_item in zip(first_list, second_list):
+            self.assertAlmostEqual(first_item, second_item, places=places)
+
+
 
 class TestCorrelation(unittest.TestCase):
     '''OBS! This only tests a symmetric case of matrix A'''
@@ -56,7 +64,7 @@ class SpeedTests(unittest.TestCase):
         print("corr_tensor for dft 50x50:", tot_time, " s")
         self.assertTrue(tot_time < 1.0)
 
-class TestFiniteDifference(unittest.TestCase):
+class TestFiniteDifference(GDFTTestCase):
 
     def setUp(self):
         self.dft = dft_matrix(2)
@@ -118,10 +126,14 @@ class TestFiniteDifference(unittest.TestCase):
 
     def test_corr_difference(self):
         thetas8 = np.pi * np.array([1, 0.2, 0.15, -0.5, 2, 0.3, 0.45, -1.5])
-
+        gdft8 = gdft_matrix(8, thetas8)
         analyzer = CorrelationAnalyzer(8)
-        ac_diff = corr_difference(analyzer, thetas8, 0, "avg_auto_corr", h=0.000001)
-        print(ac_diff)
+        ac_diffs = [corr_difference(analyzer, thetas8, k, "avg_auto_corr") for k in range(8)]
+        ac_diffs_should_be = [avg_corr_difference(thetas8, index) for index in range(8)]
+        ac_grad = [auto_corr_derivative(sigma, gdft8) for sigma in range(8)]
+        self.assertAlmostEqualLists(ac_grad, ac_diffs, places=5)
+        self.assertAlmostEqualLists(ac_grad, ac_diffs_should_be, places=5)
+        self.assertAlmostEqualLists(ac_diffs, ac_diffs_should_be, places=5)
 
     def tearDown(self):
         del self.dft

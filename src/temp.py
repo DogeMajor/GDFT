@@ -1,6 +1,7 @@
 from copy import deepcopy
 import numpy as np
 from scipy import linalg
+from utils import show
 from gdft import dft_matrix, gdft_matrix, two_param_gdft_matrix
 from analyzer import ThetasAnalyzer
 from correlations import CorrelationAnalyzer, Correlation
@@ -56,13 +57,13 @@ def auto_corr_derivative(sigma, gdft): #OK
     return 2*result / N
 
 
-def auto_corr_gradient(gdft):
+def auto_corr_gradient(gdft): #OK
     N = gdft.shape[0]
     derivatives = [auto_corr_derivative(sigma, gdft) for sigma in range(N)]
     return np.array(derivatives)
 
 
-def corr_difference(analyzer, theta, sigma, corr_name, h=0.00001):
+def corr_difference(analyzer, theta, sigma, corr_name, h=0.00001): #OK
     N = theta.shape[0]
     # print(sigma, h)
     old_gdft = gdft_matrix(N, theta)
@@ -76,7 +77,7 @@ def corr_difference(analyzer, theta, sigma, corr_name, h=0.00001):
     return (new_corr - old_corr) / h
 
 
-def corr_differences(analyzer, theta, corr_name, step=0.00001):
+def corr_differences(analyzer, theta, corr_name, step=0.00001): #OK
     diffs = [corr_difference(analyzer, theta, index, corr_name, h=step) for index, _ in enumerate(theta)]
     return np.array(diffs)
 

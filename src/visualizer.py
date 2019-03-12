@@ -161,7 +161,7 @@ if __name__ == "__main__":
         return symmetries
 
 
-    def derivative(gdft, sigma, alpha, beta, pos_mu): #OK
+    def ct_derivative(gdft, sigma, alpha, beta, pos_mu):  # OK
         N = gdft.shape[0]
         mu = pos_mu - N + 1
 
@@ -191,35 +191,35 @@ if __name__ == "__main__":
             return neg_val(sigma)
 
 
-    def gradient(gdft, alpha, beta, mu): #OK
+    def ct_gradient(gdft, alpha, beta, mu):  # OK
         N = gdft.shape[0]
-        derivatives = [derivative(gdft, sigma, alpha, beta, mu) for sigma in range(N)]
+        derivatives = [ct_derivative(gdft, sigma, alpha, beta, mu) for sigma in range(N)]
         return np.array(derivatives)
 
-    def derivative_Rac(sigma, gdft):
+
+    def auto_corr_derivative(sigma, gdft):  # OK
         N = gdft.shape[0]
         result = 0
         corr_tensor = Correlation(gdft).correlation_tensor()
         conj_tensor = np.conjugate(corr_tensor)
-        pos_mu_range = list(range(0, N-1)) + list(range(N, 2*N-1))
-        print(N)
-        print(pos_mu_range)
         for alpha in range(N):
-            for pos_mu in pos_mu_range:
-                first_term = derivative(gdft, sigma, alpha, alpha, pos_mu)*conj_tensor[alpha, alpha, pos_mu]
-                second_term = np.conjugate(derivative(gdft, sigma, alpha, alpha, pos_mu)) * corr_tensor[alpha, alpha, pos_mu]
+            for mu in range(1, N):
+                first_term = ct_derivative(gdft, sigma, alpha, alpha, mu) * conj_tensor[alpha, alpha, mu]
+                second_term = np.conjugate(ct_derivative(gdft, sigma, alpha, alpha, mu)) * corr_tensor[alpha, alpha, mu]
                 result += first_term + second_term
-                #print(alpha, mu, result)
-        return result/N
+                # print(alpha, mu, result)
+        return 2 * result / N
 
-    def grad_Rac(gdft):
+
+    def auto_corr_gradient(gdft):  # OK
         N = gdft.shape[0]
-        derivatives = [derivative_Rac(sigma, gdft) for sigma in range(N)]
+        derivatives = [auto_corr_derivative(sigma, gdft) for sigma in range(N)]
         return np.array(derivatives)
 
-    def difference(analyzer, theta, sigma, corr_name, h=0.00001):
+
+    def corr_difference(analyzer, theta, sigma, corr_name, h=0.00001):  # OK
         N = theta.shape[0]
-        #print(sigma, h)
+        # print(sigma, h)
         old_gdft = gdft_matrix(N, theta)
         old_corr_tensor = Correlation(old_gdft).correlation_tensor()
         old_corr = analyzer._corr_fns[corr_name](old_corr_tensor)
@@ -228,16 +228,17 @@ if __name__ == "__main__":
         new_gdft = gdft_matrix(N, new_theta)
         new_corr_tensor = Correlation(new_gdft).correlation_tensor()
         new_corr = analyzer._corr_fns[corr_name](new_corr_tensor)
-        return (new_corr-old_corr)/h
+        return (new_corr - old_corr) / h
 
-    def grad(analyzer, theta, corr_name, step=0.00001):
-        diffs = [difference(analyzer, theta, index, corr_name, h=step) for index, _ in enumerate(theta)]
+
+    def corr_differences(analyzer, theta, corr_name, step=0.00001):  # OK
+        diffs = [corr_difference(analyzer, theta, index, corr_name, h=step) for index, _ in enumerate(theta)]
         return np.array(diffs)
 
 
-    def diff_c_tensor(theta, sigma, h=0.00001):
+    def ct_difference(theta, sigma, h=0.00001):
         N = theta.shape[0]
-        #print(sigma, h)
+        # print(sigma, h)
         old_gdft = gdft_matrix(N, theta)
         old_corr_tensor = Correlation(old_gdft).correlation_tensor()
 
@@ -245,27 +246,27 @@ if __name__ == "__main__":
         new_theta[sigma] += h
         new_gdft = gdft_matrix(N, new_theta)
         new_corr_tensor = Correlation(new_gdft).correlation_tensor()
-        return (new_corr_tensor-old_corr_tensor)/h
+        return (new_corr_tensor - old_corr_tensor) / h
 
-    def diff_avg_corr(theta, sigma, h=0.00001):
+
+    def avg_corr_difference(theta, sigma, h=0.00001):
         N = theta.shape[0]
-        ct_diff = diff_c_tensor(theta, sigma, h=h)
+        ct_diff = ct_difference(theta, sigma, h=h)
         conj_ct_diff = np.conjugate(ct_diff)
         gdft = gdft_matrix(N, theta)
         ct = Correlation(gdft).correlation_tensor()
 
         def compute_term(a, mu):
-            return ct_diff[a, a, mu]*np.conjugate(ct[a, a, mu])+ct[a, a, mu]*conj_ct_diff[a, a, mu]
+            return ct_diff[a, a, mu] * np.conjugate(ct[a, a, mu]) + ct[a, a, mu] * conj_ct_diff[a, a, mu]
 
         result = 0
         for alpha in range(N):
-            for mu in range(N-1):
+            for mu in range(N - 1):
                 result += compute_term(alpha, mu)
-            for mu in range(N, 2*N-1):
+            for mu in range(N, 2 * N - 1):
                 result += compute_term(alpha, mu)
 
-        return result/N
-
+        return result / N
     #for n in range(8):
     #    print(symm_checker(theta, n))
     #
@@ -297,7 +298,7 @@ if __name__ == "__main__":
 
     #diff_ct_0 = diff_c_tensor(theta8, 0, h=0.001)
     #print(diff_ct_0)
-    avg_corr_diffs = np.array([diff_avg_corr(theta8, ind, h=0.00001) for ind in range(8)])
+    avg_corr_diffs = np.array([avg_corr_difference(theta8, ind, h=0.00001) for ind in range(8)])
     print(avg_corr_diffs)
     #theta2 = theta_collections.thetas[10]
     #print("avg_auto_corr", grad(corr_analyzer, theta2, "max_auto_corr", step=0.0001))
@@ -308,9 +309,9 @@ if __name__ == "__main__":
     #print(symm_checker(new_theta, 1))
 
     gdft = gdft_matrix(8, theta8)
-    avg_auto_corr_gradient = grad_Rac(gdft)
+    avg_auto_corr_gradient = [auto_corr_derivative(sigma, gdft) for sigma in range(8)]
     print(avg_auto_corr_gradient)
-    rac_der1 = derivative_Rac(1, gdft)
+    rac_der1 = auto_corr_derivative(1, gdft)
     print(rac_der1)
 
 
