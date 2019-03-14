@@ -1,3 +1,4 @@
+import unittest
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -28,3 +29,20 @@ def show_plot(wait=3, close=True):
             plt.show()
         return plot_fn
     return _show_plot
+
+class GDFTTestCase(unittest.TestCase):
+
+    def assertAlmostEqualLists(self, first_list, second_list, places=7):
+        self.assertEqual(len(first_list), len(second_list))
+        for first_item, second_item in zip(first_list, second_list):
+            self.assertAlmostEqual(first_item, second_item, places=places)
+
+    def assertEqualMatrices(self, matA, matB):
+        if matA.shape != matB.shape:
+            return False
+        return np.testing.assert_equal(matA, matB)
+
+    def assertAlmosEqualMatrices(self, matA, matB, decimals=7):
+        if matA.shape != matB.shape:
+            return False
+        return np.testing.assert_almost_equal(matA, matB, decimals=decimals)

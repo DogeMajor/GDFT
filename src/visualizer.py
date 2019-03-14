@@ -131,9 +131,9 @@ if __name__ == "__main__":
 
     #theta_collections = extract_thetas_records("../data/", "results_2018-12-24 23_33.json")
     
-    sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
+    #sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
     #thetas0 = sorted_thetas.thetas[0]
-    #data_matrix = thetas_analyzer.to_data_matrix(theta_collections.thetas)
+    #data_matrix = thetas_analyzer.to_data_matrix(sorted_thetas.thetas[0])
     #reduced_cov_mats = thetas_analyzer.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.05)
     #print(len(reduced_cov_mats))
     #print(reduced_cov_mats)
@@ -208,6 +208,18 @@ if __name__ == "__main__":
                            2.08375977, 0.4239405, 2.96378942, 0.37377238])
     direction2 = np.array([-7, -5, -3, -1,
                            1, 3, 5, 7])
+
+    direction3 = np.array([1, 1, 1, 1,
+                           1, 1, 1, 1])
+
+    direction4 = np.array([4, 3, 2, 1,
+                           0, -1, -2, -3])
+    solution_space = np.zeros((8, 4))
+    solution_space[:, 0] = direction
+    solution_space[:, 1] = direction2
+    solution_space[:, 2] = direction3
+    solution_space[:, 3] = direction4
+
     #print(symm_checker(new_theta, 1))
     '''theta_ref = sorted_thetas.thetas[0][0]
     print(theta_ref)
@@ -227,8 +239,6 @@ if __name__ == "__main__":
     #direction = np.array([0, -1, 0, -1,
     #                      0, -1, 0, -1])
 
-
-
     constructed_theta = [0.27200508, np.pi - 0.27200508, 0.27200508, 1.96402313,
                          np.pi - 0.27200508, 3.00086244, 3.00086244-1.96402313, np.pi - 3.00086244]
 
@@ -238,13 +248,13 @@ if __name__ == "__main__":
     opt_theta = np.array([0.40135885, np.pi/2 - 0.40135885, 2.88234682+0.25062983, np.pi+0.25062983-0.40135885,
                           2.0857035, 0.40135885, np.pi-0.25062983, 0.25062983])
     #print(theta0+ np.pi*direction)
-    '''for n in range(-4, 4):
+    for n in range(-10, 10):
 
-        constr_gdft = gdft_matrix(8, constructed_theta+n*delta*direction)
+        constr_gdft = gdft_matrix(8, theta_ref2+n*0.01*direction4)
         correlations = corr_analyzer.get_correlations(constr_gdft)
         print(n, correlations.avg_auto_corr)
-        print("R_ac gradient length")
-        print(np.linalg.norm(auto_corr_gradient(constr_gdft)))'''
+        #print("R_ac gradient length")
+        #print(np.linalg.norm(auto_corr_gradient(constr_gdft))
     '''for n in range(0, 5):
         new_theta = theta_init - n*0.015*direction
         constr_gdft = gdft_matrix(8, new_theta)
