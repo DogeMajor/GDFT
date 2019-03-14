@@ -7,7 +7,16 @@ sys.path.append("../src")
 sys.path.append("src/")
 from gdft import dft_matrix
 from correlations import Correlation
+from temp import *
 from tools import EqualMatrices
+
+class GDFTTestCase(unittest.TestCase):
+
+    def assertAlmostEqualLists(self, first_list, second_list, places=7):
+        self.assertEqual(len(first_list), len(second_list))
+        for first_item, second_item in zip(first_list, second_list):
+            self.assertAlmostEqual(first_item, second_item, places=places)
+
 
 
 class TestCorrelation(unittest.TestCase):
@@ -54,7 +63,6 @@ class SpeedTests(unittest.TestCase):
                                  number=1)
         print("corr_tensor for dft 50x50:", tot_time, " s")
         self.assertTrue(tot_time < 1.0)
-
 
 if __name__ == '__main__':
     unittest.main()

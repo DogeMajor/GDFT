@@ -104,8 +104,8 @@ class Runner(object):
 if __name__ == "__main__":
 
     runner = Runner(8)
-    results = runner.optimize("avg_auto_corr", 30, stop_criteria=0.087)
+    results = runner.optimize("avg_auto_corr", 1, stop_criteria=0.087)
     print(results)
-    runner.save_results("R_ac_30thetas_8x8__", results)
+    #runner.save_results("R_ac_30thetas_8x8__", results)
     #thetas = extract_thetas_records("../data/", "thetas_16x16__1-1_21_14.json")
     #print(thetas)
