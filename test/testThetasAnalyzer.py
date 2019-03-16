@@ -91,6 +91,47 @@ class TestThetasAnalyzer(unittest.TestCase):
         AssertAlmostEqualMatrices(np.identity(3), U.T.dot(U))
         self.assertTrue(np.abs(cov_mat - reduced_cov).max() < .12)
 
+    def test_solution_spaces(self):
+        analyzer = ThetasAnalyzer(8)
+        thetas = {0: theta8x100.thetas[0:10], 1: theta8x100.thetas[10:20], 2: []}
+        first_label = sum(theta8x100.thetas[0:10])/10
+        second_label = sum(theta8x100.thetas[10:20])/10
+        sorted_thetas = SortedThetas(thetas=thetas, labels=[first_label, second_label], histogram={})
+        sol_spaces = analyzer.solution_spaces(sorted_thetas, cutoff_ratio=0.005)
+        cov_mat = analyzer.get_total_covariance(theta8x100.thetas)
+
+        reduced_covs = analyzer.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.005)
+
+        U0, red_sings = reduced_covs[0]
+        eig00 = U0[:, 0]
+        eig01 = U0[:, 1]
+        reduced_cov = U0 @ red_sings @ U0.T
+        print(reduced_cov)
+        self.assertEqual(list(sol_spaces.keys()), [0, 1])
+        theta_mean, P = sol_spaces[0]['label'], sol_spaces[0]['projection']
+        #vec = np.array([0, 1, 0, 0, 0, 0, 1, 0]) - theta_mean
+        #vec = np.array([0.3556204, 0.35446735, 0.35032462, 0.35090038,
+        #                0.35293024, 0.35641427, 0.35124674, 0.35645961+0.j])
+        vec = np.array([-0.43813039, 0.35249172, -0.39762593, 0.11832356,
+                         0.40324754, 0.45714674, -0.13015696, -0.35093012])
+
+        AssertAlmostEqualMatrices(P, P.T)
+        AssertAlmostEqualMatrices(P, P.dot(P))
+
+        data_matrix = analyzer.to_data_matrix(theta8x100.thetas[0:10], subtract_avgs=True)
+
+        #print(data_matrix)
+        #print(data_matrix-(P @ data_matrix.T).T)
+        AssertAlmostEqualMatrices(analyzer.get_covariance(0, sorted_thetas), np.cov(data_matrix.T))
+        new_data_matrix = U0.T.dot(data_matrix.T)
+        reduced_data = U0 @ np.sqrt(red_sings)
+        AssertAlmostEqualMatrices(np.cov(reduced_data), reduced_data.T @ reduced_data)
+        print(reduced_cov - reduced_data.T @ reduced_data)
+        cov_differences = np.cov(reduced_data) - np.cov(data_matrix.T)
+        #print(cov_differences)
+        #print(np.linalg.eig(P)[1][:, 1])
+
+
     def test_finding_svd(self):#OK
         analyzer = ThetasAnalyzer(8)
         data_matrix = analyzer.to_data_matrix(theta8x100.thetas, subtract_avgs=True)
