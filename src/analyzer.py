@@ -83,11 +83,17 @@ class ThetasAnalyzer(object):
         thetas = sorted_thetas.thetas[label_no]
         return self.get_total_covariance(thetas)
 
-    def _pca_reduction_svd(self, cov_matrix, cutoff_ratio=0):
-        U, sing_vals, W = linalg.svd(cov_matrix)
+    def _pca_reduction_svd(self, mat, cutoff_ratio=0):
+        U, sing_vals, W = linalg.svd(mat)
+        print(U.shape, sing_vals.shape, W.shape)
+        print(sing_vals)
         max_sing = max(np.abs(sing_vals))
         mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_sing > cutoff_ratio]
-        return U[:, mask], np.diagflat(sing_vals[mask]), W[:, mask]
+        sing_diag = np.diagflat(sing_vals[mask])
+        L = len(mask)
+        sing_mat = np.block([[sing_diag], [np.zeros((mat.shape[0]-L, L))]])
+
+        return U, sing_mat, W[:, mask]
 
     def cov_pca_reduction(self, label_no, sorted_thetas, cutoff_ratio=0):
         cov_matrix = self.get_covariance(label_no, sorted_thetas)
