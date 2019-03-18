@@ -88,22 +88,18 @@ class ThetasAnalyzer(object):
         max_sing = max(np.abs(sing_vals))
         mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_sing > cutoff_ratio]
         sing_diag = np.diagflat(sing_vals[mask])
-        sing_mat = np.zeros(())
-        '''if mat.shape[0] > mat.shape[1]:
-            L = len(mask)
-            sing_mat = np.block([[sing_diag], [np.zeros((mat.shape[0]-L, L))]])
-
-        elif mat.shape[0] < mat.shape[1]:
-            print(mask[0])
-            H = len(mask[0])
-            sing_mat = np.block([[sing_diag, np.zeros((mat.shape[1]-H, H))]])'''
-
+        L = len(mask)
+        sing_mat = np.zeros((mat.shape[0], L))
+        sing_mat[0:L, 0:L] = sing_diag
         return U, sing_mat, W[:, mask]
 
     def cov_pca_reduction(self, label_no, sorted_thetas, cutoff_ratio=0):
-        cov_matrix = self.get_covariance(label_no, sorted_thetas)
-        U, sing_vals, _ = self._pca_reduction_svd(cov_matrix, cutoff_ratio=cutoff_ratio)
-        return U, sing_vals
+        #cov_matrix = self.get_covariance(label_no, sorted_thetas)
+        thetas = sorted_thetas.thetas[label_no]
+        data_matrix = self.to_data_matrix(thetas, subtract_avgs=True)
+        U, sing_vals, W = self._pca_reduction_svd(data_matrix, cutoff_ratio=cutoff_ratio)
+        sing_mat = sing_vals.T @ sing_vals
+        return W, sing_mat
 
     def cov_pca_reductions(self, sorted_thetas, cutoff_ratio=0):
         def is_empty(val):

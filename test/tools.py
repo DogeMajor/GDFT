@@ -42,7 +42,7 @@ class GDFTTestCase(unittest.TestCase):
             return False
         return np.testing.assert_equal(matA, matB)
 
-    def assertAlmosEqualMatrices(self, matA, matB, decimals=7):
+    def assertAlmostEqualMatrices(self, matA, matB, decimals=7):
         if matA.shape != matB.shape:
             return False
-        return np.testing.assert_almost_equal(matA, matB, decimals=decimals)
+        return np.testing.assert_almost_equal(matA, matB, decimal=decimals)
