@@ -88,10 +88,7 @@ class ThetasAnalyzer(object):
         max_sing = max(np.abs(sing_vals))
         mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_sing > cutoff_ratio]
         sing_diag = np.diagflat(sing_vals[mask])
-        L = len(mask)
-        sing_mat = np.zeros((mat.shape[0], L))
-        sing_mat[0:L, 0:L] = sing_diag
-        return U, sing_mat, W[:, mask]
+        return U[:, mask], sing_diag, W[mask, :]
 
     def cov_pca_reduction(self, label_no, sorted_thetas, cutoff_ratio=0):
         #cov_matrix = self.get_covariance(label_no, sorted_thetas)
