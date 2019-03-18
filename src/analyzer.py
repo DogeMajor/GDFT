@@ -75,24 +75,31 @@ class ThetasAnalyzer(object):
         return U, diags, W
 
     def get_total_covariance(self, thetas):
-        shape = (len(thetas), self._dim)
-        thetas_matrix = np.concatenate(thetas).reshape(shape)
-        return np.cov(thetas_matrix.T)
+        length = len(thetas)
+        thetas_matrix = self.to_data_matrix(thetas, subtract_avgs=True)
+        return thetas_matrix.T.dot(thetas_matrix)/length
 
     def get_covariance(self, label_no, sorted_thetas):
         thetas = sorted_thetas.thetas[label_no]
         return self.get_total_covariance(thetas)
 
-    def _pca_reduction_svd(self, cov_matrix, cutoff_ratio=0):
-        U, sing_vals, W = linalg.svd(cov_matrix)
-        max_eig = max(np.abs(sing_vals))
-        mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_eig > cutoff_ratio]
-        return U[:, mask], np.diagflat(sing_vals[mask]), W[:, mask]
+    def _pca_reduction_svd(self, mat, cutoff_ratio=0):
+        U, sing_vals, W = linalg.svd(mat)
+        max_sing = max(np.abs(sing_vals))
+        mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_sing > cutoff_ratio]
+        sing_diag = np.diagflat(sing_vals[mask])
+        L = len(mask)
+        sing_mat = np.zeros((mat.shape[0], L))
+        sing_mat[0:L, 0:L] = sing_diag
+        return U, sing_mat, W[:, mask]
 
     def cov_pca_reduction(self, label_no, sorted_thetas, cutoff_ratio=0):
-        cov_matrix = self.get_covariance(label_no, sorted_thetas)
-        U, sing_vals, _ = self._pca_reduction_svd(cov_matrix, cutoff_ratio=cutoff_ratio)
-        return U, sing_vals
+        #cov_matrix = self.get_covariance(label_no, sorted_thetas)
+        thetas = sorted_thetas.thetas[label_no]
+        data_matrix = self.to_data_matrix(thetas, subtract_avgs=True)
+        U, sing_vals, W = self._pca_reduction_svd(data_matrix, cutoff_ratio=cutoff_ratio)
+        sing_mat = sing_vals.T @ sing_vals
+        return W, sing_mat
 
     def cov_pca_reductions(self, sorted_thetas, cutoff_ratio=0):
         def is_empty(val):
@@ -100,6 +107,19 @@ class ThetasAnalyzer(object):
         non_empty_labels = (key for key, val in sorted_thetas.thetas.items() if not is_empty(val))
         return {key: self.cov_pca_reduction(key, sorted_thetas, cutoff_ratio=cutoff_ratio)
                 for key in non_empty_labels}
+
+    def solution_spaces(self, sorted_thetas, cutoff_ratio=0):
+        pca_reductions = self.cov_pca_reductions(sorted_thetas, cutoff_ratio=cutoff_ratio)
+
+        def get_solution_space(key):
+            U = pca_reductions[key][0]
+            projection = np.zeros((self._dim, self._dim))
+            for col in range(U.shape[1]):
+                projection = projection + np.outer(U[:, col], U[:, col])
+                return {'label': sorted_thetas.labels[key], 'projection': projection}
+
+        sol_spaces = {key: get_solution_space(key) for key in pca_reductions.keys()}
+        return sol_spaces
 
     def entropy(self, cov_matrix):
         return 0.5 * (self._dim + self._dim * np.log(np.pi*2) + np.log(np.linalg.det(cov_matrix)))
