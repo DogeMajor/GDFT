@@ -45,7 +45,8 @@ class TestThetasAnalyzer(GDFTTestCase):
         self.assertEqual(sorted(list(sorted_thetas.histogram.values())), [1, 1])
 
     def test_get_covariance(self):
-        sorted_thetas = SortedThetas(thetas={0: [np.array([1, 2.2]), np.array([1.2, 2.6])],
+        sorted_thetas = SortedThetas(thetas={0: [np.array([1, 2.2]),
+                                                 np.array([1.2, 2.6])],
                                              1: [np.array([3, 4])]},
                                      labels=np.array([[1.1, 2.25], [3, 4]]),
                                      histogram={0: 2, 1: 1})
@@ -113,9 +114,9 @@ class TestThetasAnalyzer(GDFTTestCase):
         self.assertAlmostEqualMatrices(U.T @ U, np.eye(5))
         self.assertAlmostEqualMatrices(W @ W.T, np.eye(4))
         self.assertAlmostEqualMatrices(sing_mat, np.array([[2.7751688, 0, 0, 0, 0],
-                                                      [0, 2.1213203, 0, 0, 0],
-                                                      [0, 0, 1.13949018, 0, 0],
-                                                      [0, 0, 0, 0, 0]]))
+                                                           [0, 2.1213203, 0, 0, 0],
+                                                           [0, 0, 1.13949018, 0, 0],
+                                                           [0, 0, 0, 0, 0]]))
         cov_sings = sing_mat.T @ sing_mat
         reconstructed_cov = (W.T @ cov_sings @ W)/data_matrix.shape[0]
         self.assertAlmostEqualMatrices((data_matrix.T @ data_matrix)/data_matrix.shape[0], reconstructed_cov)
@@ -159,61 +160,63 @@ class TestThetasAnalyzer(GDFTTestCase):
         self.assertAlmostEqualMatrices(np.identity(3), W.T.dot(W))
         self.assertTrue(np.abs(cov_mat - reduced_cov).max() < 0.12)
 
-    '''def test_solution_spaces(self):
+    def test_solution_spaces(self):
         analyzer = ThetasAnalyzer(8)
         thetas = {0: theta8x100.thetas[0:10], 1: theta8x100.thetas[10:20], 2: []}
         first_label = sum(theta8x100.thetas[0:10])/10
         second_label = sum(theta8x100.thetas[10:20])/10
         sorted_thetas = SortedThetas(thetas=thetas, labels=[first_label, second_label], histogram={})
 
-
         sol_spaces = analyzer.solution_spaces(sorted_thetas, cutoff_ratio=0.005)
-        cov_mat = analyzer.get_total_covariance(theta8x100.thetas)
-        reduced_covs = analyzer.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.000000000005)
+        reduced_covs = analyzer.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.005)
 
-        U0, red_sings = reduced_covs[0]
-        eig00 = U0[:, 0]
-        eig01 = U0[:, 1]
-        reduced_cov = U0 @ red_sings @ U0.T
+        W0, red_sings = reduced_covs[0]
+        reduced_cov = W0.T @ red_sings @ W0 / 10
         self.assertEqual(list(sol_spaces.keys()), [0, 1])
         theta_mean, P = sol_spaces[0]['label'], sol_spaces[0]['projection']
+        cov0 = analyzer.get_covariance(0, sorted_thetas)
+        cov_diff = cov0 - reduced_cov
+        self.assertTrue(np.linalg.norm(cov_diff) < 10**-9)
 
-        AssertAlmostEqualMatrices(P, P.T)
-        AssertAlmostEqualMatrices(P, P.dot(P))
+        self.assertAlmostEqualMatrices(P, P.T)
+        self.assertAlmostEqualMatrices(P, P.dot(P))
+
+        built_P = W0.T @ W0
+        self.assertAlmostEqualMatrices(built_P @ built_P, built_P)
+        self.assertAlmostEqualMatrices(built_P.T, built_P)
+        print(P.shape, built_P.shape)
+        self.assertEqual(np.linalg.norm(P - built_P), 0)
 
         data_matrix = analyzer.to_data_matrix(theta8x100.thetas[0:10], subtract_avgs=True)
 
-        #print(data_matrix)
-        #print(data_matrix-(P @ data_matrix.T).T)
-        AssertAlmostEqualMatrices(analyzer.get_covariance(0, sorted_thetas), np.cov(data_matrix.T))
-        new_data_matrix = data_matrix.dot(U0)
-        print(data_matrix.shape)
-        print(U0.shape)
+        self.assertAlmostEqualMatrices(analyzer.get_covariance(0, sorted_thetas), data_matrix.T @ data_matrix / data_matrix.shape[0])
+        self.assertEqual(W0.shape, (4, 8))
         print(red_sings.shape)
-        reduced_data = U0 @ np.sqrt(red_sings)
-        self.assertEqual(reduced_data.shape, (10, 5))
-        print(new_data_matrix.shape)
-        self.assertEqual(new_data_matrix.shape, (data_matrix.shape[0], U0.shape[1])) #(10, 5) == shape
+        projected_data = data_matrix @ built_P
+        data_diff = data_matrix - projected_data
+        self.assertTrue(np.linalg.norm(data_diff) < 10**-4)
+        vec_diff = data_matrix[0, :] @ P - data_matrix[0, :]
+        self.assertTrue(vec_diff.dot(vec_diff) < 10**-10)
 
-        self.assertEqual(reduced_data.shape, (5, 8))
-        AssertAlmostEqualMatrices(np.cov(reduced_data), reduced_data.T @ reduced_data)
-        print(reduced_cov - reduced_data @ reduced_data.T)
-        cov_differences = np.cov(reduced_data) - np.cov(data_matrix.T)
-        print(np.abs(cov_differences).max())
-        print(np.abs(cov_differences).mean())
-        #print(np.linalg.eig(P)[1][:, 1])'''
+        first_label_proj = first_label @ P
+        self.assertTrue(np.linalg.norm(first_label - first_label_proj) < 0.0002)
 
+        old_theta = theta8x100.thetas[0]
+        old_corrs = analyzer.get_correlations(gdft_matrix(8, old_theta))
+        print(old_corrs.avg_auto_corr)
+        #print(old_theta)
+        min_val = np.min(np.abs(W0[0, :]))
+        print(2*W0[0, :] / min_val)
+        direction0 = np.array([2, 7, -12, -6, 2, 11, -9, 2]) @ P
+        #print(np.array([1, 1, -1, 1, 1, 1, 1, 1]) @ P)
+        for n in range(2):
+            #new_theta = old_theta + n*np.array([1, 1, 1, 1, 1, 1, 1, 1]) @ P
+            new_theta = old_theta + n * 0.01 * direction0
+            #print(new_theta)
+            new_gdft = gdft_matrix(8, new_theta)
+            new_corrs = analyzer.get_correlations(new_gdft)
+            print(n, new_corrs.avg_auto_corr)
 
-    def test_finding_svd(self):#OK
-        analyzer = ThetasAnalyzer(8)
-        data_matrix = analyzer.to_data_matrix(theta8x100.thetas, subtract_avgs=True)
-        rows, cols = data_matrix.shape
-        U, singular_values, W = linalg.svd(data_matrix)
-        diags = np.diagflat(singular_values)
-        sing_mat = np.zeros(data_matrix.shape)
-        sing_mat[0:diags.shape[0], 0:diags.shape[1]] = diags
-        recomputed_data_matrix = np.dot(U, sing_mat.dot(W))
-        self.assertAlmostEqualMatrices(recomputed_data_matrix, data_matrix)
 
     def test_pca_reduction_svd(self):
         thetas_analyzer = ThetasAnalyzer(8)

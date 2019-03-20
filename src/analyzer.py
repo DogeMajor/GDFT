@@ -106,14 +106,13 @@ class ThetasAnalyzer(object):
                 for key in non_empty_labels}
 
     def solution_spaces(self, sorted_thetas, cutoff_ratio=0):
+        '''We've chosen the right 'eigen space' and therefore
+         projections operate from right side on (row) vectors  (==data)'''
         pca_reductions = self.cov_pca_reductions(sorted_thetas, cutoff_ratio=cutoff_ratio)
 
         def get_solution_space(key):
-            U = pca_reductions[key][0]
-            projection = np.zeros((self._dim, self._dim))
-            for col in range(U.shape[1]):
-                projection = projection + np.outer(U[:, col], U[:, col])
-                return {'label': sorted_thetas.labels[key], 'projection': projection}
+            W = pca_reductions[key][0]
+            return {'label': sorted_thetas.labels[key], 'projection': W.T @ W}
 
         sol_spaces = {key: get_solution_space(key) for key in pca_reductions.keys()}
         return sol_spaces

@@ -125,13 +125,17 @@ if __name__ == "__main__":
     #theta_collections = thetas = extract_thetas_records("../data/", "10thetas_16x16__12-26_19_4.json")
     #theta_collections = thetas = extract_thetas_records("../data/", "100thetas_4x4__12-26_16_6.json")
 
-    #theta_collections = extract_thetas_records("../data/", "R_ac_100thetas_8x8__3-7_14_39.json")
+    theta_collections = extract_thetas_records("../data/", "R_ac_100thetas_8x8__3-7_14_39.json")
     #theta_collections = extract_thetas_records("../data/", "d_ac_100thetas_8x8__3-7_15_10.json")
-    theta_collections = extract_thetas_records("../data/", "R_ac_30thetas_8x8__3-10_13_3.json")
+    #theta_collections = extract_thetas_records("../data/", "R_ac_30thetas_8x8__3-10_13_3.json")
 
     #theta_collections = extract_thetas_records("../data/", "results_2018-12-24 23_33.json")
-    
-    #sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
+
+
+    sorted_thetas = thetas_analyzer.sort_thetas(theta_collections.thetas, 6)
+
+    #print(sorted_thetas)
+
     #thetas0 = sorted_thetas.thetas[0]
     #data_matrix = thetas_analyzer.to_data_matrix(sorted_thetas.thetas[0])
     #reduced_cov_mats = thetas_analyzer.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.05)
@@ -162,68 +166,67 @@ if __name__ == "__main__":
         return symmetries
 
 
-
-    #for n in range(8):
-    #    print(symm_checker(theta, n))
-    #
-    #theta8 = np.array([0.4364, 1.2123, 1.9882, 2.7641, 2.5646, 2.3651, 2.1656, 1.9661])
     theta8 = theta_collections.thetas[1]
-    #print(theta8)
-    '''gdft = gdft_matrix(8, theta8)
-    corrs = thetas_analyzer.get_correlations(gdft)
-    print(corrs)
-    sigma = 0
-    alpha = beta = 0
-    mu = 1
-    print(derivative(gdft, sigma, alpha, beta, mu))
-    print(gradient(gdft, alpha, beta, mu))'''
-
-
     corr_analyzer = CorrelationAnalyzer(8)
-    #diffs = np.array([difference(corr_analyzer, theta8, ind, "avg_auto_corr", h=0.00001) for ind in range(8)])
-    #print(diffs)
-    #num_grad = grad(corr_analyzer, theta8, "max_auto_corr", h=0.00001)
-    #print("max_auto_corr", num_grad)
-    #print("avg_auto_corr", grad(corr_analyzer, theta8, "avg_auto_corr", step=0.00001))
-    #[-6.55475674e-07+0.j -9.05941988e-07+0.j -1.09423581e-06+0.j -1.21858079e-06+0.j -1.21858079e-06+0.j -1.09423581e-06+0.j
-    #-9.05941988e-07+0.j -6.55475674e-07+0.j]
-    #theta3 = np.zeros(8)
-    #theta3[0:4] = np.arange(0, 4, 1)
-    #print(theta3)
-    #print("avg_auto_corr", grad(corr_analyzer, theta3, "avg_auto_corr", step=0.0001))
 
-    #diff_ct_0 = diff_c_tensor(theta8, 0, h=0.001)
-    #print(diff_ct_0)
 
-    #theta2 = theta_collections.thetas[10]
-    #print("avg_auto_corr", grad(corr_analyzer, theta2, "max_auto_corr", step=0.0001))
-    #diffs = [difference(corr_analyzer, theta8, index, "avg_auto_corr", h=0.001) for index in range(8)]
-    #print(diffs)
-    #print("max_cross_corr", grad(corr_analyzer, theta8, "max_cross_corr", h=0.00001))
-    #print("avg_cross_corr", grad(corr_analyzer, theta8, "avg_cross_corr", h=0.00001))
+    #The only 'symmetric' theta we found (due to lilitations theta_k in (0, np.pi) ^N
+    special_theta = np.array([1.44608874, - 0.24, 3.14159265, 2.35929684,
+                              2.35929684, 3.14159265, - 0.24, 1.44608874])
 
-    direction = np.array([-2, -1, 0, 1,
-                          2, 3, 4, 5])
     theta_ref2 = np.array([0.23263316, 1.06778065, 3.05624654, 2.96119473,
                            2.08375977, 0.4239405, 2.96378942, 0.37377238])
+
+    direction = np.array([1, 1, 1, 1,
+                          1, 1, 1, 1])
+
     direction2 = np.array([-7, -5, -3, -1,
                            1, 3, 5, 7])
-
-    direction3 = np.array([1, 1, 1, 1,
-                           1, 1, 1, 1])
+    #The four directions generate a linear space of dimension 2!!!!
+    direction3 = np.array([-2, -1, 0, 1,
+                           2, 3, 4, 5])
 
     direction4 = np.array([4, 3, 2, 1,
                            0, -1, -2, -3])
-    solution_space = np.zeros((8, 4))
-    solution_space[:, 0] = direction
-    solution_space[:, 1] = direction2
-    solution_space[:, 2] = direction3
-    solution_space[:, 3] = direction4
 
+    #direction5 = np.array([-1, 0, 1, 2, 3, 4, 5, 6])
+    direction5 = np.array([0, 1, 2, 3, 4, 5, 6, 7])
+    solution_space = np.zeros((8, 4))
+    solution_space[:, 0] = direction / np.sqrt(direction.dot(direction))
+    solution_space[:, 1] = direction2 / np.sqrt(direction2.dot(direction2))
+    solution_space[:, 2] = direction3 / np.sqrt(direction3.dot(direction3))
+    solution_space[:, 3] = direction4 / np.sqrt(direction4.dot(direction4))
+
+    u0 = direction / np.sqrt(direction.dot(direction))
+    u1 = direction5 - direction5.dot(u0) * u0
+    u1 = u1 / np.sqrt(u1.dot(u1))
+    P = np.outer(u0, u0) + np.outer(u1, u1)
+    print(np.max(np.abs(P @ P - P)))
+    print(P @ np.array([1, -2, 3, -4, 5, -6, 7, -8]))
+    #should be [1., 0.57142857, 0.14285714, -0.28571429, -0.71428571, -1.14285714, -1.57142857, -2.]
+    print(np.linalg.matrix_rank(np.eye(8) - P))
+
+    data_matrix = thetas_analyzer.to_data_matrix(theta_collections.thetas[0:10], subtract_avgs=True)
+    U0, sing0, W0 = thetas_analyzer._pca_reduction_svd(data_matrix, cutoff_ratio=0)
+    dir0 = W0[:, 0] #R_ac almost constant
+    #dir0_new = np.array([-1.9762835, 4.19707068, 2.95672719, -3.88122006,
+    #                     1.00000003, 2.42797442, -1.42338032, 2.51663892])
+
+    dir1 = W0[:, 7]  # R_ac almost constant
+
+    #dir1 = dir1 - P @ dir1
+    #print(dir1 / -0.1284763)
+    #dir1 = np.array([2, -2, -2, 2, 0, 0, 1, -1])
+
+    #dir0_new = np.array([-10, -20, 15, 30,
+    #                     0, 0, 0, 50])/ 50
+    dir_new = dir1 / np.sqrt(dir1.dot(dir1))
+    #dir0_new = dir1
     #print(symm_checker(new_theta, 1))
-    '''theta_ref = sorted_thetas.thetas[0][0]
-    print(theta_ref)
-    for theta in sorted_thetas.thetas[0][1:]:
+
+    #theta_ref = sorted_thetas.thetas[0][0]
+    #print(theta_ref)
+    '''for theta in sorted_thetas.thetas[0][1:]:
         gdft = gdft_matrix(8, theta)
         avg_auto_corr_gradient = [auto_corr_derivative(sigma, gdft) for sigma in range(8)]
         #print(avg_auto_corr_gradient)
@@ -248,50 +251,88 @@ if __name__ == "__main__":
     opt_theta = np.array([0.40135885, np.pi/2 - 0.40135885, 2.88234682+0.25062983, np.pi+0.25062983-0.40135885,
                           2.0857035, 0.40135885, np.pi-0.25062983, 0.25062983])
     #print(theta0+ np.pi*direction)
-    for n in range(-10, 10):
 
-        constr_gdft = gdft_matrix(8, theta_ref2+n*0.01*direction4)
-        correlations = corr_analyzer.get_correlations(constr_gdft)
-        print(n, correlations.avg_auto_corr)
-        #print("R_ac gradient length")
-        #print(np.linalg.norm(auto_corr_gradient(constr_gdft))
-    '''for n in range(0, 5):
-        new_theta = theta_init - n*0.015*direction
-        constr_gdft = gdft_matrix(8, new_theta)
-        correlations = corr_analyzer.get_correlations(constr_gdft)
-        print(n, correlations)'''
-        #print(new_theta)
-    #polar_plot_angles(new_theta)
+    #print(sorted_thetas.thetas)
+    thetas_group = [np.array([2.93467664, 0.3384844 , 2.87214115, 1.20613475, 0.32252419,
+       0.22130658, 2.20358886, 3.03256426]), np.array([2.9696509 , 0.32219672, 2.80460713, 1.08736893, 0.15248202,
+       0.        , 1.93102203, 2.70875109]), np.array([3.14150297, 0.50597848, 3.00032683, 1.29500184, 0.37205216,
+       0.23150659, 2.17446601, 2.96410783]), np.array([2.85346825, 0.24653422, 2.76946155, 1.09272548, 0.19836428,
+       0.08639467, 2.05793914, 2.87617182]), np.array([2.64995925, 0.1094916 , 2.69888498, 1.08861413, 0.26072341,
+       0.21521909, 2.25322855, 3.13791887]), np.array([3.11428113, 0.49839706, 3.01236833, 1.32667583, 0.42337081,
+       0.30244392, 2.2650365 , 3.07431384]), np.array([2.97236851, 0.3847211 , 2.92693977, 1.26949081, 0.39442552,
+       0.30174438, 2.29258057, 3.1300973 ]), np.array([2.90780283, 0.31334572, 2.84876456, 1.18452025, 0.30265909,
+       0.20317343, 2.18723403, 3.01791636]), np.array([2.73064916, 0.14368992, 2.68659138, 1.02982502, 0.15544191,
+       0.06345344, 2.05497724, 2.89317578]), np.array([2.98336504, 0.33398594, 2.81447009, 1.09527923, 0.15848194,
+       0.00406954, 1.93317593, 2.70895432]), np.array([3.03389687, 0.38015566, 2.85628297, 1.13274342, 0.19158676,
+       0.03281154, 1.95755342, 2.72897963])]
+
+    thetas_group2 = [np.array([0.23263316, 1.06778065, 3.05624654, 2.96119473, 2.08375977, 0.4239405, 2.96378942, 0.37377238]),
+                     np.array([0.12853125, 0.96144711, 2.94767889, 2.85038891, 1.97072153, 0.30866741, 2.8462803, 0.25403236]),
+                     np.array([0.43171271, 1.20998793, 3.14159265, 2.9896899, 2.05536774, 0.33869695, 2.82167874, 0.17477883]),
+                     np.array([0.4590644, 1.22344731, 3.14116473, 2.97536152, 2.02716572, 0.29658784, 2.76567391, 0.10491548]),
+                     np.array([0.18417949, 0.97587018, 2.92086764, 2.7823677, 1.86144584, 0.15818738, 2.65457865, 0.02110813]),
+                     np.array([0.09761061, 0.91594684, 2.88757434, 2.77571619, 1.88147829, 0.2048429, 2.727869, 0.12101726]),
+                     np.array([1.51708874, 0., 3.14159265, 2.43028616, 2.43029684, 3.14159265, 0., 1.51711487]),
+                     np.array([0.84404373, 2.5896863, 3.14159265, 0., 3.14159265, 1.27085174, 1.35837218, 0.22956873])]
+
+    from analyzer import SortedThetas
+    sorted_thetas = SortedThetas(thetas={0: thetas_group, 1: thetas_group2}, labels=[], histogram={})
+    print(sorted_thetas.thetas[0])
+
+    #thetas_group = sorted_thetas.thetas[1]
+
+    '''for label_no in sorted(list(sorted_thetas.thetas.keys())):
+        all_thetas = sorted_thetas.thetas[label_no]
+
+        if len(all_thetas) != 0:
+            theta_ref = all_thetas[0]
+            print("Ratio of what part theta_differences do not depend on the 2-dim subspace generated by dir2 and dir")
+            print("for group {}".format(label_no))
+            for theta in all_thetas[1:]:
+                tot_theta_diff = theta - theta_ref
+                #print(tot_theta_diff)
+                theta_diff = tot_theta_diff - P @ tot_theta_diff
+                #print(theta_diff)
+                theta_diff /= np.sqrt(tot_theta_diff.dot(tot_theta_diff))
+                ratio = np.sqrt(theta_diff.dot(theta_diff)) / np.sqrt(tot_theta_diff.dot(tot_theta_diff))
+                print(ratio)'''
+
+    theta_ref = thetas_group[0]
+    for theta in thetas_group[1:]:
+        tot_theta_diff = theta - theta_ref
+        # print(tot_theta_diff)
+        theta_diff = tot_theta_diff - P @ tot_theta_diff
+        # print(theta_diff)
+        theta_diff /= np.sqrt(tot_theta_diff.dot(tot_theta_diff))
+        ratio = np.sqrt(theta_diff.dot(theta_diff)) / np.sqrt(tot_theta_diff.dot(tot_theta_diff))
+        print(ratio)
+
+
     example_theta = np.array([0.43171271, 1.20998793, 3.14159265, 2.9896899,
                               2.05536774, 0.33869695, 2.82167874, 0.17477883])
+
+    theta_ref = theta_collections.thetas[0]
+    old_gdft = gdft_matrix(8, special_theta)
+    special_direction = np.array([0, 0, -1, 0, 0, -1, 0, 0])
+
+    '''for n in range(-5, 5):
+
+        constr_gdft = gdft_matrix(8, special_theta+n*0.1*direction)
+        correlations = corr_analyzer.get_correlations(constr_gdft)
+        gdft_diff = np.linalg.norm(old_gdft - constr_gdft)
+        print(special_theta + n*0.1*direction)
+        print(n, correlations.avg_auto_corr, gdft_diff)'''
+
+
+    #polar_plot_angles(new_theta)
+
     #print(theta_init - example_theta)
     #print(theta_init + 10*0.015*direction)
+
     #for theta in sorted_thetas.thetas[0][0:10]:
     #    print(theta)
-    #polar_plot_numbered_angles(new_theta)
+    #polar_plot_numbered_angles(special_theta)
     #plt.show()
 
-    '''c_analyzer3 = CorrelationAnalyzer(3)
-    for n in range(200):
-        thetas3 = np.array([2+delta*n, 0, 1-delta*n])
-
-        gdft3 = gdft_matrix(3, thetas3)
-        correlations = c_analyzer3.get_correlations(gdft3)
-        print(correlations.avg_auto_corr)'''
-
-    '''
-    poly_coeff_8 = np.array([-7.47998864e-03, 1.73916258e-01, -1.61020449e+00, 7.60456544e+00,
-                             -1.93127379e+01, 2.45158151e+01, -1.05428434e+01, 2.47251476e-01])
-
-    poly_coeff_4 = np.array([1.04719702, -4.05332898, 2.84656905, 2.63384441])
-   
-    #THETAS8 = np.array([-3.12, -3.38, -3.2, -1.86, -1.27, 0.06, 0.25, -0.01])
-    THETAS8 = np.array([1.637, -0.79, -0.54, 2.01, 1.59, -0.83, 1.73, 2.44])
-
-    #gdft = gdft_matrix(8, THETAS8)
-    gdft = two_param_gdft_matrix(8, np.zeros(8), THETAS8)
-    correlations = thetas_analyzer.get_correlations(dft_matrix(8))
-    print(correlations)
-    '''
     #Correlations(max_auto_corr=0.3814517374888245, avg_auto_corr=(1.0209859493694915+0j),
     #max_cross_corr=0.5286804616397811, avg_cross_corr=(0.854144864375787+0j), avg_merit_factor=(0.9794454082522375+0j))'''
