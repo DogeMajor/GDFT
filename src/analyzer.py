@@ -38,37 +38,14 @@ class Classifier(object):
         return Counter(k_means_results[1])
 
 
-class ThetasAnalyzer(object):
+class PCA(object):
 
     def __init__(self, dim):
         self._dim = dim
-        self._corr_analyzer = CorrelationAnalyzer(dim)
-
-    def get_correlations(self, gdft):
-        return self._corr_analyzer.get_correlations(gdft)
-
-    def _generate_points(self, theta_vec):
-        length = theta_vec.shape[0]
-        args = np.array(list(range(length)))
-        return args, theta_vec
-
-    def _fit_polynome(self, theta_vec, grade):
-        args, _ = self._generate_points(theta_vec)
-        z = np.polyfit(args, theta_vec, grade)
-        return np.poly1d(z)
-
-    def fit_polynomes(self, thetas, grade):
-        polynomes = [self._fit_polynome(theta_vec, grade) for theta_vec in thetas]
-        return Polynomes(polynomes=polynomes, theta_vecs=thetas)
-
-    def sort_thetas(self, theta_vecs, groups):
-        classifier = Classifier()
-        return classifier.sort_thetas(theta_vecs, groups)
-
-#------Analyze covariances in order to reduce dimensions with PCA--
 
     def to_data_matrix(self, thetas, subtract_avgs=False):
-        '''Changes a list of 1-D numpy arrays into a data matrix'''
+        '''Changes a list of 1-D numpy arrays into a data matrix
+        of shape data_pointsxmesurement_dimension'''
         shape = (len(thetas), self._dim)
         records = np.concatenate(thetas).reshape(shape)
         if subtract_avgs:
@@ -113,10 +90,39 @@ class ThetasAnalyzer(object):
         return {key: self.cov_pca_reduction(key, sorted_thetas, cutoff_ratio=cutoff_ratio)
                 for key in non_empty_labels}
 
+
+class ThetasAnalyzer(object):
+
+    def __init__(self, dim):
+        self._dim = dim
+        self._corr_analyzer = CorrelationAnalyzer(dim)
+
+    def get_correlations(self, gdft):
+        return self._corr_analyzer.get_correlations(gdft)
+
+    def _generate_points(self, theta_vec):
+        length = theta_vec.shape[0]
+        args = np.array(list(range(length)))
+        return args, theta_vec
+
+    def _fit_polynome(self, theta_vec, grade):
+        args, _ = self._generate_points(theta_vec)
+        z = np.polyfit(args, theta_vec, grade)
+        return np.poly1d(z)
+
+    def fit_polynomes(self, thetas, grade):
+        polynomes = [self._fit_polynome(theta_vec, grade) for theta_vec in thetas]
+        return Polynomes(polynomes=polynomes, theta_vecs=thetas)
+
+    def sort_thetas(self, theta_vecs, groups):
+        classifier = Classifier()
+        return classifier.sort_thetas(theta_vecs, groups)
+
     def solution_spaces(self, sorted_thetas, cutoff_ratio=0):
         '''We've chosen the right 'eigen space' and therefore
          projections operate from right side on (row) vectors  (==data)'''
-        pca_reductions = self.cov_pca_reductions(sorted_thetas, cutoff_ratio=cutoff_ratio)
+        pca = PCA(self._dim)
+        pca_reductions = pca.cov_pca_reductions(sorted_thetas, cutoff_ratio=cutoff_ratio)
 
         def get_solution_space(key):
             W = pca_reductions[key][0]
