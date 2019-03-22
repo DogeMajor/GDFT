@@ -45,7 +45,7 @@ class PCA(object):
 
     def to_data_matrix(self, thetas, subtract_avgs=False):
         '''Changes a list of 1-D numpy arrays into a data matrix
-        of shape data_pointsxmesurement_dimension'''
+        of shape data_points x measurement_dimension'''
         shape = (len(thetas), self._dim)
         records = np.concatenate(thetas).reshape(shape)
         if subtract_avgs:
@@ -131,7 +131,7 @@ class ThetasAnalyzer(object):
         sol_spaces = {key: get_solution_space(key) for key in pca_reductions.keys()}
         return sol_spaces
 
-    def entropy(self, cov_matrix):
+    def entropy(self, cov_matrix):#IF X is Gaussian, otherwise this is false!!!!
         return 0.5 * (self._dim + self._dim * np.log(np.pi*2) + np.log(np.linalg.det(cov_matrix)))
 
 
@@ -167,7 +167,7 @@ class SymmetryAnalyzer(object):
     def get_similarities(self, old_gdft, new_gdft, rel_tol=10e-9):
         old_correlations = self.get_correlations(old_gdft)
         new_correlations = self.get_correlations(new_gdft)
-        similarities = (isclose(old_corr, new_corr) for old_corr, new_corr
+        similarities = (isclose(old_corr, new_corr, rel_tol=rel_tol) for old_corr, new_corr
                         in zip(old_correlations, new_correlations))
         return list(similarities)
 
