@@ -37,7 +37,7 @@ class Optimizer(object):
         if init_guess is None:
             #init_guess = np.pi * np.random.beta(0.5, 0.5, self._dim)
             init_guess = np.random.uniform(0, np.pi, self._dim)
-        bnds = tuple((0, np.pi) for n in range(self._dim))
+        bnds = tuple((0, 2*np.pi) for n in range(self._dim))
         corr_fn = self.correlation_functions[corr_fn_name]
 
         def output_fn(_params):
@@ -73,26 +73,18 @@ class Runner(object):
     def __init__(self, dim):
         self._optimizer = Optimizer(dim)
 
-    def task(self, index, corr_fn_name, results, stop_criteria):
-        params = self._optimizer.optimize_corr_fn(corr_fn_name, stop_criteria)
-        results.append(self._optimizer.get_params_summary(params))
+    def task(self, corr_fn_name, stop_criteria):
+        params = self._optimizer.optimize_corr_fn(corr_fn_name, stop_criteria=stop_criteria)
+        return self._optimizer.get_params_summary(params)
 
     @timer
-    def optimize(self, corr_fn_name, epochs, stop_criteria=None):
+    def optimize(self, corr_fn_name, epochs, stop_criteria=None, cores=1):
         date = datetime_encoder(datetime.datetime.now())
-        results = {"info": "Optimizer results for "+corr_fn_name+" at time "+date}
-        manager = multiprocessing.Manager()
-        res = manager.list()
-        jobs = []
-        func = self._optimizer.optimize_corr_fn
-        for epoch in range(epochs):
-            proc = multiprocessing.Process(target=self.task, args=(epoch, corr_fn_name, res, stop_criteria))
-            jobs.append(proc)
-            proc.start()
-
-        for proc in jobs:
-            proc.join()
-        results["results"] = list(res)
+        results = {"info": "Optimizer results for " + corr_fn_name + " at time " + date}
+        pool = multiprocessing.Pool(processes=cores)
+        repeated_args = [(corr_fn_name, stop_criteria) for epoch in range(epochs)]
+        mapped_results = pool.starmap(self.task, repeated_args)
+        results["results"] = mapped_results
         return results
 
     def save_results(self, file_name, results):
@@ -103,9 +95,9 @@ class Runner(object):
 
 if __name__ == "__main__":
 
-    runner = Runner(8)
-    results = runner.optimize("avg_auto_corr", 1, stop_criteria=0.087)
+    runner = Runner(16)
+    results = runner.optimize("avg_auto_corr", 100, stop_criteria=0.059, cores=4)
     print(results)
-    #runner.save_results("R_ac_30thetas_8x8__", results)
+    runner.save_results("R_ac_100thetas_16x16__", results)
     #thetas = extract_thetas_records("../data/", "thetas_16x16__1-1_21_14.json")
     #print(thetas)
