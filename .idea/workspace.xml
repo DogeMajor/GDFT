@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="df3ca34c-22d8-4b15-b7a9-55006b6f5138" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/analyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/analyzer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/testThetasAnalyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/testThetasAnalyzer.py" afterDir="false" />
     </list>
@@ -15,7 +16,7 @@
     <favorites_list name="GDFT" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.77115715">
+    <splitter split-orientation="horizontal" split-proportion="0.60103625">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -97,8 +98,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/analyzer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="221">
-                  <caret line="63" column="44" selection-start-line="63" selection-start-column="44" selection-end-line="63" selection-end-column="44" />
+                <state relative-caret-position="2142">
+                  <caret line="126" column="36" lean-forward="true" selection-start-line="126" selection-start-column="36" selection-end-line="126" selection-end-column="36" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
                   </folding>
@@ -176,8 +177,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/test/testThetasAnalyzer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="179">
-                  <caret line="96" lean-forward="true" selection-start-line="96" selection-end-line="96" />
+                <state relative-caret-position="383">
+                  <caret line="223" column="76" selection-start-line="223" selection-start-column="76" selection-end-line="223" selection-end-column="76" />
                 </state>
               </provider>
             </entry>
@@ -264,8 +265,8 @@
         <option value="$PROJECT_DIR$/src/sequencefinder.py" />
         <option value="$PROJECT_DIR$/src/optimizer.py" />
         <option value="$PROJECT_DIR$/src/visualizer.py" />
-        <option value="$PROJECT_DIR$/test/testThetasAnalyzer.py" />
         <option value="$PROJECT_DIR$/src/analyzer.py" />
+        <option value="$PROJECT_DIR$/test/testThetasAnalyzer.py" />
       </list>
     </option>
   </component>
@@ -848,15 +849,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/testThetasAnalyzer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="179">
-          <caret line="96" lean-forward="true" selection-start-line="96" selection-end-line="96" />
+        <state relative-caret-position="383">
+          <caret line="223" column="76" selection-start-line="223" selection-start-column="76" selection-end-line="223" selection-end-column="76" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/analyzer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="63" column="44" selection-start-line="63" selection-start-column="44" selection-end-line="63" selection-end-column="44" />
+        <state relative-caret-position="2142">
+          <caret line="126" column="36" lean-forward="true" selection-start-line="126" selection-start-column="36" selection-end-line="126" selection-end-column="36" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
