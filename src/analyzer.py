@@ -14,6 +14,28 @@ SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram')
 SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
 
 
+class Classifier(object):
+
+    def sort_thetas(self, theta_vecs, groups):
+        kmeans_results = self._classify_thetas(theta_vecs, groups)
+        grouped_theta_vecs = self.group_by_label(theta_vecs, kmeans_results)
+        return SortedThetas(thetas=grouped_theta_vecs, labels=kmeans_results[0],
+                            histogram=self._kmeans_to_histogram(kmeans_results))
+
+    def _classify_thetas(self, theta_vecs, groups):
+        return kmeans2(theta_vecs, groups)
+
+    def group_by_label(self, unsorted_thetas, k_means_results):
+        labels = k_means_results[1]
+        sorted_thetas = {}
+        for ind, theta in enumerate(unsorted_thetas):
+            label = labels[ind]
+            sorted_thetas.setdefault(label, []).append(theta)
+
+        return sorted_thetas
+
+    def _kmeans_to_histogram(self, k_means_results):
+        return Counter(k_means_results[1])
 
 
 class ThetasAnalyzer(object):
@@ -39,27 +61,9 @@ class ThetasAnalyzer(object):
         polynomes = [self._fit_polynome(theta_vec, grade) for theta_vec in thetas]
         return Polynomes(polynomes=polynomes, theta_vecs=thetas)
 
-    def sort_thetas(self, theta_vecs, groups, centered=True):
-        kmeans_results = self._classify_thetas(theta_vecs, groups)
-        grouped_theta_vecs = self.group_by_label(theta_vecs, kmeans_results)
-        return SortedThetas(thetas=grouped_theta_vecs, labels=kmeans_results[0],
-                            histogram=self._kmeans_to_histogram(kmeans_results))
-
-    def _classify_thetas(self, theta_vecs, groups):
-        print("type", type(theta_vecs), theta_vecs[0])
-        return kmeans2(theta_vecs, groups)
-
-    def group_by_label(self, unsorted_thetas, k_means_results):
-        labels = k_means_results[1]
-        sorted_thetas = {}
-        for ind, theta in enumerate(unsorted_thetas):
-            label = labels[ind]
-            sorted_thetas.setdefault(label, []).append(theta)
-
-        return sorted_thetas
-
-    def _kmeans_to_histogram(self, k_means_results):
-        return Counter(k_means_results[1])
+    def sort_thetas(self, theta_vecs, groups):
+        classifier = Classifier()
+        return classifier.sort_thetas(theta_vecs, groups)
 
 #------Analyze covariances in order to reduce dimensions with PCA--
 
