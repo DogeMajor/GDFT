@@ -15,12 +15,12 @@ from correlations import *
 from analyzer import *
 from optimizer import Runner
 from visualizer import *
-
+PATH = "test/testdata"
 #----mocked methods/fns/classes--------
 
 def save_test_data(file_name, results):
     date_string = "today"
-    dao = DAO("testdata/")
+    dao = DAO(PATH)
     dao.write(file_name + date_string + ".json", results)
 
 class TestWithSmallSize(unittest.TestCase):
@@ -41,20 +41,20 @@ class TestWithSmallSize(unittest.TestCase):
 
     def test_generating_thetas(self):
         results = self.runner.optimize("avg_auto_corr", 10)
-        self.assertTrue(len(results['results'])==10)
+        self.assertTrue(len(results['results']) == 10)
         with patch.object(self.runner, 'save_results') as save:
             save.side_effect = save_test_data
             self.runner.save_results("10thetas_4x4__", results)
 
     @show_plot(wait=3)
     def test_visualizing_polar_angles(self):
-        theta_collections = extract_thetas_records("testdata/", "10thetas_4x4__today.json")
+        theta_collections = extract_thetas_records(PATH, "10thetas_4x4__today.json")
         for theta in theta_collections.thetas:
             polar_plot_angles(theta)
 
     @show_plot(wait=1, close=False)
     def test_visualizing_angles(self):
-        theta_collections = extract_thetas_records("testdata/", "10thetas_4x4__today.json")
+        theta_collections = extract_thetas_records(PATH, "10thetas_4x4__today.json")
         print(theta_collections.thetas)
         for theta in theta_collections.thetas:
             plot_angles(np.array(sorted(theta)))
@@ -64,7 +64,7 @@ class TestWithSmallSize(unittest.TestCase):
         del self.runner
 
 
-'''class TestWithMediumSize(unittest.TestCase):
+class TestWithMediumSize(unittest.TestCase):
     #Testing gdft builder with 8x8 matrices
     def setUp(self):
         self.runner = Runner(8)
@@ -81,7 +81,7 @@ class TestWithSmallSize(unittest.TestCase):
         self.assertTrue(correlation < 0.13)
 
     def test_generating_thetas(self):
-        results = self.runner.optimize("avg_auto_corr", 10)
+        results = self.runner.optimize("avg_auto_corr", 10, stop_criteria=0.087, cores=4)
         self.assertTrue(len(results['results'])==10)
         with patch.object(self.runner, 'save_results') as save:
             save.side_effect = save_test_data
@@ -89,13 +89,13 @@ class TestWithSmallSize(unittest.TestCase):
 
     @show_plot(wait=3)
     def test_visualizing_polar_angles(self, wait=3):
-        theta_collections = extract_thetas_records("testdata/", "10thetas_8x8__today.json")
+        theta_collections = extract_thetas_records(PATH, "10thetas_8x8__today.json")
         for theta in theta_collections.thetas:
             polar_plot_angles(theta)
 
     @show_plot(wait=1, close=False)
     def test_visualizing_angles(self):
-        theta_collections = extract_thetas_records("testdata/", "10thetas_8x8__today.json")
+        theta_collections = extract_thetas_records(PATH, "10thetas_8x8__today.json")
         for theta in theta_collections.thetas:
             plot_angles(theta)
 
@@ -111,7 +111,7 @@ class TestWithLargeSize(unittest.TestCase):
         self.runner = Runner(16)
 
     def test_generating_one_gdft(self):
-        results = self.runner.optimize("avg_auto_corr", 1)
+        results = self.runner.optimize("avg_auto_corr", 1, stop_criteria=0.059, cores=4)
         records = results['results']
         self.assertTrue(records is not [])
         theta_vec = records[0]['theta_vec']
@@ -122,27 +122,27 @@ class TestWithLargeSize(unittest.TestCase):
         self.assertTrue(correlation < 0.13)
 
     def test_generating_thetas(self):
-        results = self.runner.optimize("avg_auto_corr", 10)
-        self.assertTrue(len(results['results'])==10)
+        results = self.runner.optimize("avg_auto_corr", 2)
+        self.assertTrue(len(results['results']) == 2)
         with patch.object(self.runner, 'save_results') as save:
             save.side_effect = save_test_data
-            self.runner.save_results("10thetas_16x16__", results)
+            self.runner.save_results("2thetas_16x16__", results)
 
     @show_plot(wait=3)
     def test_visualizing_polar_angles(self, wait=3):
-        theta_collections = extract_thetas_records("testdata/", "10thetas_16x16__today.json")
+        theta_collections = extract_thetas_records(PATH, "2thetas_16x16__today.json")
         for theta in theta_collections.thetas:
             polar_plot_angles(theta)
 
     @show_plot(wait=1, close=False)
     def test_visualizing_angles(self):
-        theta_collections = extract_thetas_records("testdata/", "10thetas_16x16__today.json")
+        theta_collections = extract_thetas_records(PATH, "2thetas_16x16__today.json")
         for theta in theta_collections.thetas:
             plot_angles(theta)
 
 
     def tearDown(self):
-        del self.runner'''
+        del self.runner
 
 if __name__ == '__main__':
     unittest.main()

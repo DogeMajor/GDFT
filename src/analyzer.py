@@ -174,3 +174,6 @@ class SymmetryAnalyzer(object):
     def get_symmetry(self, old_gdft, new_gdft, rel_tol=10e-9):
         similarities = self.get_similarities(old_gdft, new_gdft, rel_tol=rel_tol)
         return sum(similarities) == len(similarities)
+
+if __name__ == "__main__":
+    theta_collections =

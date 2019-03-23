@@ -163,7 +163,6 @@ def theta_directions(theta_diffs):
     return differences
 
 
-
 def subtract_projections(theta_dirs, projection):
     amount = theta_dirs.shape[0]
     dirs = np.zeros(theta_dirs.shape)
@@ -173,8 +172,6 @@ def subtract_projections(theta_dirs, projection):
             dirs[index, n, :] = diff / np.sqrt(diff.dot(diff))
 
     return dirs
-
-
 
 
 if __name__ == "__main__":

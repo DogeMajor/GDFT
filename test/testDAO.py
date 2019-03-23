@@ -8,38 +8,39 @@ sys.path.append("src/")
 from tools import EqualMatrices
 from dao import DAO, NumpyEncoder, ComplexDecoder
 
+PATH = "test/testdata/"
 np.random.seed(int(time.time()))
 
 
 class TestDAO(unittest.TestCase):
 
     def test_write_and_read(self):
-        dao = DAO("../data/")
+        dao = DAO(PATH)
         balance = int(np.random.randint(1, 10000))
         content = {"name": "Julgubbe",
                    "balance": balance}
-        dao.write("julinfo.json", content, "../data/")
+        dao.write("julinfo.json", content, PATH)
         retrieved_content = dao.read("julinfo.json")
         self.assertEqual(retrieved_content['balance'], balance)
-        os.remove("../data/julinfo.json")
-        self.assertTrue('julinfo.json' not in os.listdir('../data/'))
+        os.remove(PATH+"julinfo.json")
+        self.assertTrue('julinfo.json' not in os.listdir(PATH))
 
     def test_read(self):
-        dao = DAO("../data/")
+        dao = DAO(PATH)
         retrieved_content = dao.read("static_julinfo.json")
         self.assertEqual(retrieved_content['balance'], 1000)
         self.assertEqual(retrieved_content['name'], "Jultomte")
 
     def test_saving_int_numpy_vector(self):
-        dao = DAO("../data/")
+        dao = DAO(PATH)
         vector = np.array([1, 2, 3], dtype=np.int32)
         content = {"name": "int_vector",
                    "vector": vector}
 
-        dao.write("int_vector_info.json", content, "../data/")
+        dao.write("int_vector_info.json", content, PATH)
         retrieved_content = dao.read("int_vector_info.json")
         self.assertEqual(retrieved_content['vector'], [1, 2, 3])
-        os.remove("../data/int_vector_info.json")
+        os.remove(PATH+"int_vector_info.json")
 
     def test_complex_encodings(self):
         encoder = NumpyEncoder()
@@ -64,25 +65,28 @@ class TestDAO(unittest.TestCase):
                          list(np.array([1 + 1j, 2 - 2 * 1j, 3 - 3 * 1j])))
 
     def test_saving_complex_numpy_vector(self):
-        dao = DAO("../data/")
+        dao = DAO(PATH)
         vector = np.array([1+1j, 2-2*1j, 3-3*1j])
         content = {"name": "complex vector",
                    "vector": vector}
 
-        dao.write("vector_info.json", content, "../data/")
+        dao.write("vector_info.json", content, PATH)
         retrieved_content = dao.read("vector_info.json")
         retrieved_vec = retrieved_content['vector']
         self.assertEqual(list(retrieved_vec), list(vector))
-        os.remove("../data/vector_info.json")
+        os.remove(PATH+"vector_info.json")
 
     def test_saving_complex_numpy_matrix(self):
-        dao = DAO("../data/")
+        dao = DAO(PATH)
         matrix = np.array([[1+1j, 2-2*1j], [3-3*1j, 4-4*1j]])
         content = {"name": "complex matrix",
                    "matrix": matrix}
 
-        dao.write("matrix_info.json", content, "../data/")
+        dao.write("matrix_info.json", content, PATH)
         retrieved_content = dao.read("matrix_info.json")
         retrieved_mat = retrieved_content['matrix']
         self.assertTrue(EqualMatrices(retrieved_mat, matrix))
-        os.remove("../data/matrix_info.json")
+        os.remove(PATH+"matrix_info.json")
+
+if __name__ == '__main__':
+    unittest.main()
