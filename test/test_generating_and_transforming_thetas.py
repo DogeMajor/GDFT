@@ -5,7 +5,7 @@ from math import sqrt, pow, atan
 import numpy as np
 sys.path.append("../src")
 sys.path.append("src/")
-from gdft import gdft_matrix, permutation_matrix
+from gdft import gdft_matrix, permutation_matrix, two_param_gdft_matrix
 from correlations import *
 from analyzer import ThetasAnalyzer, GDFTBuilder, SymmetryAnalyzer
 from sequencefinder import SequenceFinder

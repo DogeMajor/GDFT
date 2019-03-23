@@ -37,7 +37,7 @@ class Optimizer(object):
         if init_guess is None:
             #init_guess = np.pi * np.random.beta(0.5, 0.5, self._dim)
             init_guess = np.random.uniform(0, np.pi, self._dim)
-        bnds = tuple((0, 2*np.pi) for n in range(self._dim))
+        bnds = tuple((0, 1*np.pi) for n in range(self._dim))
         corr_fn = self.correlation_functions[corr_fn_name]
 
         def output_fn(_params):
@@ -98,6 +98,6 @@ if __name__ == "__main__":
     runner = Runner(16)
     results = runner.optimize("avg_auto_corr", 100, stop_criteria=0.059, cores=4)
     print(results)
-    runner.save_results("R_ac_100thetas_16x16__", results)
+    #runner.save_results("R_ac_100thetas_16x16__", results)
     #thetas = extract_thetas_records("../data/", "thetas_16x16__1-1_21_14.json")
     #print(thetas)
