@@ -176,4 +176,4 @@ class SymmetryAnalyzer(object):
         return sum(similarities) == len(similarities)
 
 if __name__ == "__main__":
-    theta_collections =
+    pass

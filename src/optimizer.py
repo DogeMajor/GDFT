@@ -87,10 +87,10 @@ class Runner(object):
         results["results"] = mapped_results
         return results
 
-    def save_results(self, file_name, results):
+    def save_results(self, file_name, results, file_format="json", file_path="data/"):
         date_string = datetime_encoder(datetime.datetime.now())
-        dao = DAO("data/")
-        dao.write(file_name + date_string + ".json", results)
+        dao = DAO(file_path)
+        dao.write(file_name + date_string + "." + file_format, results)
 
 
 if __name__ == "__main__":

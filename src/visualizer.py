@@ -1,9 +1,5 @@
-from copy import deepcopy
-from typing import Union
-
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.core.multiarray import ndarray
 from scipy import linalg
 from utils import extract_thetas_records, seq_norm, approximate_matrix, approximate_phases, Thetas
 from gdft import dft_matrix, gdft_matrix, two_param_gdft_matrix
