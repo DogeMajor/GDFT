@@ -11,8 +11,6 @@ corr_fns = {1: "avg_auto_corr", 2: "max_auto_corr",
 
 file_formats = {1: "json", 2: "xl", 3: "csv"}
 
-paths = {1: "data/", 2: "/Documents/"}
-
 
 # You can unbind and rebind an event to a function
 '''def bind_button(event):
@@ -25,24 +23,50 @@ paths = {1: "data/", 2: "/Documents/"}
 class GUI(object):
 
     def quit(self):
-        self._root.quit()
+        root.quit()
 
-    def optimize(self, dim, corr_fn_name, epochs, file_name, file_format, path, stop_criteria=None, cores=1):
+    def optimize(self):
+        dim = self.dimensionVar.get()
+        corr_fn_name = corr_fns[self.corrChoiceVar.get()]
+        epochs = self.thetasAmountVar.get()
+        file_name = self.filenameVar.get()
+        file_format = file_formats[self.fileformatVar.get()]
+        path = self.pathVar.get()
+        stop_criteria = self.stopCriteriumVar.get()
+        cores = self.coresVar.get()
+
         runner = Runner(dim)
         results = runner.optimize(corr_fn_name, epochs, stop_criteria=stop_criteria, cores=cores)
-        runner.save_results(file_name, results, file_format=file_format, file_path=path)
+        print("Results for optimization:")
+        print(results)
+        full_name = runner.save_results(file_name, results, file_format=file_format, file_path=path)
+        self._recent_files.append(full_name)
 
     def show_recent_files(self):
         print(self._files)
 
-    def analyze_thetas(self, path="data/", file_name=None):
-        if file_name == None:
+    def analyze_thetas(self):
+        path = self.pathVar.get()
+        cutoff = self.cutoffVar.get()
+        try:
             file_name = self._recent_files[-1]
-            thetas = extract_thetas_records(path, file_name)
-        else:
-            thetas = extract_thetas_records(path, file_name)
-        dim = thetas.thetas[0].shape[0]
+            theta_collections = extract_thetas_records(path, file_name)
+        except:
+            raise FileNotFoundError("No thetas were optimized during session")
+
+        dim = self.dimensionVar.get()
         analyzer = ThetasAnalyzer(dim)
+        groups = min(len(theta_collections.thetas), int(dim*0.75))
+        sorted_thetas = analyzer.sort_thetas(theta_collections.thetas, groups)
+        cov_pca_reductions = analyzer.cov_pca_reductions(sorted_thetas, cutoff_ratio=cutoff)
+        sol_spaces = analyzer.solution_spaces(sorted_thetas, cutoff_ratio=cutoff)
+        print("Sorted thetas histogram: ", sorted_thetas.histogram)
+        print("Labels in the same order: ", sorted_thetas.labels)
+        print("Theta groups with their biggest variances: ")
+        for key, value in cov_pca_reductions.items():
+            print(str(key) + ":")
+            print("variances: ", value[1])
+
 
     def show_about(self, event=None):
         self.show_vars()
@@ -50,29 +74,94 @@ class GUI(object):
                                "DogeHouse Productions NLC (No liability company)")
 
     def show_vars(self):
-        print(self._recent_files, str(self.fileformatVar.get()), str(self.corrChoiceVar.get()),
-              str(self.pathChoiceVar.get()), str(self.coresVar.get()))
-
-    def select_corr(self):
-        self.file_format = self.corrChoiceVar.get()
-
-    def select_file_format(self):
-        self.file_format = self.fileformatVar.get()
+        print(self._recent_files, file_formats[self.fileformatVar.get()],
+              corr_fns[self.corrChoiceVar.get()],
+              self.pathVar.get(), self.coresVar.get(),
+              self.dimensionVar.get(), self.stopCriteriumVar.get(),
+              self.filenameVar.get())
 
 
     def __init__(self, root):
-        self._root = root
+        #self._root = root
         self._recent_files = []
 
         self.fileformatVar = tk.IntVar()
         self.corrChoiceVar = tk.IntVar()
-        self.pathChoiceVar = tk.IntVar()
-        self.coresVar = IntVar()
+        self.coresVar = tk.IntVar()
+        self.thetasAmountVar = tk.IntVar()
+        self.dimensionVar = tk.IntVar()
+        self.stopCriteriumVar = tk.DoubleVar()
+        self.filenameVar = tk.StringVar()
+        self.pathVar = tk.StringVar()
+
+        self.cutoffVar = tk.DoubleVar()
 
         self.fileformatVar.set(1)
         self.corrChoiceVar.set(1)
-        self.pathChoiceVar.set(1)
         self.coresVar.set(2)
+        self.dimensionVar.set(8)
+        self.stopCriteriumVar.set(0.5)
+        self.filenameVar.set("No name was given!")
+        self.pathVar.set("No path was given!")
+        self.thetasAmountVar.set(1)
+
+        self.cutoffVar.set(0.05) #For cov pca reduction in sorted theta groups
+
+        self.set_menus()
+        self.set_widgets()
+
+
+
+    def set_widgets(self):
+
+        Label(root, text="Dimension").grid(row=1, column=0, sticky=W)
+        dim_entry = Entry(root, width=50, textvariable=self.dimensionVar)
+        dim_entry.grid(row=1, column=1)
+        #Button(root, text="Submit").grid(row=1, column=8)
+
+        Label(root, text="Amount").grid(row=2, column=0, sticky=W)
+        thetas_amount_entry = Entry(root, width=50, textvariable=self.thetasAmountVar)
+        thetas_amount_entry.grid(row=2, column=1)
+
+        Label(root, text="Stop criterium").grid(row=3, column=0, sticky=W)
+        Entry(root, width=50, textvariable=self.stopCriteriumVar).grid(row=3, column=1)
+
+        Label(root, text="File name").grid(row=6, column=0, sticky=W)
+        Entry(root, width=50, textvariable=self.filenameVar).grid(row=6, column=1)
+
+        Label(root, text="File path").grid(row=7, column=0, sticky=W)
+        Entry(root, width=50, textvariable=self.pathVar).grid(row=7, column=1)
+
+
+        Label(root, text="File format").grid(row=8, column=0, sticky=W)
+        Radiobutton(root, text="JSON", value=1,
+                    variable=self.fileformatVar).grid(row=9, column=0, sticky=W)
+        Radiobutton(root, text="Excel", value=2,
+                    variable=self.fileformatVar).grid(row=10, column=0, sticky=W)
+        Radiobutton(root, text="CSV", value=3,
+                    variable=self.fileformatVar).grid(row=11, column=0, sticky=W)
+
+
+        optimizeButton = Button(root, text="Optimize", command=self.optimize)
+        optimizeButton.grid(row=11, column=3, sticky=E)
+        #print(optimizeButton)
+        optimizeButton.bind("<Button-1>", self.optimize)
+
+        analyzeButton = Button(root, text="Analyze", command=self.analyze_thetas).grid(row=12, column=3, sticky=E)
+        #analyzeButton.bind("<Button-1>", self.analyze_thetas)
+
+
+        Label(root, text="Correlation to be minimized").grid(row=8, column=1, sticky=W)
+        Radiobutton(root, text="Average auto correlation", value=1,
+                    variable=self.corrChoiceVar).grid(row=9, column=1, sticky=W)
+        Radiobutton(root, text="Max auto correlation", value=2,
+                    variable=self.corrChoiceVar).grid(row=10, column=1, sticky=W)
+        Radiobutton(root, text="Average cross correlation", value=3,
+                    variable=self.corrChoiceVar).grid(row=11, column=1, sticky=W)
+        Radiobutton(root, text="Max cross correlation", value=4,
+                    variable=self.corrChoiceVar).grid(row=12, column=1, sticky=W)
+
+    def set_menus(self):
 
         # Create the menu object
         the_menu = Menu(root)
@@ -112,53 +201,6 @@ class GUI(object):
 
         # Display the menu bar
         root.config(menu=the_menu)
-
-        Label(root, text="Dimension").grid(row=1, column=0, sticky=W)
-        Entry(root, width=50).grid(row=1, column=1)
-        #Button(root, text="Submit").grid(row=1, column=8)
-
-        Label(root, text="Amount").grid(row=2, column=0, sticky=W)
-        Entry(root, width=50).grid(row=2, column=1)
-        #Button(root, text="Submit").grid(row=2, column=8)
-
-        Label(root, text="Stop criterium").grid(row=3, column=0, sticky=W)
-        Entry(root, width=50).grid(row=3, column=1)
-        #Button(root, text="Submit").grid(row=3, column=8)
-
-        Label(root, text="File name").grid(row=6, column=0, sticky=W)
-        Entry(root, width=50).grid(row=6, column=1)
-        #Button(root, text="Submit").grid(row=6, column=8)
-
-        Label(root, text="File format").grid(row=7, column=0, sticky=W)
-        Radiobutton(root, text="JSON", value=1, variable=self.fileformatVar,
-                    command=self.select_file_format).grid(row=8, column=0, sticky=W)
-        Radiobutton(root, text="Excel", value=2, variable=self.fileformatVar,
-                    command=self.select_file_format).grid(row=9, column=0, sticky=W)
-        Radiobutton(root, text="CSV", value=3, variable=self.fileformatVar,
-                    command=self.select_file_format).grid(row=10, column=0, sticky=W)
-
-        Label(root, text="Path").grid(row=7, column=1, sticky=W)
-        Checkbutton(root, text="Data/").grid(row=8, column=1, sticky=W)
-        Checkbutton(root, text="/Documents/").grid(row=9, column=1, sticky=W)
-
-
-        optimizeButton = Button(root, text="Optimize").grid(row=10, column=2)
-        #print(optimizeButton)
-        #optimizeButton.bind("<Button-1>", self.optimize)
-
-        analyzeButton = Button(root, text="Analyze").grid(row=11, column=2)
-        #analyzeButton.bind("<Button-1>", self.analyze_thetas)
-
-
-        Label(root, text="Correlation to be minimized").grid(row=7, column=1, sticky=W)
-        Radiobutton(root, text="Average auto correlation", value=1, variable=self.corrChoiceVar,
-                    command=self.select_corr).grid(row=8, column=1, sticky=W)
-        Radiobutton(root, text="Max auto correlation", value=2, variable=self.corrChoiceVar,
-                    command=self.select_corr).grid(row=9, column=1, sticky=W)
-        Radiobutton(root, text="Average cross correlation", value=3, variable=self.corrChoiceVar,
-                    command=self.select_corr).grid(row=10, column=1, sticky=W)
-        Radiobutton(root, text="Max cross correlation", value=4, variable=self.corrChoiceVar,
-                    command=self.select_corr).grid(row=11, column=1, sticky=W)
 
 root = Tk()
 

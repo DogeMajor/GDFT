@@ -77,7 +77,7 @@ class Runner(object):
         params = self._optimizer.optimize_corr_fn(corr_fn_name, stop_criteria=stop_criteria)
         return self._optimizer.get_params_summary(params)
 
-    @timer
+    #@timer
     def optimize(self, corr_fn_name, epochs, stop_criteria=None, cores=1):
         date = datetime_encoder(datetime.datetime.now())
         results = {"info": "Optimizer results for " + corr_fn_name + " at time " + date}
@@ -90,7 +90,10 @@ class Runner(object):
     def save_results(self, file_name, results, file_format="json", file_path="data/"):
         date_string = datetime_encoder(datetime.datetime.now())
         dao = DAO(file_path)
-        dao.write(file_name + date_string + "." + file_format, results)
+        full_name = file_name + date_string + "." + file_format
+        print("saving results in file {}...".format(full_name))
+        dao.write(full_name, results)
+        return full_name
 
 
 if __name__ == "__main__":

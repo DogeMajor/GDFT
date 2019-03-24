@@ -7,7 +7,7 @@ sys.path.append("../src")
 sys.path.append("src/")
 from gdft import gdft_matrix, permutation_matrix, two_param_gdft_matrix
 from correlations import *
-from analyzer import ThetasAnalyzer, GDFTBuilder, SymmetryAnalyzer
+from analyzer import ThetasAnalyzer, SymmetryAnalyzer
 from sequencefinder import SequenceFinder
 from tools import GDFTTestCase
 
@@ -97,25 +97,6 @@ class TestFindingThetaGeneratingFunction(unittest.TestCase):
     def tearDown(self):
         del self.seq_finder
         del self.centered_thetas
-
-
-
-
-class TestGDFTBuilder(GDFTTestCase):
-
-    def setUp(self):
-        self.builder = GDFTBuilder(8)
-
-    def test_build(self):
-        gdft = self.builder.build()
-        should_be_identity = gdft.dot(np.conjugate(gdft.T))
-        self.assertAlmostEqualMatrices(should_be_identity, 8*np.eye(8))
-        correlations = ThetasAnalyzer(8).get_correlations(gdft)
-        print(correlations)
-
-
-    def tearDown(self):
-        del self.builder
 
 
 class TestSymmetryAnalyzer(unittest.TestCase):

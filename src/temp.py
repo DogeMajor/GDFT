@@ -1,135 +1,293 @@
-from copy import deepcopy
-import numpy as np
-from scipy import linalg
-from utils import show
-from gdft import dft_matrix, gdft_matrix, two_param_gdft_matrix
-from analyzer import ThetasAnalyzer
-from correlations import CorrelationAnalyzer, Correlation
+'''from tkinter import *
+from tkinter import messagebox
 
 
-def ct_derivative(gdft, sigma, alpha, beta, pos_mu): #OK
-    N = gdft.shape[0]
-    mu = pos_mu - N + 1
-
-    is_positive = 0 < mu <= N - 1
-    is_negative = 1 - N <= mu <= 0
-
-    def pos_val(sigma):
-        res = 0
-        if sigma <= N-1-mu:
-            res += 1j*gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
-        if sigma >= mu:
-            res -= 1j*gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma])
-        return res/N
-
-    def neg_val(sigma):
-        res = 0
-        if sigma >= -mu:
-            res += 1j*gdft[alpha, sigma] * np.conjugate(gdft[beta, sigma + mu])
-        if sigma <= N - 1 + mu:
-            res -= 1j*gdft[alpha, sigma - mu] * np.conjugate(gdft[beta, sigma])
-        return res/N
-
-    if is_positive:
-        return pos_val(sigma)
-
-    if is_negative:
-        return neg_val(sigma)
+# ---------- VARIABLES & UNBIND ----------
+def get_data(event):
+    # Output the values for the Widgets with get()
+    print("String :", strVar.get())
+    print("Integer :", intVar.get())
+    print("Double :", dblVar.get())
+    print("Boolean :", boolVar.get())
 
 
-def ct_gradient(gdft, alpha, beta, mu): #OK
-    N = gdft.shape[0]
-    derivatives = [ct_derivative(gdft, sigma, alpha, beta, mu) for sigma in range(N)]
-    return np.array(derivatives)
+# You can unbind and rebind an event to a function
+def bind_button(event):
+    if boolVar.get():
+        getDataButton.unbind("<Button-1>")
+    else:
+        getDataButton.bind("<Button-1>", get_data)
 
 
-def auto_corr_derivative(sigma, gdft): #OK
-    N = gdft.shape[0]
-    result = 0
-    corr_tensor = Correlation(gdft).correlation_tensor()
-    conj_tensor = np.conjugate(corr_tensor)
-    for alpha in range(N):
-        for mu in range(1, N):
-            first_term = ct_derivative(gdft, sigma, alpha, alpha, mu) * conj_tensor[alpha, alpha, mu]
-            second_term = np.conjugate(ct_derivative(gdft, sigma, alpha, alpha, mu)) * corr_tensor[alpha, alpha, mu]
-            result += first_term + second_term
-            # print(alpha, mu, result)
-    return 2*result / N
+root = Tk()
+
+# As I showed previously there are TkInter variables
+# you can use with Widgets to set and get values
+strVar = StringVar()
+intVar = IntVar()
+dblVar = DoubleVar()
+boolVar = BooleanVar()
+
+# Set the default values with set()
+strVar.set("Enter String")
+intVar.set("Enter Integer")
+dblVar.set("Enter Double")
+boolVar.set(True)
+
+# Assign the variable to either textvariable or variable
+strEntry = Entry(root, textvariable=strVar)
+strEntry.pack(side=LEFT)
+
+intEntry = Entry(root, textvariable=intVar)
+intEntry.pack(side=LEFT)
+
+dblEntry = Entry(root, textvariable=dblVar)
+dblEntry.pack(side=LEFT)
+
+# Depending on if this check button is selected or not
+# will determine if we can get data on our Widgets
+theCheckBut = Checkbutton(root, text="Switch", variable=boolVar)
+theCheckBut.bind("<Button-1>", bind_button)
+theCheckBut.pack(side=LEFT)
+
+# Call the function get_data on click
+getDataButton = Button(root, text="Get Data")
+getDataButton.bind("<Button-1>", get_data)
+getDataButton.pack(side=LEFT)
+
+root.mainloop()
 
 
-def auto_corr_gradient(gdft): #OK
-    N = gdft.shape[0]
-    derivatives = [auto_corr_derivative(sigma, gdft) for sigma in range(N)]
-    return np.array(derivatives)
+# ---------- STYLING WIDGETS ----------
+# There are many ways to custom style your widgets
+
+# You can open message boxes
+def open_msg_box():
+    messagebox.showwarning(
+        "Event Triggered",
+        "Button Clicked"
+    )
 
 
-def corr_difference(analyzer, theta, sigma, corr_name, h=0.00001): #OK
-    N = theta.shape[0]
-    # print(sigma, h)
-    old_gdft = gdft_matrix(N, theta)
-    old_corr_tensor = Correlation(old_gdft).correlation_tensor()
-    old_corr = analyzer._corr_fns[corr_name](old_corr_tensor)
-    new_theta = deepcopy(theta)
-    new_theta[sigma] += h
-    new_gdft = gdft_matrix(N, new_theta)
-    new_corr_tensor = Correlation(new_gdft).correlation_tensor()
-    new_corr = analyzer._corr_fns[corr_name](new_corr_tensor)
-    return (new_corr - old_corr) / h
+root = Tk()
+
+# You can define the size of the window and the
+# position on the screen with
+# widthxheight+xoffset+yoffset
+root.geometry("400x400+300+300")
+
+# You can make it so the window isn't resizable
+root.resizable(width=False, height=False)
+
+frame = Frame(root)
+
+# Your can change a styling option like this
+# Color option names are here http://wiki.tcl.tk/37701
+# For the font list the font family, px and font style
+
+style = ttk.Style()
+style.configure("TButton",
+                foreground="midnight blue",
+                font="Times 20 bold italic",
+                padding=20)
+
+# Ttk widget names : TButton, TCheckbutton, TCombobox,
+# TEntry, TFrame, TLabel, TLabelframe, TMenubutton,
+# TNotebook, TProgressbar, TRadiobutton, TScale,
+# TScrollbar, TSpinbox, Treeview
+
+# You can change the theme style for your applications
+# This shows you all the themes for your OS
+print(ttk.Style().theme_names())
+
+# You can see current style settings like this
+print(style.lookup('TButton', 'font'))
+print(style.lookup('TButton', 'foreground'))
+print(style.lookup('TButton', 'padding'))
+
+# Change the theme for every widget
+ttk.Style().theme_use('clam')
+
+# Have the button open a message box on click
+theButton = ttk.Button(frame,
+                       text="Important Button",
+                       command=open_msg_box)
+
+# You can also disable and enable buttons
+theButton['state'] = 'disabled'
+theButton['state'] = 'normal'
+
+theButton.pack()
+
+frame.pack()
+
+root.mainloop()
 
 
-def corr_differences(analyzer, theta, corr_name, step=0.00001): #OK
-    diffs = [corr_difference(analyzer, theta, index, corr_name, h=step) for index, _ in enumerate(theta)]
-    return np.array(diffs)
+# ---------- MENU BARS ----------
+
+# Quits the TkInter app when called
+def quit_app():
+    root.quit()
 
 
-def ct_difference(theta, sigma, h=0.00001):
-    N = theta.shape[0]
-    # print(sigma, h)
-    old_gdft = gdft_matrix(N, theta)
-    old_corr_tensor = Correlation(old_gdft).correlation_tensor()
-
-    new_theta = deepcopy(theta)
-    new_theta[sigma] += h
-    new_gdft = gdft_matrix(N, new_theta)
-    new_corr_tensor = Correlation(new_gdft).correlation_tensor()
-    return (new_corr_tensor - old_corr_tensor) / h
+# Opens a message box when called
+def show_about(event=None):
+    messagebox.showwarning(
+        "About",
+        "This Awesome Program was Made in 2016"
+    )
 
 
-def avg_corr_difference(theta, sigma, h=0.00001):
-    N = theta.shape[0]
-    ct_diff = ct_difference(theta, sigma, h=h)
-    conj_ct_diff = np.conjugate(ct_diff)
-    gdft = gdft_matrix(N, theta)
-    ct = Correlation(gdft).correlation_tensor()
+root = Tk()
 
-    def compute_term(a, mu):
-        return ct_diff[a, a, mu] * np.conjugate(ct[a, a, mu]) + ct[a, a, mu] * conj_ct_diff[a, a, mu]
+# Create the menu object
+the_menu = Menu(root)
 
-    result = 0
-    for alpha in range(N):
-        for mu in range(N - 1):
-            result += compute_term(alpha, mu)
-        for mu in range(N, 2 * N - 1):
-            result += compute_term(alpha, mu)
+# ----- FILE MENU -----
 
-    return result / N
+# Create a pull down menu that can't be removed
+file_menu = Menu(the_menu, tearoff=0)
+
+# Add items to the menu that show when clicked
+# compound allows you to add an image
+file_menu.add_command(label="Open")
+file_menu.add_command(label="Save")
+
+# Add a horizontal bar to group similar commands
+file_menu.add_separator()
+
+# Call for the function to execute when clicked
+file_menu.add_command(label="Quit", command=quit_app)
+
+# Add the pull down menu to the menu bar
+the_menu.add_cascade(label="File", menu=file_menu)
+
+# ----- FONT MENU FOR VIEW MENU -----
+
+# Stores font chosen and will update based on menu
+# selection
+text_font = StringVar()
+text_font.set("Times")
 
 
-def avg_corr_derivative(theta, sigma, h=0.00001):
-    N = theta.shape[0]
-    ct_diff = ct_difference(theta, sigma, h=h)
-    conj_ct_diff = np.conjugate(ct_diff)
-    gdft = gdft_matrix(N, theta)
-    ct = Correlation(gdft).correlation_tensor()
+# Outputs font changes
+def change_font(event=None):
+    print("Font Picked :", text_font.get())
 
-    def compute_term(a, mu):
-        return ct_diff[a, a, mu] * np.conjugate(ct[a, a, mu]) + ct[a, a, mu] * conj_ct_diff[a, a, mu]
 
-    result = 0
-    for alpha in range(N):
-        for mu in range(N - 1):
-            result += compute_term(alpha, mu)
-        for mu in range(N, 2 * N - 1):
-            result += compute_term(alpha, mu)
+# Define font drop down that will be attached to view
+font_menu = Menu(the_menu, tearoff=0)
 
-    return result / N
+# Define radio button options for fonts
+font_menu.add_radiobutton(label="Times",
+                          variable=text_font,
+                          command=change_font)
+
+font_menu.add_radiobutton(label="Courier",
+                          variable=text_font,
+                          command=change_font)
+
+font_menu.add_radiobutton(label="Ariel",
+                          variable=text_font,
+                          command=change_font)
+
+# ----- VIEW MENU -----
+view_menu = Menu(the_menu, tearoff=0)
+
+# Variable changes when line numbers is checked
+# or unchecked
+line_numbers = IntVar()
+line_numbers.set(1)
+
+# Bind the checking of the line number option
+# to variable line_numbers
+view_menu.add_checkbutton(label="Line Numbers",
+                          variable=line_numbers)
+
+view_menu.add_cascade(label="Fonts", menu=font_menu)
+
+# Add the pull down menu to the menu bar
+the_menu.add_cascade(label="View", menu=view_menu)
+
+# ----- HELP MENU -----
+help_menu = Menu(the_menu, tearoff=0)
+
+# accelerator is used to show a shortcut
+# OSX, Windows and Linux use the following options
+# Command-O, Shift+Ctrl+S, Command-Option-Q with the
+# modifiers Control, Ctrl, Option, Opt, Alt, Shift,
+# and Command
+help_menu.add_command(label="About",
+                      accelerator="command-H",
+                      command=show_about)
+
+the_menu.add_cascade(label="Help", menu=help_menu)
+
+# Bind the shortcut to the function
+root.bind('<Command-A>', show_about)
+root.bind('<Command-a>', show_about)
+
+# Display the menu bar
+root.config(menu=the_menu)
+
+root.mainloop()
+'''
+from tkinter import *
+from tkinter import messagebox
+
+
+# ---------- VARIABLES & UNBIND ----------
+def get_data(event):
+    # Output the values for the Widgets with get()
+    print("String :", strVar.get())
+    print("Integer :", intVar.get())
+    print("Double :", dblVar.get())
+    print("Boolean :", boolVar.get())
+
+
+# You can unbind and rebind an event to a function
+def bind_button(event):
+    if boolVar.get():
+        getDataButton.unbind("<Button-1>")
+    else:
+        getDataButton.bind("<Button-1>", get_data)
+
+
+root = Tk()
+
+# As I showed previously there are TkInter variables
+# you can use with Widgets to set and get values
+strVar = StringVar()
+intVar = IntVar()
+dblVar = DoubleVar()
+boolVar = BooleanVar()
+
+# Set the default values with set()
+strVar.set("Enter String")
+intVar.set("Enter Integer")
+dblVar.set("Enter Double")
+boolVar.set(True)
+
+# Assign the variable to either textvariable or variable
+strEntry = Entry(root, textvariable=strVar)
+strEntry.pack(side=LEFT)
+
+intEntry = Entry(root, textvariable=intVar)
+intEntry.pack(side=LEFT)
+
+dblEntry = Entry(root, textvariable=dblVar)
+dblEntry.pack(side=LEFT)
+
+# Depending on if this check button is selected or not
+# will determine if we can get data on our Widgets
+theCheckBut = Checkbutton(root, text="Switch", variable=boolVar)
+theCheckBut.bind("<Button-1>", bind_button)
+theCheckBut.pack(side=LEFT)
+
+# Call the function get_data on click
+getDataButton = Button(root, text="Get Data")
+getDataButton.bind("<Button-1>", get_data)
+getDataButton.pack(side=LEFT)
+
+root.mainloop()
