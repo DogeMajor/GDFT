@@ -17,10 +17,20 @@ SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
 class Classifier(object):
 
     def sort_thetas(self, theta_vecs, groups):
-        kmeans_results = self._classify_thetas(theta_vecs, groups)
-        grouped_theta_vecs = self.group_by_label(theta_vecs, kmeans_results)
-        return SortedThetas(thetas=grouped_theta_vecs, labels=kmeans_results[0],
-                            histogram=self._kmeans_to_histogram(kmeans_results))
+        old_kmeans_results = self._classify_thetas(theta_vecs, groups)
+        new_kmeans_results = self.filter_empty_labels(old_kmeans_results)
+        grouped_theta_vecs = self.group_by_label(theta_vecs, new_kmeans_results)
+        return SortedThetas(thetas=grouped_theta_vecs, labels=new_kmeans_results[0],
+                            histogram=self._kmeans_to_histogram(new_kmeans_results))
+
+    def filter_empty_labels(self, kmeans_results):
+        labels, labelings = kmeans_results[0], kmeans_results[1]
+        hist = self._kmeans_to_histogram(kmeans_results)
+        non_empty_labels = sorted([key for key in hist.keys() if hist[key] != []])
+        labeling_transforms = {old_labeling: new_labeling for new_labeling, old_labeling in enumerate(non_empty_labels)}
+        new_labels = labels[non_empty_labels, :]
+        new_labelings = [labeling_transforms[old_labeling] for old_labeling in labelings]
+        return new_labels, np.array(new_labelings)
 
     def _classify_thetas(self, theta_vecs, groups):
         return kmeans2(theta_vecs, groups)
@@ -118,6 +128,10 @@ class ThetasAnalyzer(object):
         classifier = Classifier()
         return classifier.sort_thetas(theta_vecs, groups)
 
+    def cov_pca_reductions(self, sorted_thetas, cutoff_ratio=0):
+        pca = PCA(self._dim)
+        return pca.cov_pca_reductions(sorted_thetas, cutoff_ratio=cutoff_ratio)
+
     def solution_spaces(self, sorted_thetas, cutoff_ratio=0):
         '''We've chosen the right 'eigen space' and therefore
          projections operate from right side on (row) vectors  (==data)'''
@@ -130,29 +144,6 @@ class ThetasAnalyzer(object):
 
         sol_spaces = {key: get_solution_space(key) for key in pca_reductions.keys()}
         return sol_spaces
-
-    def entropy(self, cov_matrix):#IF X is Gaussian, otherwise this is false!!!!
-        return 0.5 * (self._dim + self._dim * np.log(np.pi*2) + np.log(np.linalg.det(cov_matrix)))
-
-
-def generate_thetas_v1(dim):
-    if dim <= 8:
-        return [0.5 * np.pi + 1.135 * atan(n - 3.63) for n in range(dim)]
-    return [0.5 * np.pi + 1.0 * atan(n - (dim/8) * 3.75) for n in range(dim)]
-
-def generate_thetas(dim):
-    poly = np.poly1d([-4.88506, 5.82857, -1.23057, 0.22106, -0.0184515])
-    print(poly)
-    return [poly(n) for n in range(dim)]
-
-class GDFTBuilder(object):
-
-    def __init__(self, dim):
-        self._dim = dim
-
-    def build(self):
-        shifts = np.array(generate_thetas(self._dim))
-        return gdft_matrix(self._dim, shifts)
 
 
 class SymmetryAnalyzer(object):
@@ -176,4 +167,4 @@ class SymmetryAnalyzer(object):
         return sum(similarities) == len(similarities)
 
 if __name__ == "__main__":
-    theta_collections =
+    pass
