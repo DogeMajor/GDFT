@@ -3,8 +3,8 @@
 echo "Testing all the modules"
 
 python test/testGDFT.py TestGDFT
-python test/testCorrelations.py
-python test/testCorrelationAnalyzer.py
+python test/testCorrelation.py TestCorrelation
+python test/testCorrelationAnalyzer.py TestCorrelationAnalyzer
 python test/testDAO.py TestDAO
 python test/testSequenceFinder.py TestSequenceFinder
 python test/testOptimizer.py TestOptimizer

@@ -23,6 +23,13 @@ class TestClassifier(GDFTTestCase):
         self.assertAlmostEqualMatrices(np.sort(sorted_thetas.labels, axis=0), KMEANS_RESULTS[0])
         self.assertEqual(sorted(list(sorted_thetas.histogram.values())), [1, 1])
 
+    def test_filter_empty_labels(self):
+        old_kmeans = (np.array([[1, 1], [2, 2], [3, 3]]),
+                      np.array([0, 0, 0, 2, 0, 2, 0, 0, 0, 2, 2, 2]))
+        new_kmeans = self.classifier.filter_empty_labels(old_kmeans)
+        self.assertAlmostEqualMatrices(np.array([[1, 1], [3, 3]]), new_kmeans[0])
+        self.assertAlmostEqualMatrices(np.array([0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1]), new_kmeans[1])
+
     def test_group_by_label(self):
         groups = self.classifier.group_by_label(UNSORTED_THETAS, KMEANS_RESULTS)
         vals = list(groups.values())

@@ -7,19 +7,10 @@ sys.path.append("../src")
 sys.path.append("src/")
 from gdft import dft_matrix
 from correlations import Correlation
-from temp import *
-from tools import EqualMatrices
-
-class GDFTTestCase(unittest.TestCase):
-
-    def assertAlmostEqualLists(self, first_list, second_list, places=7):
-        self.assertEqual(len(first_list), len(second_list))
-        for first_item, second_item in zip(first_list, second_list):
-            self.assertAlmostEqual(first_item, second_item, places=places)
+from tools import EqualMatrices, GDFTTestCase
 
 
-
-class TestCorrelation(unittest.TestCase):
+class TestCorrelation(GDFTTestCase):
     '''OBS! This only tests a symmetric case of matrix A'''
 
     def setUp(self):
@@ -45,7 +36,7 @@ class TestCorrelation(unittest.TestCase):
         matrix = np.array([[1, 2], [3, 4]])
         corr = Correlation(matrix)
         c_tensor = corr.correlation_tensor()
-        self.assertTrue(EqualMatrices(c_tensor[0, 1, :], np.array([3, 5.5, 2])))
+        self.assertEqualMatrices(c_tensor[0, 1, :], np.array([3, 5.5, 2]))
 
     def tearDown(self):
         del self.correlation
@@ -56,7 +47,7 @@ from correlations import Correlation
 get_corr_tensor = Correlation(dft_matrix(50)).correlation_tensor'''
 
 
-class SpeedTests(unittest.TestCase):
+class SpeedTests(GDFTTestCase):
 
     def test_how_quickly_correlations_are_computed(self):
         tot_time = timeit.timeit("get_corr_tensor()", setup=SETUP,

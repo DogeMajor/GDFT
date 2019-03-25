@@ -1,6 +1,9 @@
 import json
+import csv
 import codecs
+from collections import Counter
 import numpy as np
+from analyzer import SortedThetas
 
 
 class ComplexDecoder(object):
@@ -60,7 +63,8 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class DAO(object):
+
+class BaseDAO(object):
     '''Writes json files of records in numpy format and reads
     jsons into numpy/list formats'''
 
@@ -72,19 +76,119 @@ class DAO(object):
             path = self._path
         try:
             with codecs.open(path+file_name, 'r', 'utf-8') as file_object:
-                decoder = ComplexDecoder()
-                raw_data = file_object.read()
-                return json.loads(raw_data, object_hook=decoder.decode)
+                return self._read(file_object)
         except IOError:
             print('Can\'t read the file called {}'.format(path+file_name))
             raise
+
+    def _read(self, file_object):
+        return file_object.read()
 
     def write(self, file_name, content, path=None):
         if path is None:
             path = self._path
         try:
             with open(path+file_name, 'w') as file_object:
-                json.dump(content, file_object, ensure_ascii=False, cls=NumpyEncoder)
+                self._write(file_object, content)
         except IOError:
             print('Can\'t write the file {}'.format(path+file_name))
             raise
+
+    def _write(self, file_object, content):
+        return file_object.write(content)
+
+
+class ThetasDAO(BaseDAO):
+
+    def __init__(self, path):
+        BaseDAO.__init__(self, path)
+
+    def _read(self, file_object):
+        decoder = ComplexDecoder()
+        raw_data = file_object.read()
+        return json.loads(raw_data, object_hook=decoder.decode)
+
+    def _write(self, file_object, content):
+        json.dump(content, file_object, ensure_ascii=False, cls=NumpyEncoder)
+
+
+class SortedThetasDAO(BaseDAO):
+
+    def __init__(self, path):
+        BaseDAO.__init__(self, path)
+
+    def _to_histogram(self, groups):
+        amounts = {key: len(value) for key, value in groups.items()}
+        return Counter(amounts)
+
+    def _read(self, file_object):
+        # csv_data = csv.DictReader(file_object)
+        # column_names = ", ".join(csv_data[0])
+        reader = csv.reader(file_object, delimiter=',')
+        headers = next(reader)
+        #print(headers)
+
+        # analyzed_thetas = {header: }
+        thetas = {}
+        labels = []
+        for row in reader:
+            if len(row) != 0:
+                if row[0] is 'average':
+                    labels.append(np.array(row[1:], dtype=np.float64))
+                elif row[0] not in thetas.keys():
+                    thetas[row[0]] = []
+                thetas[row[0]].append(np.array(row[1:], dtype=np.float64))
+            #print(row)
+        #print(thetas)
+        #print(labels)
+        thetas = {int(key): value for key, value in thetas.items()}
+        hist = self._to_histogram(thetas)
+        return SortedThetas(thetas=thetas, labels=labels, histogram=hist)
+
+    def _get_headers(self, dim):
+        return ("theta_" + str(index) for index in range(dim))
+
+    def _write(self, file_object, sorted_thetas):
+        dim = sorted_thetas.thetas[0][0].shape[0]
+        length = len(sorted_thetas.thetas)
+        headers = list(self._get_headers(dim))
+        fieldnames = ['Label'] + headers
+        thetas_writer = csv.writer(file_object, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        thetas_writer.writerow(fieldnames)
+        theta_labels = list(sorted_thetas.thetas.keys())
+        for label_ind in sorted_thetas.thetas.keys():
+            for theta in sorted_thetas.thetas[label_ind]:
+
+                thetas_writer.writerow([label_ind] + theta.tolist())
+            thetas_writer.writerow(['average'] + sorted_thetas.labels[label_ind].tolist())
+            #thetas_writer.writerow(['-']*(dim+1))
+
+
+
+
+class AnalyzedThetasDAO(BaseDAO):
+    '''Writes csv files of the analysis of the records and reads them'''
+
+    def __init__(self, path):
+        BaseDAO.__init__(self, path)
+
+    def _to_csv(self, json):
+        pass
+
+    def _read(self, file_object):
+        #csv_data = csv.DictReader(file_object)
+        #column_names = ", ".join(csv_data[0])
+        reader = csv.reader(file_object, delimiter=',', quotechar='|')
+        headers = next(reader)
+        print(headers)
+        #analyzed_thetas = {header: }
+        for index, row in reader:
+            print(index, row)
+
+    def _write(self, file_object, content):
+        fieldnames = ['label_index', 'last_name']
+        writer = csv.DictWriter(file_object, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow({'first_name': 'Baked', 'last_name': 'Beans'})
+        writer.writerow({'first_name': 'Lovely', 'last_name': 'Spam'})
+        writer.writerow({'first_name': 'Wonderful', 'last_name': 'Spam'})

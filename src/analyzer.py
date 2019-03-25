@@ -17,10 +17,20 @@ SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
 class Classifier(object):
 
     def sort_thetas(self, theta_vecs, groups):
-        kmeans_results = self._classify_thetas(theta_vecs, groups)
-        grouped_theta_vecs = self.group_by_label(theta_vecs, kmeans_results)
-        return SortedThetas(thetas=grouped_theta_vecs, labels=kmeans_results[0],
-                            histogram=self._kmeans_to_histogram(kmeans_results))
+        old_kmeans_results = self._classify_thetas(theta_vecs, groups)
+        new_kmeans_results = self.filter_empty_labels(old_kmeans_results)
+        grouped_theta_vecs = self.group_by_label(theta_vecs, new_kmeans_results)
+        return SortedThetas(thetas=grouped_theta_vecs, labels=new_kmeans_results[0],
+                            histogram=self._kmeans_to_histogram(new_kmeans_results))
+
+    def filter_empty_labels(self, kmeans_results):
+        labels, labelings = kmeans_results[0], kmeans_results[1]
+        hist = self._kmeans_to_histogram(kmeans_results)
+        non_empty_labels = sorted([key for key in hist.keys() if hist[key] != []])
+        labeling_transforms = {old_labeling: new_labeling for new_labeling, old_labeling in enumerate(non_empty_labels)}
+        new_labels = labels[non_empty_labels, :]
+        new_labelings = [labeling_transforms[old_labeling] for old_labeling in labelings]
+        return new_labels, np.array(new_labelings)
 
     def _classify_thetas(self, theta_vecs, groups):
         return kmeans2(theta_vecs, groups)
