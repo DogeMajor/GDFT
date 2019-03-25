@@ -117,16 +117,14 @@ SORTED_THETAS = SortedThetas(thetas={0: FIRST_THETAS_GROUP, 1: SECOND_THETAS_GRO
 class TestSortedThetasDAO(GDFTTestCase):
 
     def test_write_and_read(self):
-        #print(SORTED_THETAS.thetas[0][0].dtype)
         dao = SortedThetasDAO(PATH)
         dao.write("sorted_thetas.csv", SORTED_THETAS, PATH)
         retrieved_content = dao.read("sorted_thetas.csv")
-        print(retrieved_content)
-        self.assertAlmostEqualLists(retrieved_content.thetas[0], SORTED_THETAS.thetas[0])
-        self.assertAlmostEqualLists(retrieved_content.thetas[1], SORTED_THETAS.thetas[1])
+        self.assertAlmostEqualMatrices(retrieved_content.thetas[0][0], SORTED_THETAS.thetas[0][0])
+        self.assertAlmostEqualMatrices(retrieved_content.thetas[1][0], SORTED_THETAS.thetas[1][0])
+        self.assertEqual(retrieved_content.histogram, SORTED_THETAS.histogram)
         os.remove(PATH+"sorted_thetas.csv")
         self.assertTrue("sorted_thetas.csv" not in os.listdir(PATH))
-
 
 
 class TestAnalyzedThetasDAO(unittest.TestCase):

@@ -121,14 +121,12 @@ class SortedThetasDAO(BaseDAO):
         amounts = {key: len(value) for key, value in groups.items()}
         return Counter(amounts)
 
+    def _get_headers(self, dim):
+        return ("theta_" + str(index) for index in range(dim))
+
     def _read(self, file_object):
-        # csv_data = csv.DictReader(file_object)
-        # column_names = ", ".join(csv_data[0])
         reader = csv.reader(file_object, delimiter=',')
         headers = next(reader)
-        #print(headers)
-
-        # analyzed_thetas = {header: }
         thetas = {}
         labels = []
         for row in reader:
@@ -138,31 +136,21 @@ class SortedThetasDAO(BaseDAO):
                 elif row[0] not in thetas.keys():
                     thetas[row[0]] = []
                 thetas[row[0]].append(np.array(row[1:], dtype=np.float64))
-            #print(row)
-        #print(thetas)
-        #print(labels)
+        del thetas['average']
         thetas = {int(key): value for key, value in thetas.items()}
         hist = self._to_histogram(thetas)
         return SortedThetas(thetas=thetas, labels=labels, histogram=hist)
 
-    def _get_headers(self, dim):
-        return ("theta_" + str(index) for index in range(dim))
-
     def _write(self, file_object, sorted_thetas):
         dim = sorted_thetas.thetas[0][0].shape[0]
-        length = len(sorted_thetas.thetas)
         headers = list(self._get_headers(dim))
         fieldnames = ['Label'] + headers
         thetas_writer = csv.writer(file_object, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         thetas_writer.writerow(fieldnames)
-        theta_labels = list(sorted_thetas.thetas.keys())
         for label_ind in sorted_thetas.thetas.keys():
             for theta in sorted_thetas.thetas[label_ind]:
-
                 thetas_writer.writerow([label_ind] + theta.tolist())
             thetas_writer.writerow(['average'] + sorted_thetas.labels[label_ind].tolist())
-            #thetas_writer.writerow(['-']*(dim+1))
-
 
 
 
