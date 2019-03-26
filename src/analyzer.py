@@ -10,18 +10,34 @@ from correlations import CorrelationAnalyzer
 np.random.seed(int(time.time()))
 
 Polynomes = namedtuple('Polynomes', 'polynomes theta_vecs')
-SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram')
+SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram correlations')
 SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
 
 
 class Classifier(object):
 
+
+    def get_correlations(self, grouped_theta_vecs):
+        dim = grouped_theta_vecs[0][0].shape[0]
+        corr_analyzer = CorrelationAnalyzer(dim)
+        def get_corrs(thetas):
+            corrs = []
+            for theta in thetas:
+                gdft_mat = gdft_matrix(dim, theta)
+                corrs.append(corr_analyzer.get_correlations(gdft_mat))
+            return corrs
+
+        return {label_ind: get_corrs(theta_vecs) for label_ind, theta_vecs in grouped_theta_vecs.items()}
+
     def sort_thetas(self, theta_vecs, groups):
         old_kmeans_results = self._classify_thetas(theta_vecs, groups)
+
         new_kmeans_results = self.filter_empty_labels(old_kmeans_results)
         grouped_theta_vecs = self.group_by_label(theta_vecs, new_kmeans_results)
+        grouped_corrs = self.get_correlations(grouped_theta_vecs)
+        #print("grouped_corrs:", grouped_corrs)
         return SortedThetas(thetas=grouped_theta_vecs, labels=new_kmeans_results[0],
-                            histogram=self._kmeans_to_histogram(new_kmeans_results))
+                            histogram=self._kmeans_to_histogram(new_kmeans_results), correlations=grouped_corrs)
 
     def filter_empty_labels(self, kmeans_results):
         labels, labelings = kmeans_results[0], kmeans_results[1]
@@ -126,7 +142,8 @@ class ThetasAnalyzer(object):
 
     def sort_thetas(self, theta_vecs, groups):
         classifier = Classifier()
-        return classifier.sort_thetas(theta_vecs, groups)
+        sorted_thetas = classifier.sort_thetas(theta_vecs, groups)
+        return sorted_thetas
 
     def cov_pca_reductions(self, sorted_thetas, cutoff_ratio=0):
         pca = PCA(self._dim)

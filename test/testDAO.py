@@ -8,6 +8,7 @@ sys.path.append("src/")
 from tools import GDFTTestCase
 from dao import BaseDAO, ThetasDAO, SortedThetasDAO, AnalyzedThetasDAO, NumpyEncoder, ComplexDecoder
 from analyzer import SortedThetas
+from correlations import Correlations
 
 PATH = "test/testdata/"
 np.random.seed(int(time.time()))
@@ -90,7 +91,10 @@ class TestThetasDAO(unittest.TestCase):
         self.assertTrue(EqualMatrices(retrieved_mat, matrix))
         os.remove(PATH+"matrix_info.json")
 
-
+FIRST_CORRS = Correlations(max_auto_corr=0.1, avg_auto_corr=0.2, max_cross_corr=0.3,
+                           avg_cross_corr=0.4, avg_merit_factor=0.5)
+SECOND_CORRS = Correlations(max_auto_corr=1.1, avg_auto_corr=1.2, max_cross_corr=1.3,
+                            avg_cross_corr=1.4, avg_merit_factor=1.5)
 
 
 FIRST_THETAS_GROUP = [np.array([2.93467664, 0.3384844, 2.87214115, 1.20613475, 0.32252419,
@@ -111,7 +115,8 @@ SECOND_THETAS_GROUP = [np.array([0.23263316, 1.06778065, 3.05624654, 2.96119473,
 
 SORTED_THETAS = SortedThetas(thetas={0: FIRST_THETAS_GROUP, 1: SECOND_THETAS_GROUP},
                              labels=[FIRST_THETAS_GROUP[0], SECOND_THETAS_GROUP[0]],
-                             histogram={0: 3, 1:4})
+                             histogram={0: 3, 1: 4},
+                             correlations={0: [FIRST_CORRS]*3, 1: [SECOND_CORRS]*4})
 
 
 class TestSortedThetasDAO(GDFTTestCase):
@@ -123,20 +128,21 @@ class TestSortedThetasDAO(GDFTTestCase):
         self.assertAlmostEqualMatrices(retrieved_content.thetas[0][0], SORTED_THETAS.thetas[0][0])
         self.assertAlmostEqualMatrices(retrieved_content.thetas[1][0], SORTED_THETAS.thetas[1][0])
         self.assertEqual(retrieved_content.histogram, SORTED_THETAS.histogram)
+        #self.assertEqualCorrelationGroups(retrieved_content.correlations, SORTED_THETAS.correlations)
+        self.assertEqual(retrieved_content.correlations, SORTED_THETAS.correlations)
         os.remove(PATH+"sorted_thetas.csv")
         self.assertTrue("sorted_thetas.csv" not in os.listdir(PATH))
-
 
 class TestAnalyzedThetasDAO(unittest.TestCase):
 
     def test_write_and_read(self): #False!!!!!!!
         #print(SORTED_THETAS.thetas[0][0].dtype)
-        dao = SortedThetasDAO(PATH)
-        dao.write("sorted_thetas.csv", SORTED_THETAS, PATH)
-        retrieved_content = dao.read("sorted_thetas.csv")
+        dao = AnalyzedThetasDAO(PATH)
+        dao.write("analyzed_thetas.csv", SORTED_THETAS, PATH)
+        retrieved_content = dao.read("analyzed_thetas.csv")
         print(retrieved_content)
-        os.remove(PATH+"sorted_thetas.csv")
-        self.assertTrue("sorted_thetas.csv" not in os.listdir(PATH))
+        os.remove(PATH+"analyzed_thetas.csv")
+        self.assertTrue("analyzed_thetas.csv" not in os.listdir(PATH))
 
     def test_read(self):
         dao = AnalyzedThetasDAO(PATH)
@@ -144,62 +150,12 @@ class TestAnalyzedThetasDAO(unittest.TestCase):
         #self.assertEqual(retrieved_content['balance'], 1000)
         #self.assertEqual(retrieved_content['name'], "Jultomte")
 
-    def test_saving_int_numpy_vector(self):
-        dao = AnalyzedThetasDAO(PATH)
-        vector = np.array([1, 2, 3], dtype=np.int32)
-        content = {"name": "int_vector",
-                   "vector": vector}
-
-        dao.write("int_vector_info.json", content, PATH)
-        retrieved_content = dao.read("int_vector_info.json")
-        self.assertEqual(retrieved_content['vector'], [1, 2, 3])
-        os.remove(PATH+"int_vector_info.json")
-
-    def test_complex_encodings(self):
-        encoder = NumpyEncoder()
-        matrix = np.array([1 + 1j, 2 - 2 * 1j, 3 - 3 * 1j])
-        json_array = encoder.complex_array_encoder(matrix)
-        self.assertEqual(json_array["ComplexArray"]["Re"], [1, 2, 3])
-        self.assertEqual(json_array["ComplexArray"]["Im"], [1, -2, -3])
-        complex_json = encoder.complex_number_encoder(1 - 1j)
-        self.assertEqual(complex_json["ComplexNumber"]["Re"], 1)
-        self.assertEqual(complex_json["ComplexNumber"]["Im"], -1)
-
-    def test_complex_decodings(self):
-        decoder = ComplexDecoder()
-
-        complex_json = {"ComplexNumber": {"Re": 1, "Im": -1}}
-        self.assertEqual(decoder.complex_number_decoder(complex_json), 1 - 1j)
-
-        complex_mat_json = {"ComplexArray": {"Re": [1, 2, 3], "Im": [1, -2, -3]}}
-
-        matrix = decoder.complex_array_decoder(complex_mat_json)
-        self.assertEqual(list(matrix),
-                         list(np.array([1 + 1j, 2 - 2 * 1j, 3 - 3 * 1j])))
-
-    def test_saving_complex_numpy_vector(self):
-        dao = AnalyzedThetasDAO(PATH)
-        vector = np.array([1+1j, 2-2*1j, 3-3*1j])
-        content = {"name": "complex vector",
-                   "vector": vector}
-
-        dao.write("vector_info.json", content, PATH)
-        retrieved_content = dao.read("vector_info.json")
-        retrieved_vec = retrieved_content['vector']
-        self.assertEqual(list(retrieved_vec), list(vector))
-        os.remove(PATH+"vector_info.json")
-
-    def test_saving_complex_numpy_matrix(self):
-        dao = AnalyzedThetasDAO(PATH)
-        matrix = np.array([[1+1j, 2-2*1j], [3-3*1j, 4-4*1j]])
-        content = {"name": "complex matrix",
-                   "matrix": matrix}
-
-        dao.write("matrix_info.json", content, PATH)
-        retrieved_content = dao.read("matrix_info.json")
-        retrieved_mat = retrieved_content['matrix']
-        self.assertTrue(EqualMatrices(retrieved_mat, matrix))
-        os.remove(PATH+"matrix_info.json")
 
 if __name__ == '__main__':
     unittest.main()
+    print(FIRST_CORRS._asdict().values())
+    '''corrs = Correlations(max_auto_corr=0.1, avg_auto_corr=0.2,
+                         max_cross_corr=0.3, avg_cross_corr=0.4,
+                         avg_merit_factor=0.5)
+
+    print(corrs == FIRST_CORRS)'''

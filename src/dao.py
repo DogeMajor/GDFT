@@ -3,6 +3,7 @@ import csv
 import codecs
 from collections import Counter
 import numpy as np
+from correlations import Correlations
 from analyzer import SortedThetas
 
 
@@ -127,29 +128,37 @@ class SortedThetasDAO(BaseDAO):
     def _read(self, file_object):
         reader = csv.reader(file_object, delimiter=',')
         headers = next(reader)
+        dim = len(headers) - 1 - len(Correlations._fields)
         thetas = {}
+        corrs = {}
         labels = []
-        for row in reader:
+
+        def process_row(row):
             if len(row) != 0:
-                if row[0] is 'average':
-                    labels.append(np.array(row[1:], dtype=np.float64))
-                elif row[0] not in thetas.keys():
-                    thetas[row[0]] = []
-                thetas[row[0]].append(np.array(row[1:], dtype=np.float64))
-        del thetas['average']
-        thetas = {int(key): value for key, value in thetas.items()}
+                if row[0] != 'average':
+                    label_index = int(row[0])
+                    theta = np.array(row[1:dim + 1], dtype=np.float64)
+                    thetas.setdefault(label_index, []).append(theta)
+                    vals = [float(val) for val in row[dim+1:]]
+                    corr = Correlations(*vals)
+                    corrs.setdefault(label_index, []).append(corr)
+                elif row[0] == 'average':
+                    labels.append(np.array(row[1:dim+1], dtype=np.float64))
+
+        for row in reader:
+            process_row(row)
         hist = self._to_histogram(thetas)
-        return SortedThetas(thetas=thetas, labels=labels, histogram=hist)
+        return SortedThetas(thetas=thetas, labels=labels, histogram=hist, correlations=corrs)
 
     def _write(self, file_object, sorted_thetas):
         dim = sorted_thetas.thetas[0][0].shape[0]
         headers = list(self._get_headers(dim))
-        fieldnames = ['Label'] + headers
+        fieldnames = ['Label'] + headers + list(Correlations._fields)
         thetas_writer = csv.writer(file_object, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         thetas_writer.writerow(fieldnames)
         for label_ind in sorted_thetas.thetas.keys():
-            for theta in sorted_thetas.thetas[label_ind]:
-                thetas_writer.writerow([label_ind] + theta.tolist())
+            for theta, corrs in zip(sorted_thetas.thetas[label_ind], sorted_thetas.correlations[label_ind]):
+                thetas_writer.writerow([label_ind] + theta.tolist() + list(corrs._asdict().values()))
             thetas_writer.writerow(['average'] + sorted_thetas.labels[label_ind].tolist())
 
 
