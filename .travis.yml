@@ -3,10 +3,11 @@ python:
   - "3.5"
   #- "3.6"
 #install dependencies
+#Travis sets up an ubuntu 14.04 env by default
 install:
   - pip3 install numpy scipy
 script:
-  - py.test --cov=. ./test/
+  - py.test
 branches:
   only:
     - master
