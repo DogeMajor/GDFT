@@ -1,6 +1,6 @@
 import time
 from collections import namedtuple, Counter
-from math import atan, isclose
+from math import isclose
 import numpy as np
 from numpy import linalg
 from scipy.cluster.vq import kmeans2
@@ -16,7 +16,6 @@ SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
 
 class Classifier(object):
 
-
     def get_correlations(self, grouped_theta_vecs):
         dim = grouped_theta_vecs[0][0].shape[0]
         corr_analyzer = CorrelationAnalyzer(dim)
@@ -27,7 +26,8 @@ class Classifier(object):
                 corrs.append(corr_analyzer.get_correlations(gdft_mat))
             return corrs
 
-        return {label_ind: get_corrs(theta_vecs) for label_ind, theta_vecs in grouped_theta_vecs.items()}
+        return {label_ind: get_corrs(theta_vecs) for
+                label_ind, theta_vecs in grouped_theta_vecs.items()}
 
     def sort_thetas(self, theta_vecs, groups):
         old_kmeans_results = self._classify_thetas(theta_vecs, groups)
@@ -37,13 +37,15 @@ class Classifier(object):
         grouped_corrs = self.get_correlations(grouped_theta_vecs)
         #print("grouped_corrs:", grouped_corrs)
         return SortedThetas(thetas=grouped_theta_vecs, labels=new_kmeans_results[0],
-                            histogram=self._kmeans_to_histogram(new_kmeans_results), correlations=grouped_corrs)
+                            histogram=self._kmeans_to_histogram(new_kmeans_results),
+                            correlations=grouped_corrs)
 
     def filter_empty_labels(self, kmeans_results):
         labels, labelings = kmeans_results[0], kmeans_results[1]
         hist = self._kmeans_to_histogram(kmeans_results)
         non_empty_labels = sorted([key for key in hist.keys() if hist[key] != []])
-        labeling_transforms = {old_labeling: new_labeling for new_labeling, old_labeling in enumerate(non_empty_labels)}
+        labeling_transforms = {old_labeling: new_labeling
+                               for new_labeling, old_labeling in enumerate(non_empty_labels)}
         new_labels = labels[non_empty_labels, :]
         new_labelings = [labeling_transforms[old_labeling] for old_labeling in labelings]
         return new_labels, np.array(new_labelings)

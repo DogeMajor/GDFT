@@ -99,6 +99,7 @@ class BaseDAO(object):
         return file_object.write(content)
 
 
+
 class ThetasDAO(BaseDAO):
 
     def __init__(self, path):
@@ -111,6 +112,7 @@ class ThetasDAO(BaseDAO):
 
     def _write(self, file_object, content):
         json.dump(content, file_object, ensure_ascii=False, cls=NumpyEncoder)
+
 
 
 class SortedThetasDAO(BaseDAO):
@@ -154,12 +156,17 @@ class SortedThetasDAO(BaseDAO):
         dim = sorted_thetas.thetas[0][0].shape[0]
         headers = list(self._get_headers(dim))
         fieldnames = ['Label'] + headers + list(Correlations._fields)
-        thetas_writer = csv.writer(file_object, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        thetas_writer = csv.writer(file_object, delimiter=',',
+                                   quotechar='"', quoting=csv.QUOTE_MINIMAL)
         thetas_writer.writerow(fieldnames)
         for label_ind in sorted_thetas.thetas.keys():
-            for theta, corrs in zip(sorted_thetas.thetas[label_ind], sorted_thetas.correlations[label_ind]):
-                thetas_writer.writerow([label_ind] + theta.tolist() + list(corrs._asdict().values()))
+            thetas_and_corrs = zip(sorted_thetas.thetas[label_ind],
+                                   sorted_thetas.correlations[label_ind])
+            for theta, corrs in thetas_and_corrs:
+                row_content = [label_ind] + theta.tolist() + list(corrs._asdict().values())
+                thetas_writer.writerow(row_content)
             thetas_writer.writerow(['average'] + sorted_thetas.labels[label_ind].tolist())
+
 
 
 class ThetaGroupsDAO(BaseDAO):
@@ -188,7 +195,8 @@ class ThetaGroupsDAO(BaseDAO):
     def _write(self, file_object, content):
         max_var_dim = self.get_max_variances_dim(content)
         fieldnames = ['Label', 'Dimensions'] + ['var_'+str(index) for index in range(max_var_dim)]
-        thetas_writer = csv.writer(file_object, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        thetas_writer = csv.writer(file_object, delimiter=',',
+                                   quotechar='"', quoting=csv.QUOTE_MINIMAL)
         thetas_writer.writerow(fieldnames)
         for label_index in content.keys():
             variances = np.diag(content[label_index][0])
