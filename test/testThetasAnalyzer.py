@@ -51,7 +51,7 @@ SECOND_THETAS_GROUP = [np.array([0.23263316, 1.06778065, 3.05624654, 2.96119473,
 
 SORTED_THETAS = SortedThetas(thetas={0: FIRST_THETAS_GROUP, 1: SECOND_THETAS_GROUP},
                              labels=[FIRST_THETAS_GROUP[0], SECOND_THETAS_GROUP[0]],
-                             histogram={})
+                             histogram={}, correlations={})
 
 class TestThetasAnalyzer(GDFTTestCase):
 
@@ -59,13 +59,20 @@ class TestThetasAnalyzer(GDFTTestCase):
         self.analyzer = ThetasAnalyzer(8)
         self.pca = PCA(8)
 
+    def test_sort_thetas(self):
+        sorted_thetas = self.analyzer.sort_thetas(OPTIMIZED_THETAS.thetas, 6)
+        self.assertTrue(4 <= len(sorted_thetas.histogram) <= 6)
+        self.assertEqual(sorted_thetas.histogram.keys(), sorted_thetas.correlations.keys())
+        corr_example = sorted_thetas.correlations[0][0]
+        self.assertTrue(corr_example.avg_auto_corr < 0.11)
+
     def test_solution_spaces(self):
         thetas = {0: OPTIMIZED_THETAS.thetas[0:10], 1: OPTIMIZED_THETAS.thetas[10:20], 2: []}
         first_label = sum(OPTIMIZED_THETAS.thetas[0:10]) / 10
         second_label = sum(OPTIMIZED_THETAS.thetas[10:20]) / 10
         sorted_thetas = SortedThetas(thetas=thetas,
                                      labels=[first_label, second_label],
-                                     histogram={})
+                                     histogram={}, correlations={})
 
         sol_spaces = self.analyzer.solution_spaces(sorted_thetas, cutoff_ratio=0.005)
         reduced_covs = self.pca.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.005)

@@ -3,6 +3,7 @@ import csv
 import codecs
 from collections import Counter
 import numpy as np
+from correlations import Correlations
 from analyzer import SortedThetas
 
 
@@ -98,6 +99,7 @@ class BaseDAO(object):
         return file_object.write(content)
 
 
+
 class ThetasDAO(BaseDAO):
 
     def __init__(self, path):
@@ -110,6 +112,7 @@ class ThetasDAO(BaseDAO):
 
     def _write(self, file_object, content):
         json.dump(content, file_object, ensure_ascii=False, cls=NumpyEncoder)
+
 
 
 class SortedThetasDAO(BaseDAO):
@@ -127,56 +130,75 @@ class SortedThetasDAO(BaseDAO):
     def _read(self, file_object):
         reader = csv.reader(file_object, delimiter=',')
         headers = next(reader)
+        dim = len(headers) - 1 - len(Correlations._fields)
         thetas = {}
+        corrs = {}
         labels = []
-        for row in reader:
+
+        def process_row(row):
             if len(row) != 0:
-                if row[0] is 'average':
-                    labels.append(np.array(row[1:], dtype=np.float64))
-                elif row[0] not in thetas.keys():
-                    thetas[row[0]] = []
-                thetas[row[0]].append(np.array(row[1:], dtype=np.float64))
-        del thetas['average']
-        thetas = {int(key): value for key, value in thetas.items()}
+                if row[0] != 'average':
+                    label_index = int(row[0])
+                    theta = np.array(row[1:dim + 1], dtype=np.float64)
+                    thetas.setdefault(label_index, []).append(theta)
+                    vals = [float(val) for val in row[dim+1:]]
+                    corr = Correlations(*vals)
+                    corrs.setdefault(label_index, []).append(corr)
+                elif row[0] == 'average':
+                    labels.append(np.array(row[1:dim+1], dtype=np.float64))
+
+        for row in reader:
+            process_row(row)
         hist = self._to_histogram(thetas)
-        return SortedThetas(thetas=thetas, labels=labels, histogram=hist)
+        return SortedThetas(thetas=thetas, labels=labels, histogram=hist, correlations=corrs)
 
     def _write(self, file_object, sorted_thetas):
         dim = sorted_thetas.thetas[0][0].shape[0]
         headers = list(self._get_headers(dim))
-        fieldnames = ['Label'] + headers
-        thetas_writer = csv.writer(file_object, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        fieldnames = ['Label'] + headers + list(Correlations._fields)
+        thetas_writer = csv.writer(file_object, delimiter=',',
+                                   quotechar='"', quoting=csv.QUOTE_MINIMAL)
         thetas_writer.writerow(fieldnames)
         for label_ind in sorted_thetas.thetas.keys():
-            for theta in sorted_thetas.thetas[label_ind]:
-                thetas_writer.writerow([label_ind] + theta.tolist())
+            thetas_and_corrs = zip(sorted_thetas.thetas[label_ind],
+                                   sorted_thetas.correlations[label_ind])
+            for theta, corrs in thetas_and_corrs:
+                row_content = [label_ind] + theta.tolist() + list(corrs._asdict().values())
+                thetas_writer.writerow(row_content)
             thetas_writer.writerow(['average'] + sorted_thetas.labels[label_ind].tolist())
 
 
 
-class AnalyzedThetasDAO(BaseDAO):
+class ThetaGroupsDAO(BaseDAO):
     '''Writes csv files of the analysis of the records and reads them'''
 
     def __init__(self, path):
         BaseDAO.__init__(self, path)
 
-    def _to_csv(self, json):
-        pass
-
     def _read(self, file_object):
-        #csv_data = csv.DictReader(file_object)
-        #column_names = ", ".join(csv_data[0])
         reader = csv.reader(file_object, delimiter=',', quotechar='|')
         headers = next(reader)
-        print(headers)
-        #analyzed_thetas = {header: }
-        for index, row in reader:
-            print(index, row)
+        theta_groups = []
+        for row in reader:
+            if len(row) != 0:
+                theta_group = {}
+                theta_group["dimension"] = int(row[1])
+                theta_group["variances"] = np.array(row[2:], dtype=np.float64)
+                theta_groups.append(theta_group)
+        return theta_groups
+
+    def get_max_variances_dim(self, content):
+        variances = [np.diag(var) for W, var in content.values()]
+        var_amounts = map(len, variances)
+        return max(var_amounts)
 
     def _write(self, file_object, content):
-        fieldnames = ['label_index', 'last_name']
-        writer = csv.DictWriter(file_object, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerow({'first_name': 'Baked', 'last_name': 'Beans'})
-        writer.writerow({'first_name': 'Lovely', 'last_name': 'Spam'})
-        writer.writerow({'first_name': 'Wonderful', 'last_name': 'Spam'})
+        max_var_dim = self.get_max_variances_dim(content)
+        fieldnames = ['Label', 'Dimensions'] + ['var_'+str(index) for index in range(max_var_dim)]
+        thetas_writer = csv.writer(file_object, delimiter=',',
+                                   quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        thetas_writer.writerow(fieldnames)
+        for label_index in content.keys():
+            variances = np.diag(content[label_index][0])
+            dim = len(variances)
+            thetas_writer.writerow([label_index, dim] + variances.tolist())

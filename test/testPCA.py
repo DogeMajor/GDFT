@@ -25,7 +25,8 @@ class TestPCA(GDFTTestCase):
                                                  np.array([1.2, 2.6])],
                                              1: [np.array([3, 4])]},
                                      labels=np.array([[1.1, 2.25], [3, 4]]),
-                                     histogram={0: 2, 1: 1})
+                                     histogram={0: 2, 1: 1},
+                                     correlations={})
         raw_data = np.array([[1, 2.2], [1.2, 2.6]])
         data_matrix = raw_data.mean(axis=0) - raw_data
         cov_mat = small_pca.get_covariance(0, sorted_thetas)
@@ -88,7 +89,7 @@ class TestPCA(GDFTTestCase):
 
     def test_get_cov_pca_reductions(self):
         thetas = {0: optimized_thetas.thetas, 1: optimized_thetas.thetas[50:], 2: []}
-        sorted_thetas = SortedThetas(thetas=thetas, labels=[], histogram={})
+        sorted_thetas = SortedThetas(thetas=thetas, labels=[], histogram={}, correlations={})
         reduced_covs = self.pca.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.23)
         cov_mat = self.pca.get_total_covariance(optimized_thetas.thetas)
         self.assertEqual(list(reduced_covs.keys()), [0, 1])

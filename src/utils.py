@@ -3,7 +3,7 @@ import datetime
 from collections import namedtuple
 from math import sqrt
 import numpy as np
-from dao import DAO
+from dao import BaseDAO, ThetasDAO, SortedThetasDAO
 
 '''General functions / decorator to help the dev process and
 to take care of file handling + administrative processes.'''
@@ -50,7 +50,7 @@ Thetas = namedtuple('Thetas', 'thetas correlations')
 
 
 def extract_thetas_records(path, file_name):
-    dao = DAO(path)
+    dao = ThetasDAO(path)
     content = dao.read(file_name)
     theta_vecs = [np.array(result["theta_vec"]) for result in content["results"]]
     corrs = [result["correlation"] for result in content["results"]]
