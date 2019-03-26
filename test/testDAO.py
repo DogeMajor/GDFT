@@ -6,7 +6,7 @@ import numpy as np
 sys.path.append("../src")
 sys.path.append("src/")
 from tools import GDFTTestCase
-from dao import BaseDAO, ThetasDAO, SortedThetasDAO, AnalyzedThetasDAO, NumpyEncoder, ComplexDecoder
+from dao import BaseDAO, ThetasDAO, SortedThetasDAO, ThetaGroupsDAO, NumpyEncoder, ComplexDecoder
 from analyzer import SortedThetas
 from correlations import Correlations
 
@@ -14,8 +14,7 @@ PATH = "test/testdata/"
 np.random.seed(int(time.time()))
 
 
-
-class TestThetasDAO(unittest.TestCase):
+class TestThetasDAO(GDFTTestCase):
 
     def test_write_and_read(self):
         dao = ThetasDAO(PATH)
@@ -88,7 +87,7 @@ class TestThetasDAO(unittest.TestCase):
         dao.write("matrix_info.json", content, PATH)
         retrieved_content = dao.read("matrix_info.json")
         retrieved_mat = retrieved_content['matrix']
-        self.assertTrue(EqualMatrices(retrieved_mat, matrix))
+        self.assertEqualMatrices(retrieved_mat, matrix)
         os.remove(PATH+"matrix_info.json")
 
 FIRST_CORRS = Correlations(max_auto_corr=0.1, avg_auto_corr=0.2, max_cross_corr=0.3,
@@ -133,29 +132,41 @@ class TestSortedThetasDAO(GDFTTestCase):
         os.remove(PATH+"sorted_thetas.csv")
         self.assertTrue("sorted_thetas.csv" not in os.listdir(PATH))
 
-class TestAnalyzedThetasDAO(unittest.TestCase):
+
+PCA_REDUCTIONS = {0: (np.array([[-0.17871947, -0.22419062, -0.26966179, -0.31509518,
+                                 -0.360584  ,-0.40606456, -0.45154365, -0.49698547]]),
+                      np.array([[0.20368057]])),
+                  1: (np.array([[ 0.63215118,  0.48860089,  0.34508568,  0.20158228,
+                                  0.0580235 , -0.08549447, -0.22903137, -0.3725629 ],
+                                [ 0.13060307,  0.18724898,  0.24388899,  0.3005496 ,
+                                  0.35718431, 0.41384416,  0.470503  ,  0.52711295]]),
+                      np.array([[0.1878457 , 0.        ], [0.        , 0.04977875]]))}
+
+GROUPED_THETAS = [{'dimension': 1, 'variances': np.array([-0.17871947])},
+                  {'dimension': 2, 'variances': np.array([0.63215118, 0.18724898])}]
+
+class TestThetaGroupsDAO(GDFTTestCase):
 
     def test_write_and_read(self): #False!!!!!!!
         #print(SORTED_THETAS.thetas[0][0].dtype)
-        dao = AnalyzedThetasDAO(PATH)
-        dao.write("analyzed_thetas.csv", SORTED_THETAS, PATH)
+        dao = ThetaGroupsDAO(PATH)
+        from analyzer import PCA
+        pca = PCA(8)
+        dao.write("analyzed_thetas.csv", PCA_REDUCTIONS)
         retrieved_content = dao.read("analyzed_thetas.csv")
-        print(retrieved_content)
+        self.assertAlmostEqualMatrices(retrieved_content[0]["variances"], np.array([-0.17871947]))
+        self.assertAlmostEqualMatrices(retrieved_content[1]["variances"], np.array([0.63215118, 0.18724898]))
+        self.assertEqual(retrieved_content[0]["dimension"], 1)
+        self.assertEqual(retrieved_content[1]["dimension"], 2)
         os.remove(PATH+"analyzed_thetas.csv")
         self.assertTrue("analyzed_thetas.csv" not in os.listdir(PATH))
 
     def test_read(self):
-        dao = AnalyzedThetasDAO(PATH)
-        retrieved_content = dao.read("analyzed_thetas.csv")
+        dao = ThetaGroupsDAO(PATH)
+        #retrieved_content = dao.read("analyzed_thetas.csv")
         #self.assertEqual(retrieved_content['balance'], 1000)
         #self.assertEqual(retrieved_content['name'], "Jultomte")
 
 
 if __name__ == '__main__':
     unittest.main()
-    print(FIRST_CORRS._asdict().values())
-    '''corrs = Correlations(max_auto_corr=0.1, avg_auto_corr=0.2,
-                         max_cross_corr=0.3, avg_cross_corr=0.4,
-                         avg_merit_factor=0.5)
-
-    print(corrs == FIRST_CORRS)'''

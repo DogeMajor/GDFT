@@ -162,30 +162,35 @@ class SortedThetasDAO(BaseDAO):
             thetas_writer.writerow(['average'] + sorted_thetas.labels[label_ind].tolist())
 
 
-
-class AnalyzedThetasDAO(BaseDAO):
+class ThetaGroupsDAO(BaseDAO):
     '''Writes csv files of the analysis of the records and reads them'''
 
     def __init__(self, path):
         BaseDAO.__init__(self, path)
 
-    def _to_csv(self, json):
-        pass
-
     def _read(self, file_object):
-        #csv_data = csv.DictReader(file_object)
-        #column_names = ", ".join(csv_data[0])
         reader = csv.reader(file_object, delimiter=',', quotechar='|')
         headers = next(reader)
-        print(headers)
-        #analyzed_thetas = {header: }
-        for index, row in reader:
-            print(index, row)
+        theta_groups = []
+        for row in reader:
+            if len(row) != 0:
+                theta_group = {}
+                theta_group["dimension"] = int(row[1])
+                theta_group["variances"] = np.array(row[2:], dtype=np.float64)
+                theta_groups.append(theta_group)
+        return theta_groups
+
+    def get_max_variances_dim(self, content):
+        variances = [np.diag(var) for W, var in content.values()]
+        var_amounts = map(len, variances)
+        return max(var_amounts)
 
     def _write(self, file_object, content):
-        fieldnames = ['label_index', 'last_name']
-        writer = csv.DictWriter(file_object, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerow({'first_name': 'Baked', 'last_name': 'Beans'})
-        writer.writerow({'first_name': 'Lovely', 'last_name': 'Spam'})
-        writer.writerow({'first_name': 'Wonderful', 'last_name': 'Spam'})
+        max_var_dim = self.get_max_variances_dim(content)
+        fieldnames = ['Label', 'Dimensions'] + ['var_'+str(index) for index in range(max_var_dim)]
+        thetas_writer = csv.writer(file_object, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        thetas_writer.writerow(fieldnames)
+        for label_index in content.keys():
+            variances = np.diag(content[label_index][0])
+            dim = len(variances)
+            thetas_writer.writerow([label_index, dim] + variances.tolist())
