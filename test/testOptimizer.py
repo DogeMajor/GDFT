@@ -64,11 +64,11 @@ class TestOptimizer(unittest.TestCase):
         self.assertTrue(average_auto_correlation < 0.4)
 
     def test_optimize_avg_cross_corr_with_cycles(self):
-        thetas, average_auto_correlation, _ = self.optimizer.optimize_corr_fn("avg_auto_corr",
-                                                                              stop_criteria=0.10)
-        self.assertTrue(1.0 < thetas.mean() < 2.0)
-        self.assertTrue(1.0 < thetas.var() < 2.0)
-        self.assertAlmostEqual(average_auto_correlation, 0.0857, places=4)
+        thetas, average_cross_correlation, _ = self.optimizer.optimize_corr_fn("avg_cross_corr",
+                                                                               stop_criteria=0.3750, cycles=15)
+        self.assertTrue(np.pi/2 - 0.5 < thetas.mean() < np.pi/2 + 0.5)
+        self.assertTrue(thetas.var() < 0.3)
+        self.assertAlmostEqual(average_cross_correlation, 0.3750, places=4)
 
     def tearDown(self):
         del self.optimizer

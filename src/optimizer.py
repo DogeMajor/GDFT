@@ -5,7 +5,7 @@ from collections import namedtuple
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 from utils import timer, datetime_encoder
-from dao import DAO
+from dao import ThetasDAO
 from gdft import gdft_matrix
 from correlations import Correlation, CorrelationAnalyzer
 #np.random.seed(int(time.time()))
@@ -89,7 +89,7 @@ class Runner(object):
 
     def save_results(self, file_name, results, file_format="json", file_path="data/"):
         date_string = datetime_encoder(datetime.datetime.now())
-        dao = DAO(file_path)
+        dao = ThetasDAO(file_path)
         full_name = file_name + date_string + "." + file_format
         print("saving results in file {}...".format(full_name))
         dao.write(full_name, results)
