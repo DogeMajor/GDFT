@@ -12,13 +12,6 @@ corr_fns = {1: "avg_auto_corr", 2: "max_auto_corr",
 file_formats = {1: "json", 2: "xls", 3: "csv"}
 
 
-# You can unbind and rebind an event to a function
-'''def bind_button(event):
-    if boolVar.get():
-        getDataButton.unbind("<Button-1>")
-    else:
-        getDataButton.bind("<Button-1>", get_data)'''
-
 
 class GUI(object):
 
