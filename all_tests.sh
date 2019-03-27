@@ -2,12 +2,12 @@
 
 echo "Testing all the modules"
 
-python test/testGDFT.py TestGDFT
-python test/testCorrelation.py TestCorrelation
-python test/testCorrelationAnalyzer.py TestCorrelationAnalyzer
-python test/testDAO.py TestThetasDAO TestSortedThetasDAO TestThetaGroupsDAO
-python test/testSequenceFinder.py TestSequenceFinder
-python test/testOptimizer.py TestOptimizer
-python test/testThetasAnalyzer.py TestThetasAnalyzer
-python test/testClassifier.py TestClassifier
-python test/testPCA.py TestPCA
+python tests/testGDFT.py TestGDFT
+python tests/testCorrelation.py TestCorrelation
+python tests/testCorrelationAnalyzer.py TestCorrelationAnalyzer
+python tests/testDAO.py TestThetasDAO TestSortedThetasDAO TestThetaGroupsDAO
+python tests/testSequenceFinder.py TestSequenceFinder
+python tests/testOptimizer.py TestOptimizer
+python tests/testThetasAnalyzer.py TestThetasAnalyzer
+python tests/testClassifier.py TestClassifier
+python tests/testPCA.py TestPCA
