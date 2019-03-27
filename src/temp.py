@@ -1,3 +1,29 @@
+def doge_processing(self, event=None):
+    frames = [tk.PhotoImage(file="data/doge_rotation.gif", format="gif -index {}".format(i)) for i in range(23)]
+
+    # photo = tk.PhotoImage(file="data/doge_rotation.gif")
+
+    def update(ind):
+        frame = frames[ind]
+        ind = (ind + 1) % 23
+        self.progressBar.configure(image=frame)
+        # if not self.processingVar.get():
+        #    self.progressBar.grid_forget()
+        root.after(23, update, ind)
+
+    self.progressBar.grid(row=16, column=1, sticky=W)
+    root.after(0, update, 0)
+
+    # label = Label(image=photo)
+    # label.image = photo  # this line can be omitted if using the 'self' method to save a reference
+    # label.grid(row=16, column=1, sticky=W)
+
+
+def stop_doge_processing(self):
+    self.processingVar.set(False)
+    self.progressBar.grid_forget()
+    print("Stop doge processing was called")
+    # root.after(5000, self.stop_doge_processing)
 '''from tkinter import *
 from tkinter import messagebox
 

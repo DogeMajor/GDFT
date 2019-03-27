@@ -1,4 +1,5 @@
 import time
+import datetime
 from collections import namedtuple, Counter
 from math import isclose
 import numpy as np
@@ -6,11 +7,13 @@ from numpy import linalg
 from scipy.cluster.vq import kmeans2
 from gdft import gdft_matrix
 from correlations import CorrelationAnalyzer
+from utils import datetime_encoder
+from dao import SortedThetasDAO, ThetaGroupsDAO, SortedThetas
 
 np.random.seed(int(time.time()))
 
 Polynomes = namedtuple('Polynomes', 'polynomes theta_vecs')
-SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram correlations')
+
 SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
 
 
@@ -51,7 +54,7 @@ class Classifier(object):
         return new_labels, np.array(new_labelings)
 
     def _classify_thetas(self, theta_vecs, groups):
-        return kmeans2(theta_vecs, groups)
+        return kmeans2(theta_vecs, groups, minit='points')
 
     def group_by_label(self, unsorted_thetas, k_means_results):
         labels = k_means_results[1]
@@ -99,7 +102,7 @@ class PCA(object):
     def _pca_reduction_svd(self, mat, cutoff_ratio=0):
         U, sing_vals, W = linalg.svd(mat)
         max_sing = max(np.abs(sing_vals))
-        mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_sing > cutoff_ratio]
+        mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_sing >= cutoff_ratio]
         sing_diag = np.diagflat(sing_vals[mask])
         return U[:, mask], sing_diag, W[mask, :]
 
@@ -164,6 +167,21 @@ class ThetasAnalyzer(object):
         sol_spaces = {key: get_solution_space(key) for key in pca_reductions.keys()}
         return sol_spaces
 
+    def save_sorted_thetas(self, sorted_thetas, file_name, path):
+        sorted_dao = SortedThetasDAO(path)
+        date_string = datetime_encoder(datetime.datetime.now())
+        full_name = file_name + date_string + ".csv"
+        print("Saving sorted thetas in file {}...".format(full_name))
+        sorted_dao.write(full_name, sorted_thetas)
+        return full_name
+
+    def save_cov_reductions(self, cov_reductions, file_name, path):
+        group_dao = ThetaGroupsDAO(path)
+        date_string = datetime_encoder(datetime.datetime.now())
+        full_name = file_name + date_string + ".csv"
+        print("Saving cov pca reduction characteristics in file {}...".format(full_name))
+        group_dao.write(full_name, cov_reductions)
+        return full_name
 
 class SymmetryAnalyzer(object):
 
