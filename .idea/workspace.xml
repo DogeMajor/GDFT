@@ -3,12 +3,31 @@
   <component name="ChangeListManager">
     <list default="true" id="df3ca34c-22d8-4b15-b7a9-55006b6f5138" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/analyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/analyzer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/correlations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/correlations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dao.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/dao.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/optimizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/optimizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/temp.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/temp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/AcceptanceTests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testClassifier.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testCorrelation.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testCorrelationAnalyzer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testDAO.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testDerivator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testGDFT.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testOptimizer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testPCA.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testSequenceFinder.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testThetasAnalyzer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_gdft_matrices.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_gdft_matrices_notebook.nb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_generating_and_transforming_thetas.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testdata/10thetas_8x8__1-16_13_33.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testdata/10thetas_8x8__today.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testdata/hehe1-16_13_28.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testdata10thetas_4x4__today.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testdata10thetas_8x8__today.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/testdata2thetas_16x16__today.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/tools.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,7 +39,7 @@
     <favorites_list name="GDFT" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.78655463">
+    <splitter split-orientation="horizontal" split-proportion="0.8476096">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -47,10 +66,22 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/gui.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="119">
-                  <caret line="91" column="42" lean-forward="true" selection-start-line="91" selection-start-column="42" selection-end-line="91" selection-end-column="42" />
+                <state relative-caret-position="155">
+                  <caret line="179" column="24" selection-start-line="179" selection-start-column="24" selection-end-line="179" selection-end-column="24" />
                   <folding>
                     <element signature="e#0#21#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/temp.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="425">
+                  <caret line="25" column="49" selection-start-line="25" selection-start-column="49" selection-end-line="25" selection-end-column="49" />
+                  <folding>
+                    <element signature="e#6039#6060#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -68,11 +99,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/.travis.yml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="221">
-                  <caret line="13" selection-start-line="13" selection-end-line="13" />
+                <state relative-caret-position="153">
+                  <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
                 </state>
               </provider>
             </entry>
@@ -80,7 +111,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/analyzer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="113">
+                <state relative-caret-position="1768">
                   <caret line="104" column="87" selection-start-line="104" selection-start-column="87" selection-end-line="104" selection-end-column="87" />
                   <folding>
                     <element signature="e#0#11#0" expanded="true" />
@@ -101,10 +132,10 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/correlations.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="153">
+                <state relative-caret-position="1683">
                   <caret line="99" column="44" lean-forward="true" selection-start-line="99" selection-start-column="44" selection-end-line="99" selection-end-column="44" />
                   <folding>
                     <element signature="e#0#34#0" expanded="true" />
@@ -117,71 +148,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/tools.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="884">
-                  <caret line="55" selection-start-line="55" selection-end-line="55" />
-                  <folding>
-                    <element signature="e#0#15#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/testThetasAnalyzer.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1003">
-                  <caret line="61" column="31" selection-start-line="61" selection-start-column="31" selection-end-line="61" selection-end-column="31" />
-                  <folding>
-                    <element signature="e#0#10#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/testPCA.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1581">
-                  <caret line="95" column="37" selection-start-line="95" selection-start-column="37" selection-end-line="95" selection-end-column="37" />
-                  <folding>
-                    <element signature="e#0#10#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/testOptimizer.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="272">
-                  <caret line="18" selection-start-line="18" selection-end-line="18" />
-                  <folding>
-                    <element signature="e#0#10#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/all_tests.sh">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="221">
                   <caret line="13" selection-start-line="13" selection-end-line="13" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/test/testDAO.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="17">
-                  <caret line="13" column="32" selection-start-line="13" selection-start-column="32" selection-end-line="13" selection-end-column="32" />
-                  <folding>
-                    <element signature="e#0#9#0" expanded="true" />
-                  </folding>
                 </state>
               </provider>
             </entry>
@@ -259,7 +230,6 @@
         <option value="$PROJECT_DIR$/src/sequencefinder.py" />
         <option value="$PROJECT_DIR$/test/AcceptanceTests.py" />
         <option value="$PROJECT_DIR$/src/visualizer.py" />
-        <option value="$PROJECT_DIR$/src/temp.py" />
         <option value="$PROJECT_DIR$/test/test_generating_and_transforming_thetas.py" />
         <option value="$PROJECT_DIR$/test/testClassifier.py" />
         <option value="$PROJECT_DIR$/test/testCorrelations.py" />
@@ -270,13 +240,14 @@
         <option value="$PROJECT_DIR$/all_tests.sh" />
         <option value="$PROJECT_DIR$/test/testPCA.py" />
         <option value="$PROJECT_DIR$/test/testOptimizer.py" />
-        <option value="$PROJECT_DIR$/.travis.yml" />
         <option value="$PROJECT_DIR$/src/dao.py" />
         <option value="$PROJECT_DIR$/src/utils.py" />
         <option value="$PROJECT_DIR$/src/optimizer.py" />
         <option value="$PROJECT_DIR$/src/analyzer.py" />
-        <option value="$PROJECT_DIR$/src/gui.py" />
         <option value="$PROJECT_DIR$/src/correlations.py" />
+        <option value="$PROJECT_DIR$/src/temp.py" />
+        <option value="$PROJECT_DIR$/src/gui.py" />
+        <option value="$PROJECT_DIR$/.travis.yml" />
       </list>
     </option>
   </component>
@@ -296,11 +267,6 @@
             <path>
               <item name="GDFT" type="b2602c69:ProjectViewProjectNode" />
               <item name="GDFT" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="GDFT" type="b2602c69:ProjectViewProjectNode" />
-              <item name="GDFT" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -497,9 +463,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-16" y="0" width="1386" height="735" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.78328174" visible="true" weight="0.117210686" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.78328174" visible="true" weight="0.25519288" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.21671827" side_tool="true" weight="0.10074627" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -510,7 +475,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49925372" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.71716416" visible="true" weight="0.35714287" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.71716416" visible="true" weight="0.35714287" />
       <window_info anchor="bottom" id="Python Console" order="9" sideWeight="0.49925372" weight="0.5368249" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.19940476" side_tool="true" weight="0.31096563" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -718,16 +683,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/temp.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4097">
-          <caret line="241" column="50" selection-start-line="241" selection-start-column="50" selection-end-line="241" selection-end-column="50" />
-          <folding>
-            <element signature="e#6039#6060#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/joup3-24_16_49.json">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -834,13 +789,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/all_tests.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/testDAO.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
@@ -858,13 +806,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.travis.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/dao.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1564">
@@ -875,9 +816,19 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/correlations.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1683">
+          <caret line="99" column="44" lean-forward="true" selection-start-line="99" selection-start-column="44" selection-end-line="99" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/analyzer.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="113">
+        <state relative-caret-position="1768">
           <caret line="104" column="87" selection-start-line="104" selection-start-column="87" selection-end-line="104" selection-end-column="87" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
@@ -895,23 +846,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/temp.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" column="49" selection-start-line="25" selection-start-column="49" selection-end-line="25" selection-end-column="49" />
+          <folding>
+            <element signature="e#6039#6060#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/all_tests.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="91" column="42" lean-forward="true" selection-start-line="91" selection-start-column="42" selection-end-line="91" selection-end-column="42" />
+        <state relative-caret-position="155">
+          <caret line="179" column="24" selection-start-line="179" selection-start-column="24" selection-end-line="179" selection-end-column="24" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/correlations.py">
+    <entry file="file://$PROJECT_DIR$/.travis.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
-          <caret line="99" column="44" lean-forward="true" selection-start-line="99" selection-start-column="44" selection-end-line="99" selection-end-column="44" />
-          <folding>
-            <element signature="e#0#34#0" expanded="true" />
-          </folding>
+          <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
         </state>
       </provider>
     </entry>

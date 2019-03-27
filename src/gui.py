@@ -37,13 +37,11 @@ class GUI(object):
 
         runner = Runner(dim)
         results = runner.optimize(corr_fn_name, epochs, stop_criteria=stop_criteria, cores=cores)
-        print("Results for optimization:")
-        print(results)
         full_name = runner.save_results(file_name, results, file_path=path, file_format="json")
         self._recent_files.append(full_name)
 
     def show_recent_files(self):
-        print(self._recent_files)
+        print(self._recent_files + self._analyzed_thetas)
 
     def analyze_thetas(self, save=True):
         path = self.pathVar.get()
@@ -66,9 +64,9 @@ class GUI(object):
             file_name = file_name.split("__")[0]
 
             sorted_name = analyzer.save_sorted_thetas(sorted_thetas, file_name + "_sorted__", path)
-            self._recent_files.append(sorted_name)
+            self._analyzed_thetas.append(sorted_name)
             cov_reductions_name = analyzer.save_cov_reductions(cov_pca_reductions, file_name + "_cov_reductions__", path)
-            self._recent_files.append(cov_reductions_name)
+            self._analyzed_thetas.append(cov_reductions_name)
         #sol_spaces = analyzer.solution_spaces(sorted_thetas, cutoff_ratio=cutoff)
 
     def show_about(self, event=None):
@@ -77,15 +75,15 @@ class GUI(object):
                                "DogeHouse Productions NLC (No liability company)")
 
     def show_vars(self):
-        print(self._recent_files, corr_fns[self.corrChoiceVar.get()],
-              self.pathVar.get(), self.coresVar.get(),
-              self.dimensionVar.get(), self.stopCriteriumVar.get(),
-              self.filenameVar.get())
+        print(self._recent_files, self._analyzed_thetas, corr_fns[self.corrChoiceVar.get()],
+              self.pathVar.get(), self.coresVar.get(), self.dimensionVar.get(),
+              self.stopCriteriumVar.get(), self.filenameVar.get())
 
 
     def __init__(self, root):
         #self._root = root
         self._recent_files = []
+        self._analyzed_thetas = []
 
         self.corrChoiceVar = tk.IntVar()
         self.coresVar = tk.IntVar()
@@ -94,7 +92,6 @@ class GUI(object):
         self.stopCriteriumVar = tk.DoubleVar()
         self.filenameVar = tk.StringVar()
         self.pathVar = tk.StringVar()
-
         self.cutoffVar = tk.DoubleVar()
 
         self.corrChoiceVar.set(1)
@@ -109,6 +106,7 @@ class GUI(object):
 
         self.set_menus()
         self.set_widgets()
+        #self.doge_processing()
 
 
     def set_widgets(self):
@@ -143,12 +141,15 @@ class GUI(object):
                     variable=self.corrChoiceVar).grid(row=12, column=1, sticky=W)
 
         optimizeButton = Button(root, text="Optimize", command=self.optimize)
-        optimizeButton.grid(row=11, column=3, sticky=E)
+        optimizeButton.grid(row=12, column=3, sticky=E)
         #print(optimizeButton)
         optimizeButton.bind("<Button-1>", self.optimize)
 
+        Label(root, text="Cutoff ratio for variances").grid(row=15, column=0, sticky=W)
+        Entry(root, width=50, textvariable=self.cutoffVar).grid(row=15, column=1)
+
         analyzeButton = Button(root, text="Analyze", command=self.analyze_thetas)
-        analyzeButton.grid(row=12, column=3, sticky=E)
+        analyzeButton.grid(row=15, column=3, sticky=E)
         #analyzeButton.bind("<Button-1>", self.analyze_thetas)
 
 
@@ -171,13 +172,12 @@ class GUI(object):
                               accelerator="command-H",
                               command=self.show_about)
         the_menu.add_cascade(label="Help", menu=help_menu)
-        root.bind('<Command-A>', self.show_about)
 
         root.config(menu=the_menu)
 
 if __name__ == "__main__":
     root = Tk()
-    root.geometry("600x700")
+    root.geometry("600x400")
     root.title("GDFT Optimizer and Analyzer")
     gui = GUI(root)
     root.mainloop()
