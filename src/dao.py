@@ -1,11 +1,12 @@
 import json
 import csv
 import codecs
-from collections import Counter
+from collections import Counter, namedtuple
 import numpy as np
 from correlations import Correlations
-from analyzer import SortedThetas
+#from analyzer import SortedThetas
 
+SortedThetas = namedtuple('SortedThetas', 'thetas labels histogram correlations')
 
 class ComplexDecoder(object):
     '''Decodes json complex arrays to lists (or lists of lists etc.), not numpy.arrays.

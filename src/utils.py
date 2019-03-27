@@ -3,7 +3,7 @@ import datetime
 from collections import namedtuple
 from math import sqrt
 import numpy as np
-from dao import BaseDAO, ThetasDAO, SortedThetasDAO
+from dao import BaseDAO, ThetasDAO, SortedThetasDAO, ThetaGroupsDAO
 
 '''General functions / decorator to help the dev process and
 to take care of file handling + administrative processes.'''
@@ -40,7 +40,7 @@ def save_as_json(function):
         print("Saving results to a json file")
         date_string = datetime_encoder(datetime.datetime.now())
         file_name = "results_"+date_string+".json"
-        dao = DAO("../data/")
+        dao = ThetasDAO("../data/")
         dao.write(file_name, results)
         return results
     return inner_fn

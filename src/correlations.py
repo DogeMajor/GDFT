@@ -97,7 +97,7 @@ class CorrelationAnalyzer(object):
 
     def _reduce_corr_tensor(self, mask, calc_fn, c_tensor):
         masked_corr = c_tensor * mask
-        return calc_fn(masked_corr)
+        return np.real(calc_fn(masked_corr))
 
     def max_auto_corr(self, c_tensor):
         return self._reduce_corr_tensor(self._auto_corr_mask, get_max_length, c_tensor)

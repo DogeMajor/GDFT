@@ -1,6 +1,7 @@
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk
+from tkinter import simpledialog
 from tkinter import messagebox
 from optimizer import Optimizer, Runner
 from analyzer import ThetasAnalyzer
@@ -9,11 +10,18 @@ from utils import extract_thetas_records
 corr_fns = {1: "avg_auto_corr", 2: "max_auto_corr",
             3: "avg_cross_corr", 4: "max_cross_corr"}
 
-file_formats = {1: "json", 2: "xls", 3: "csv"}
-
-
 
 class GUI(object):
+
+    def set_cores(self):
+        cores = simpledialog.askinteger("Cores", "Number of cores available",
+                                        parent=root,
+                                        minvalue=1, maxvalue=50)
+        if cores is not None:
+            print("No of cores was set to {}".format(cores))
+            self.coresVar.set(int(cores))
+        else:
+            print("No multiprocessing is used")
 
     def quit(self):
         root.quit()
@@ -22,8 +30,7 @@ class GUI(object):
         dim = self.dimensionVar.get()
         corr_fn_name = corr_fns[self.corrChoiceVar.get()]
         epochs = self.thetasAmountVar.get()
-        file_name = self.filenameVar.get()
-        file_format = file_formats[self.fileformatVar.get()]
+        file_name = self.filenameVar.get()+"__"
         path = self.pathVar.get()
         stop_criteria = self.stopCriteriumVar.get()
         cores = self.coresVar.get()
@@ -32,13 +39,13 @@ class GUI(object):
         results = runner.optimize(corr_fn_name, epochs, stop_criteria=stop_criteria, cores=cores)
         print("Results for optimization:")
         print(results)
-        full_name = runner.save_results(file_name, results, file_format=file_format, file_path=path)
+        full_name = runner.save_results(file_name, results, file_path=path, file_format="json")
         self._recent_files.append(full_name)
 
     def show_recent_files(self):
-        print(self._files)
+        print(self._recent_files)
 
-    def analyze_thetas(self):
+    def analyze_thetas(self, save=True):
         path = self.pathVar.get()
         cutoff = self.cutoffVar.get()
         try:
@@ -50,16 +57,19 @@ class GUI(object):
         dim = self.dimensionVar.get()
         analyzer = ThetasAnalyzer(dim)
         groups = min(len(theta_collections.thetas), int(dim*0.75))
+
         sorted_thetas = analyzer.sort_thetas(theta_collections.thetas, groups)
         cov_pca_reductions = analyzer.cov_pca_reductions(sorted_thetas, cutoff_ratio=cutoff)
-        sol_spaces = analyzer.solution_spaces(sorted_thetas, cutoff_ratio=cutoff)
-        print("Sorted thetas histogram: ", sorted_thetas.histogram)
-        print("Labels in the same order: ", sorted_thetas.labels)
-        print("Theta groups with their biggest variances: ")
-        for key, value in cov_pca_reductions.items():
-            print(str(key) + ":")
-            print("variances: ", value[1])
 
+        if save:
+            path = self.pathVar.get()
+            file_name = file_name.split("__")[0]
+
+            sorted_name = analyzer.save_sorted_thetas(sorted_thetas, file_name + "_sorted__", path)
+            self._recent_files.append(sorted_name)
+            cov_reductions_name = analyzer.save_cov_reductions(cov_pca_reductions, file_name + "_cov_reductions__", path)
+            self._recent_files.append(cov_reductions_name)
+        #sol_spaces = analyzer.solution_spaces(sorted_thetas, cutoff_ratio=cutoff)
 
     def show_about(self, event=None):
         self.show_vars()
@@ -67,8 +77,7 @@ class GUI(object):
                                "DogeHouse Productions NLC (No liability company)")
 
     def show_vars(self):
-        print(self._recent_files, file_formats[self.fileformatVar.get()],
-              corr_fns[self.corrChoiceVar.get()],
+        print(self._recent_files, corr_fns[self.corrChoiceVar.get()],
               self.pathVar.get(), self.coresVar.get(),
               self.dimensionVar.get(), self.stopCriteriumVar.get(),
               self.filenameVar.get())
@@ -78,7 +87,6 @@ class GUI(object):
         #self._root = root
         self._recent_files = []
 
-        self.fileformatVar = tk.IntVar()
         self.corrChoiceVar = tk.IntVar()
         self.coresVar = tk.IntVar()
         self.thetasAmountVar = tk.IntVar()
@@ -89,20 +97,18 @@ class GUI(object):
 
         self.cutoffVar = tk.DoubleVar()
 
-        self.fileformatVar.set(1)
         self.corrChoiceVar.set(1)
         self.coresVar.set(2)
-        self.dimensionVar.set(8)
+        self.dimensionVar.set(4)
         self.stopCriteriumVar.set(0.5)
-        self.filenameVar.set("No name was given!")
-        self.pathVar.set("No path was given!")
-        self.thetasAmountVar.set(1)
+        self.filenameVar.set("Enter a name")
+        self.pathVar.set("data/")
+        self.thetasAmountVar.set(10)
 
         self.cutoffVar.set(0.05) #For cov pca reduction in sorted theta groups
 
         self.set_menus()
         self.set_widgets()
-
 
 
     def set_widgets(self):
@@ -126,25 +132,7 @@ class GUI(object):
         Entry(root, width=50, textvariable=self.pathVar).grid(row=7, column=1)
 
 
-        Label(root, text="File format").grid(row=8, column=0, sticky=W)
-        Radiobutton(root, text="JSON", value=1,
-                    variable=self.fileformatVar).grid(row=9, column=0, sticky=W)
-        Radiobutton(root, text="Excel", value=2,
-                    variable=self.fileformatVar).grid(row=10, column=0, sticky=W)
-        Radiobutton(root, text="CSV", value=3,
-                    variable=self.fileformatVar).grid(row=11, column=0, sticky=W)
-
-
-        optimizeButton = Button(root, text="Optimize", command=self.optimize)
-        optimizeButton.grid(row=11, column=3, sticky=E)
-        #print(optimizeButton)
-        optimizeButton.bind("<Button-1>", self.optimize)
-
-        analyzeButton = Button(root, text="Analyze", command=self.analyze_thetas).grid(row=12, column=3, sticky=E)
-        #analyzeButton.bind("<Button-1>", self.analyze_thetas)
-
-
-        Label(root, text="Correlation to be minimized").grid(row=8, column=1, sticky=W)
+        Label(root, text="Correlation to be minimized").grid(row=8, column=0, sticky=W)
         Radiobutton(root, text="Average auto correlation", value=1,
                     variable=self.corrChoiceVar).grid(row=9, column=1, sticky=W)
         Radiobutton(root, text="Max auto correlation", value=2,
@@ -154,50 +142,42 @@ class GUI(object):
         Radiobutton(root, text="Max cross correlation", value=4,
                     variable=self.corrChoiceVar).grid(row=12, column=1, sticky=W)
 
-    def set_menus(self):
+        optimizeButton = Button(root, text="Optimize", command=self.optimize)
+        optimizeButton.grid(row=11, column=3, sticky=E)
+        #print(optimizeButton)
+        optimizeButton.bind("<Button-1>", self.optimize)
 
-        # Create the menu object
+        analyzeButton = Button(root, text="Analyze", command=self.analyze_thetas)
+        analyzeButton.grid(row=12, column=3, sticky=E)
+        #analyzeButton.bind("<Button-1>", self.analyze_thetas)
+
+
+    def set_menus(self):
         the_menu = Menu(root)
 
-        # Create a pull down menu that can't be removed
         file_menu = Menu(the_menu, tearoff=0)
-
-        # Call for the function to execute when clicked
         file_menu.add_command(label="Quit", command=self.quit)
-
-        # Add the pull down menu to the menu bar
         the_menu.add_cascade(label="File", menu=file_menu)
 
         # ----- SETTINGS MENU -----
         settings_menu = Menu(the_menu, tearoff=0)
-
-        # Bind the checking of the line number option
-        # to variable line_numbers
-        settings_menu.add_checkbutton(label="Cores",
-                                      variable=self.coresVar)
-
-        # Add the pull down menu to the menu bar
+        settings_menu.add_command(label="Cores",
+                                  command=self.set_cores)
         the_menu.add_cascade(label="Settings", menu=settings_menu)
 
         # ----- HELP MENU -----
         help_menu = Menu(the_menu, tearoff=0)
-
-
         help_menu.add_command(label="About",
                               accelerator="command-H",
                               command=self.show_about)
-
         the_menu.add_cascade(label="Help", menu=help_menu)
-
-        # Bind the shortcut to the function
         root.bind('<Command-A>', self.show_about)
 
-        # Display the menu bar
         root.config(menu=the_menu)
 
-root = Tk()
-
-root.geometry("600x600")
-root.title("GDFT Optimizer and Analyzer")
-gui = GUI(root)
-root.mainloop()
+if __name__ == "__main__":
+    root = Tk()
+    root.geometry("600x700")
+    root.title("GDFT Optimizer and Analyzer")
+    gui = GUI(root)
+    root.mainloop()
