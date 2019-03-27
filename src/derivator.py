@@ -113,23 +113,3 @@ def avg_corr_difference(theta, sigma, h=0.00001):
             result += compute_term(alpha, mu)
 
     return result / N
-
-
-def avg_corr_derivative(theta, sigma, h=0.00001):
-    N = theta.shape[0]
-    ct_diff = ct_difference(theta, sigma, h=h)
-    conj_ct_diff = np.conjugate(ct_diff)
-    gdft = gdft_matrix(N, theta)
-    ct = Correlation(gdft).correlation_tensor()
-
-    def compute_term(a, mu):
-        return ct_diff[a, a, mu] * np.conjugate(ct[a, a, mu]) + ct[a, a, mu] * conj_ct_diff[a, a, mu]
-
-    result = 0
-    for alpha in range(N):
-        for mu in range(N - 1):
-            result += compute_term(alpha, mu)
-        for mu in range(N, 2 * N - 1):
-            result += compute_term(alpha, mu)
-
-    return result / N
