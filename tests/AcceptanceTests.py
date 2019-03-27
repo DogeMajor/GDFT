@@ -7,7 +7,7 @@ from functools import wraps
 from unittest import mock
 from unittest.mock import patch
 import numpy as np
-from dao import DAO
+from dao import ThetasDAO
 from utils import extract_thetas_records, datetime_encoder
 from tools import show_plot
 from gdft import *
@@ -15,12 +15,12 @@ from correlations import *
 from analyzer import *
 from optimizer import Runner
 from visualizer import *
-PATH = "test/testdata"
+PATH = "tests/testdata"
 #----mocked methods/fns/classes--------
 
 def save_test_data(file_name, results):
     date_string = "today"
-    dao = DAO(PATH)
+    dao = ThetasDAO(PATH)
     dao.write(file_name + date_string + ".json", results)
 
 class TestWithSmallSize(unittest.TestCase):
