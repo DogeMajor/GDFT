@@ -1,9 +1,6 @@
-from tkinter import *
 import tkinter as tk
-from tkinter import ttk
-from tkinter import simpledialog
-from tkinter import messagebox
-from optimizer import Optimizer, Runner
+from tkinter import simpledialog, messagebox
+from optimizer import Runner
 from analyzer import ThetasAnalyzer
 from utils import extract_thetas_records
 
@@ -15,7 +12,7 @@ class GUI(object):
 
     def set_cores(self):
         cores = simpledialog.askinteger("Cores", "Number of cores available",
-                                        parent=root,
+                                        parent=self.root,
                                         minvalue=1, maxvalue=50)
         if cores is not None:
             print("No of cores was set to {}".format(cores))
@@ -24,7 +21,7 @@ class GUI(object):
             print("No multiprocessing is used")
 
     def quit(self):
-        root.quit()
+        self.root.quit()
 
     def optimize(self):
         dim = self.dimensionVar.get()
@@ -65,12 +62,12 @@ class GUI(object):
 
             sorted_name = analyzer.save_sorted_thetas(sorted_thetas, file_name + "_sorted__", path)
             self._analyzed_thetas.append(sorted_name)
-            cov_reductions_name = analyzer.save_cov_reductions(cov_pca_reductions, file_name + "_cov_reductions__", path)
+            cov_reductions_name = analyzer.save_cov_reductions(cov_pca_reductions,
+                                                               file_name + "_cov_reductions__",
+                                                               path)
             self._analyzed_thetas.append(cov_reductions_name)
-        #sol_spaces = analyzer.solution_spaces(sorted_thetas, cutoff_ratio=cutoff)
 
     def show_about(self, event=None):
-        self.show_vars()
         messagebox.showwarning("About",
                                "DogeHouse Productions NLC (No liability company)")
 
@@ -81,7 +78,10 @@ class GUI(object):
 
 
     def __init__(self, root):
-        #self._root = root
+        self.root = root
+        self.root.geometry("600x400")
+        self.root.title("GDFT Optimizer and Analyzer")
+
         self._recent_files = []
         self._analyzed_thetas = []
 
@@ -92,6 +92,7 @@ class GUI(object):
         self.stopCriteriumVar = tk.DoubleVar()
         self.filenameVar = tk.StringVar()
         self.pathVar = tk.StringVar()
+
         self.cutoffVar = tk.DoubleVar()
 
         self.corrChoiceVar.set(1)
@@ -102,82 +103,74 @@ class GUI(object):
         self.pathVar.set("data/")
         self.thetasAmountVar.set(10)
 
-        self.cutoffVar.set(0.05) #For cov pca reduction in sorted theta groups
+        self.cutoffVar.set(0.05)
 
         self.set_menus()
         self.set_widgets()
-        #self.doge_processing()
-
 
     def set_widgets(self):
 
-        Label(root, text="Dimension").grid(row=1, column=0, sticky=W)
-        dim_entry = Entry(root, width=50, textvariable=self.dimensionVar)
+        tk.Label(self.root, text="Dimension").grid(row=1, column=0, sticky=tk.W)
+        dim_entry = tk.Entry(self.root, width=50, textvariable=self.dimensionVar)
         dim_entry.grid(row=1, column=1)
-        #Button(root, text="Submit").grid(row=1, column=8)
 
-        Label(root, text="Amount").grid(row=2, column=0, sticky=W)
-        thetas_amount_entry = Entry(root, width=50, textvariable=self.thetasAmountVar)
+        tk.Label(self.root, text="Amount").grid(row=2, column=0, sticky=tk.W)
+        thetas_amount_entry = tk.Entry(self.root, width=50, textvariable=self.thetasAmountVar)
         thetas_amount_entry.grid(row=2, column=1)
 
-        Label(root, text="Stop criterium").grid(row=3, column=0, sticky=W)
-        Entry(root, width=50, textvariable=self.stopCriteriumVar).grid(row=3, column=1)
+        tk.Label(self.root, text="Stop criterium").grid(row=3, column=0, sticky=tk.W)
+        tk.Entry(self.root, width=50, textvariable=self.stopCriteriumVar).grid(row=3, column=1)
 
-        Label(root, text="File name").grid(row=6, column=0, sticky=W)
-        Entry(root, width=50, textvariable=self.filenameVar).grid(row=6, column=1)
+        tk.Label(self.root, text="File name").grid(row=6, column=0, sticky=tk.W)
+        tk.Entry(self.root, width=50, textvariable=self.filenameVar).grid(row=6, column=1)
 
-        Label(root, text="File path").grid(row=7, column=0, sticky=W)
-        Entry(root, width=50, textvariable=self.pathVar).grid(row=7, column=1)
+        tk.Label(self.root, text="File path").grid(row=7, column=0, sticky=tk.W)
+        tk.Entry(self.root, width=50, textvariable=self.pathVar).grid(row=7, column=1)
 
+        tk.Label(self.root, text="Correlation to be minimized").grid(row=8, column=0, sticky=tk.W)
+        tk.Radiobutton(self.root, text="Average auto correlation", value=1,
+                       variable=self.corrChoiceVar).grid(row=9, column=1, sticky=tk.W)
+        tk.Radiobutton(self.root, text="Max auto correlation", value=2,
+                       variable=self.corrChoiceVar).grid(row=10, column=1, sticky=tk.W)
+        tk.Radiobutton(self.root, text="Average cross correlation", value=3,
+                       variable=self.corrChoiceVar).grid(row=11, column=1, sticky=tk.W)
+        tk.Radiobutton(self.root, text="Max cross correlation", value=4,
+                       variable=self.corrChoiceVar).grid(row=12, column=1, sticky=tk.W)
 
-        Label(root, text="Correlation to be minimized").grid(row=8, column=0, sticky=W)
-        Radiobutton(root, text="Average auto correlation", value=1,
-                    variable=self.corrChoiceVar).grid(row=9, column=1, sticky=W)
-        Radiobutton(root, text="Max auto correlation", value=2,
-                    variable=self.corrChoiceVar).grid(row=10, column=1, sticky=W)
-        Radiobutton(root, text="Average cross correlation", value=3,
-                    variable=self.corrChoiceVar).grid(row=11, column=1, sticky=W)
-        Radiobutton(root, text="Max cross correlation", value=4,
-                    variable=self.corrChoiceVar).grid(row=12, column=1, sticky=W)
-
-        optimizeButton = Button(root, text="Optimize", command=self.optimize)
-        optimizeButton.grid(row=12, column=3, sticky=E)
-        #print(optimizeButton)
+        optimizeButton = tk.Button(self.root, text="Optimize", command=self.optimize)
+        optimizeButton.grid(row=12, column=3, sticky=tk.E)
         optimizeButton.bind("<Button-1>", self.optimize)
 
-        Label(root, text="Cutoff ratio for variances").grid(row=15, column=0, sticky=W)
-        Entry(root, width=50, textvariable=self.cutoffVar).grid(row=15, column=1)
+        tk.Label(self.root, text="Cutoff ratio for variances").grid(row=15, column=0, sticky=tk.W)
+        tk.Entry(self.root, width=50, textvariable=self.cutoffVar).grid(row=15, column=1)
 
-        analyzeButton = Button(root, text="Analyze", command=self.analyze_thetas)
-        analyzeButton.grid(row=15, column=3, sticky=E)
-        #analyzeButton.bind("<Button-1>", self.analyze_thetas)
+        analyzeButton = tk.Button(self.root, text="Analyze", command=self.analyze_thetas)
+        analyzeButton.grid(row=15, column=3, sticky=tk.E)
 
 
     def set_menus(self):
-        the_menu = Menu(root)
+        the_menu = tk.Menu(self.root)
 
-        file_menu = Menu(the_menu, tearoff=0)
+        file_menu = tk.Menu(the_menu, tearoff=0)
         file_menu.add_command(label="Quit", command=self.quit)
         the_menu.add_cascade(label="File", menu=file_menu)
 
         # ----- SETTINGS MENU -----
-        settings_menu = Menu(the_menu, tearoff=0)
+        settings_menu = tk.Menu(the_menu, tearoff=0)
         settings_menu.add_command(label="Cores",
                                   command=self.set_cores)
         the_menu.add_cascade(label="Settings", menu=settings_menu)
 
         # ----- HELP MENU -----
-        help_menu = Menu(the_menu, tearoff=0)
+        help_menu = tk.Menu(the_menu, tearoff=0)
         help_menu.add_command(label="About",
                               accelerator="command-H",
                               command=self.show_about)
         the_menu.add_cascade(label="Help", menu=help_menu)
 
-        root.config(menu=the_menu)
+        self.root.config(menu=the_menu)
 
 if __name__ == "__main__":
-    root = Tk()
-    root.geometry("600x400")
-    root.title("GDFT Optimizer and Analyzer")
+    root = tk.Tk()
     gui = GUI(root)
     root.mainloop()

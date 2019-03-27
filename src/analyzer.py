@@ -18,6 +18,8 @@ SortedPolynomes = namedtuple('SortedPolynomes', 'polynomes kmean_labels')
 
 
 class Classifier(object):
+    '''Sorts theta vectors into n groups based on minimizing distances to
+    group averages'''
 
     def get_correlations(self, grouped_theta_vecs):
         dim = grouped_theta_vecs[0][0].shape[0]
@@ -83,13 +85,6 @@ class PCA(object):
             records = records - records.mean(axis=0)
         return records
 
-    def get_svd(self, data_matrix):
-        '''Returns U and W.T directly (NOT W!!) + singular vals
-        as a list'''
-        U, sing_values, W = linalg.svd(data_matrix)
-        diags = np.diagflat(sing_values)
-        return U, diags, W
-
     def get_total_covariance(self, thetas):
         length = len(thetas)
         thetas_matrix = self.to_data_matrix(thetas, subtract_avgs=True)
@@ -102,12 +97,12 @@ class PCA(object):
     def _pca_reduction_svd(self, mat, cutoff_ratio=0):
         U, sing_vals, W = linalg.svd(mat)
         max_sing = max(np.abs(sing_vals))
-        mask = [index for index, eig in enumerate(sing_vals) if np.abs(eig)/max_sing >= cutoff_ratio]
+        mask = [index for index, eig in enumerate(sing_vals)
+                if np.abs(eig)/max_sing >= cutoff_ratio]
         sing_diag = np.diagflat(sing_vals[mask])
         return U[:, mask], sing_diag, W[mask, :]
 
     def cov_pca_reduction(self, label_no, sorted_thetas, cutoff_ratio=0):
-        #cov_matrix = self.get_covariance(label_no, sorted_thetas)
         thetas = sorted_thetas.thetas[label_no]
         data_matrix = self.to_data_matrix(thetas, subtract_avgs=True)
         U, sing_vals, W = self._pca_reduction_svd(data_matrix, cutoff_ratio=cutoff_ratio)
@@ -155,8 +150,6 @@ class ThetasAnalyzer(object):
         return pca.cov_pca_reductions(sorted_thetas, cutoff_ratio=cutoff_ratio)
 
     def solution_spaces(self, sorted_thetas, cutoff_ratio=0):
-        '''We've chosen the right 'eigen space' and therefore
-         projections operate from right side on (row) vectors  (==data)'''
         pca = PCA(self._dim)
         pca_reductions = pca.cov_pca_reductions(sorted_thetas, cutoff_ratio=cutoff_ratio)
 
@@ -202,6 +195,3 @@ class SymmetryAnalyzer(object):
     def get_symmetry(self, old_gdft, new_gdft, rel_tol=10e-9):
         similarities = self.get_similarities(old_gdft, new_gdft, rel_tol=rel_tol)
         return sum(similarities) == len(similarities)
-
-if __name__ == "__main__":
-    pass

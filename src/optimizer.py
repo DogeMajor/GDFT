@@ -1,14 +1,11 @@
-import time
 import datetime
 import multiprocessing
-from collections import namedtuple
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
 from utils import timer, datetime_encoder
 from dao import ThetasDAO
 from gdft import gdft_matrix
 from correlations import Correlation, CorrelationAnalyzer
-#np.random.seed(int(time.time()))
 
 '''Optimizes gdft-matrix generating phase shifts with respect to
 a chosen correlation measure. Utilizes SciPy's fmin_l_bfgs_b optimizer,
@@ -99,8 +96,8 @@ class Runner(object):
 if __name__ == "__main__":
 
     runner = Runner(16)
-    results = runner.optimize("avg_auto_corr", 100, stop_criteria=0.059, cores=4)
-    print(results)
-    #runner.save_results("R_ac_100thetas_16x16__", results)
+    opt_thetas = runner.optimize("avg_auto_corr", 100, stop_criteria=0.059, cores=4)
+    print(opt_thetas)
+    #runner.save_results("R_ac_100thetas_16x16__", opt_thetas)
     #thetas = extract_thetas_records("../data/", "thetas_16x16__1-1_21_14.json")
     #print(thetas)

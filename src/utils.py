@@ -3,7 +3,7 @@ import datetime
 from collections import namedtuple
 from math import sqrt
 import numpy as np
-from dao import BaseDAO, ThetasDAO, SortedThetasDAO, ThetaGroupsDAO
+from dao import ThetasDAO
 
 '''General functions / decorator to help the dev process and
 to take care of file handling + administrative processes.'''
@@ -11,9 +11,9 @@ to take care of file handling + administrative processes.'''
 
 def timer(function):
     def timer_wrapper(*args, **kwargs):
-        t0 = time.clock()
+        start_time = time.clock()
         result = function(*args, **kwargs)
-        delta_t = time.clock()-t0
+        delta_t = time.clock() - start_time
         print('Function {} took {} seconds to run.'.format(function.__name__, delta_t))
         return result
     return timer_wrapper

@@ -2,7 +2,7 @@ from cmath import exp
 import numpy as np
 from scipy.linalg import expm
 
-'''Collection of functions to rapidly generate
+'''Collection of functions and classes to rapidly generate
 gdft, dft and permutation matrices.'''
 
 

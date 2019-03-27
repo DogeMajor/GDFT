@@ -74,7 +74,8 @@ def is_cross_corr_mask(shape):
     return cc_mask
 
 
-Correlations = namedtuple('Correlations', 'max_auto_corr avg_auto_corr max_cross_corr avg_cross_corr avg_merit_factor')
+Correlations = namedtuple('Correlations',
+                          'max_auto_corr avg_auto_corr max_cross_corr avg_cross_corr avg_merit_factor')
 
 
 class CorrelationAnalyzer(object):
