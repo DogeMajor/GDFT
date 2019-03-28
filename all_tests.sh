@@ -11,3 +11,5 @@ python tests/testOptimizer.py TestOptimizer
 python tests/testThetasAnalyzer.py TestThetasAnalyzer
 python tests/testClassifier.py TestClassifier
 python tests/testPCA.py TestPCA
+
+#python -m unittest discover -s tests

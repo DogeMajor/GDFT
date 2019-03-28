@@ -1,4 +1,5 @@
 import sys
+import timeit
 sys.path.append("../src")
 sys.path.append("src/")
 import unittest
@@ -22,6 +23,46 @@ def save_test_data(file_name, results):
     date_string = "today"
     dao = ThetasDAO(PATH)
     dao.write(file_name + date_string + ".json", results)
+
+
+def create_small_gdft_matrix():
+    thetas = np.ones(8)
+    gdft = gdft_matrix(8, thetas)
+
+def create_big_gdft_matrix():
+    thetas = np.ones(1000)
+    gdft = gdft_matrix(1000, thetas)
+
+class TestSpeedForGDFT(unittest.TestCase):
+
+    def test_constructing_gdft_mat_with_dim8(self):
+        tot_time = timeit.timeit("create_small_gdft_matrix()",
+                                 setup="from __main__ import create_small_gdft_matrix",
+                                 number=10000)
+        print("gdft 8x8, 10000 iterations:", tot_time, " s")
+        self.assertTrue(tot_time < 0.4)
+
+    def test_constructing_gdft_mat_with_dim1000(self):
+        tot_time = timeit.timeit("create_big_gdft_matrix()",
+                                 setup="from __main__ import create_big_gdft_matrix",
+                                 number=1)
+        print("gdft 1000x1000, one iteration:", tot_time, "s")
+        self.assertTrue(tot_time < 0.6)
+
+
+SETUP = '''from gdft import gdft_matrix, dft_matrix
+from correlations import Correlation
+get_corr_tensor = Correlation(dft_matrix(50)).correlation_tensor'''
+
+
+class TestSpeedForCorrelation(GDFTTestCase):
+
+    def test_how_quickly_correlations_are_computed(self):
+        tot_time = timeit.timeit("get_corr_tensor()", setup=SETUP,
+                                 number=1)
+        print("corr_tensor for dft 50x50:", tot_time, " s")
+        self.assertTrue(tot_time < 1.0)
+
 
 class TestWithSmallSize(unittest.TestCase):
     #Testing gdft runner with 4x4 matrices

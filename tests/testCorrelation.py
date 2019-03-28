@@ -41,19 +41,5 @@ class TestCorrelation(GDFTTestCase):
     def tearDown(self):
         del self.correlation
 
-
-SETUP = '''from gdft import gdft_matrix, dft_matrix
-from correlations import Correlation
-get_corr_tensor = Correlation(dft_matrix(50)).correlation_tensor'''
-
-
-class SpeedTests(GDFTTestCase):
-
-    def test_how_quickly_correlations_are_computed(self):
-        tot_time = timeit.timeit("get_corr_tensor()", setup=SETUP,
-                                 number=1)
-        print("corr_tensor for dft 50x50:", tot_time, " s")
-        self.assertTrue(tot_time < 1.0)
-
 if __name__ == '__main__':
     unittest.main()

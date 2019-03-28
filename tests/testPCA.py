@@ -104,18 +104,11 @@ class TestPCA(GDFTTestCase):
         self.assertAlmostEqualMatrices(np.identity(3), W.T.dot(W))
         self.assertTrue(np.abs(cov_mat - reduced_cov).max() < 0.12)
 
-    def test_pca_reduction_svd(self):
-
-        data_matrix = self.pca.to_data_matrix(optimized_thetas.thetas, subtract_avgs=True)
-        cov_matrix = np.cov(data_matrix.T)
-        U, sing_mat, W = self.pca.get_svd(cov_matrix)
-        reconstructed_cov_mat = U @ sing_mat @ W
-        self.assertAlmostEqualMatrices(reconstructed_cov_mat, cov_matrix)
-
     def test_distance_of_pca_decomp(self): #They should be zeros if cov_mat is of full rank
         data_matrix = self.pca.to_data_matrix(optimized_thetas.thetas, subtract_avgs=True)
         cov_matrix = data_matrix.T @ data_matrix / 100
-        _, sing_mat, _ = self.pca.get_svd(cov_matrix)
+        _, svd_vals, _ = np.linalg.svd(cov_matrix)
+        sing_mat = np.diagflat(svd_vals)
         eigen_values, _ = np.linalg.eig(cov_matrix)
         sorted_eigen_values = np.sort(eigen_values, axis=0)
         self.assertAlmostEqualLists(sorted_eigen_values[::-1], sing_mat.diagonal())

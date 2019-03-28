@@ -64,7 +64,7 @@ class TestThetasAnalyzer(GDFTTestCase):
         self.assertTrue(4 <= len(sorted_thetas.histogram) <= 6)
         self.assertEqual(sorted_thetas.histogram.keys(), sorted_thetas.correlations.keys())
         corr_example = sorted_thetas.correlations[0][0]
-        self.assertTrue(corr_example.avg_auto_corr < 0.11)
+        self.assertTrue(corr_example.avg_auto_corr < 0.13)
 
     def test_solution_spaces(self):
         thetas = {0: OPTIMIZED_THETAS.thetas[0:10], 1: OPTIMIZED_THETAS.thetas[10:20], 2: []}

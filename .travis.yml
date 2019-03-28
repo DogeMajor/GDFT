@@ -5,9 +5,9 @@ python:
 #install dependencies
 #Travis sets up an ubuntu 14.04 env by default
 install:
-  - pip3 install numpy scipy
+  - pip3 install numpy scipy matplotlib
 script:
-  - python tests/testCorrelation.py
+  - python -m unittest discover -s tests
 #  - ./all_tests.sh
 branches:
   only:
