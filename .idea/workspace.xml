@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="df3ca34c-22d8-4b15-b7a9-55006b6f5138" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/all_tests.sh" beforeDir="false" afterPath="$PROJECT_DIR$/all_tests.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/correlations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/correlations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/AcceptanceTests.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/AcceptanceTests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/testCorrelation.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/testCorrelation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/testDerivator.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/testDerivator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/testGDFT.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/testGDFT.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/testOptimizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/testOptimizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/testPCA.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/testPCA.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/testThetasAnalyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/testThetasAnalyzer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_gdft_matrices_notebook.nb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_generating_and_transforming_thetas.py" beforeDir="false" />
-    </list>
+    <list default="true" id="df3ca34c-22d8-4b15-b7a9-55006b6f5138" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,7 +12,7 @@
     <favorites_list name="GDFT" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.56352633">
+    <splitter split-orientation="horizontal" split-proportion="0.31201383">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -84,8 +71,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/.travis.yml">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="221">
-                  <caret line="13" column="12" lean-forward="true" selection-start-line="13" selection-start-column="12" selection-end-line="13" selection-end-column="12" />
+                <state relative-caret-position="136">
+                  <caret line="8" column="7" lean-forward="true" selection-start-line="8" selection-start-column="7" selection-end-line="8" selection-end-column="7" />
                 </state>
               </provider>
             </entry>
@@ -998,8 +985,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.travis.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" column="12" lean-forward="true" selection-start-line="13" selection-start-column="12" selection-end-line="13" selection-end-column="12" />
+        <state relative-caret-position="136">
+          <caret line="8" column="7" lean-forward="true" selection-start-line="8" selection-start-column="7" selection-end-line="8" selection-end-column="7" />
         </state>
       </provider>
     </entry>
