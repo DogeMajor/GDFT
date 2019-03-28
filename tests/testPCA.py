@@ -88,7 +88,7 @@ class TestPCA(GDFTTestCase):
         self.assertTrue(np.abs(cov_matrix - reduced_cov).max() < 0.12)
 
     def test_get_cov_pca_reductions(self):
-        thetas = {0: optimized_thetas.thetas, 1: optimized_thetas.thetas[50:], 2: []}
+        thetas = {0: optimized_thetas.thetas, 1: optimized_thetas.thetas[50:]}#, 2: []}
         sorted_thetas = SortedThetas(thetas=thetas, labels=[], histogram={}, correlations={})
         reduced_covs = self.pca.cov_pca_reductions(sorted_thetas, cutoff_ratio=0.23)
         cov_mat = self.pca.get_total_covariance(optimized_thetas.thetas)

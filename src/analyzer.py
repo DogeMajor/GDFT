@@ -46,7 +46,7 @@ class Classifier(object):
                             correlations=grouped_corrs)
 
     def filter_empty_labels(self, kmeans_results):
-        labels, labelings = kmeans_results[0], kmeans_results[1]
+        labels, labelings = kmeans_results
         hist = self._kmeans_to_histogram(kmeans_results)
         non_empty_labels = sorted([key for key in hist.keys() if hist[key] != []])
         labeling_transforms = {old_labeling: new_labeling
@@ -110,11 +110,11 @@ class PCA(object):
         return W, sing_mat
 
     def cov_pca_reductions(self, sorted_thetas, cutoff_ratio=0):
-        def is_empty(val):
+        '''def is_empty(val):
             return val == []
-        non_empty_labels = (key for key, val in sorted_thetas.thetas.items() if not is_empty(val))
+        non_empty_labels = (key for key, val in sorted_thetas.thetas.items() if not is_empty(val))'''
         return {key: self.cov_pca_reduction(key, sorted_thetas, cutoff_ratio=cutoff_ratio)
-                for key in non_empty_labels}
+                for key in sorted_thetas.thetas}
 
 
 class ThetasAnalyzer(object):

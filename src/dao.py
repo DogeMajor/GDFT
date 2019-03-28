@@ -90,7 +90,7 @@ class BaseDAO(object):
         if path is None:
             path = self._path
         try:
-            with open(path+file_name, 'w') as file_object:
+            with open(path+file_name, 'w', newline='') as file_object:
                 self._write(file_object, content)
         except IOError:
             print('Can\'t write the file {}'.format(path+file_name))

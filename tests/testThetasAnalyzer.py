@@ -67,7 +67,7 @@ class TestThetasAnalyzer(GDFTTestCase):
         self.assertTrue(corr_example.avg_auto_corr < 0.13)
 
     def test_solution_spaces(self):
-        thetas = {0: OPTIMIZED_THETAS.thetas[0:10], 1: OPTIMIZED_THETAS.thetas[10:20], 2: []}
+        thetas = {0: OPTIMIZED_THETAS.thetas[0:10], 1: OPTIMIZED_THETAS.thetas[10:20]}#, 2: []}
         first_label = sum(OPTIMIZED_THETAS.thetas[0:10]) / 10
         second_label = sum(OPTIMIZED_THETAS.thetas[10:20]) / 10
         sorted_thetas = SortedThetas(thetas=thetas,

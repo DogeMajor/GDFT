@@ -129,4 +129,4 @@ class CorrelationAnalyzer(object):
 
     def avg_merit_factor(self, c_tensor):
         m_factors = self.merit_factors(c_tensor)
-        return m_factors.mean(axis=0)
+        return np.real(m_factors.mean(axis=0))
