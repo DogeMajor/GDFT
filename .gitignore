@@ -57,7 +57,9 @@ venv.bak/
 .mypy_cache/
 
 data/
-test/testdata
+tests/testdata/*
+!tests/testdata/100thetas_8dim_Rac.json
+!tests/testdata/static_julinfo.json
 
 
 articles/
