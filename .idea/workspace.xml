@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="df3ca34c-22d8-4b15-b7a9-55006b6f5138" name="Default" comment="" />
+    <list default="true" id="df3ca34c-22d8-4b15-b7a9-55006b6f5138" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/testPCA.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/testPCA.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/testThetasAnalyzer.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/testThetasAnalyzer.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -12,7 +16,7 @@
     <favorites_list name="GDFT" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.31201383">
+    <splitter split-orientation="horizontal" split-proportion="0.37856525">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file pinned="false" current-in-tab="false">
@@ -129,8 +133,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/tests/testPCA.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="17">
-                  <caret line="104" column="67" selection-start-line="104" selection-start-column="67" selection-end-line="104" selection-end-column="67" />
+                <state relative-caret-position="102">
+                  <caret line="9" column="54" selection-start-line="9" selection-start-column="54" selection-end-line="9" selection-end-column="54" />
                   <folding>
                     <element signature="e#0#10#0" expanded="true" />
                   </folding>
@@ -150,7 +154,7 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/all_tests.sh">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="34">
@@ -162,11 +166,20 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/tests/testThetasAnalyzer.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="204">
-                  <caret line="66" column="57" selection-start-line="66" selection-start-column="57" selection-end-line="66" selection-end-column="57" />
+                <state relative-caret-position="170">
+                  <caret line="13" column="76" selection-start-line="13" selection-start-column="76" selection-end-line="13" selection-end-column="76" />
                   <folding>
                     <element signature="e#0#10#0" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/.gitignore">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="176">
+                  <caret line="60" column="15" selection-start-line="60" selection-start-column="15" selection-end-line="60" selection-end-column="15" />
                 </state>
               </provider>
             </entry>
@@ -213,7 +226,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>get_max_length</find>
       <find>get_squared_sum</find>
       <find>get_random_gdft</find>
       <find>self._dft</find>
@@ -243,6 +255,7 @@
       <find>datetime_encoder</find>
       <find>get_svd</find>
       <find>DAO</find>
+      <find>test</find>
     </findStrings>
     <replaceStrings>
       <replace>,</replace>
@@ -275,7 +288,6 @@
         <option value="$PROJECT_DIR$/data/results_2018-12-24 22_57.json" />
         <option value="$PROJECT_DIR$/test/testGDFT.py" />
         <option value="$PROJECT_DIR$/test/testCorrelationAnalyzer.py" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/src/sequencefinder.py" />
         <option value="$PROJECT_DIR$/test/AcceptanceTests.py" />
         <option value="$PROJECT_DIR$/test/test_generating_and_transforming_thetas.py" />
@@ -299,8 +311,6 @@
         <option value="$PROJECT_DIR$/src/utils.py" />
         <option value="$PROJECT_DIR$/src/visualizer.py" />
         <option value="$PROJECT_DIR$/tests/testOptimizer.py" />
-        <option value="$PROJECT_DIR$/tests/testPCA.py" />
-        <option value="$PROJECT_DIR$/tests/testThetasAnalyzer.py" />
         <option value="$PROJECT_DIR$/src/correlations.py" />
         <option value="$PROJECT_DIR$/tests/testGDFT.py" />
         <option value="$PROJECT_DIR$/tests/testCorrelation.py" />
@@ -308,6 +318,9 @@
         <option value="$PROJECT_DIR$/tests/testDerivator.py" />
         <option value="$PROJECT_DIR$/.travis.yml" />
         <option value="$PROJECT_DIR$/all_tests.sh" />
+        <option value="$PROJECT_DIR$/tests/testThetasAnalyzer.py" />
+        <option value="$PROJECT_DIR$/tests/testPCA.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -327,6 +340,17 @@
             <path>
               <item name="GDFT" type="b2602c69:ProjectViewProjectNode" />
               <item name="GDFT" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="GDFT" type="b2602c69:ProjectViewProjectNode" />
+              <item name="GDFT" type="462c0819:PsiDirectoryNode" />
+              <item name="tests" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="GDFT" type="b2602c69:ProjectViewProjectNode" />
+              <item name="GDFT" type="462c0819:PsiDirectoryNode" />
+              <item name="tests" type="462c0819:PsiDirectoryNode" />
+              <item name="testdata" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -625,13 +649,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-6">
-          <caret line="43" column="5" lean-forward="true" selection-start-line="43" selection-start-column="5" selection-end-line="43" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/R_cc_30thetas_16x16__3-4_23_11.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -872,16 +889,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/testPCA.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="104" column="67" selection-start-line="104" selection-start-column="67" selection-end-line="104" selection-end-column="67" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/testOptimizer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
@@ -898,16 +905,6 @@
           <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
           <folding>
             <element signature="e#0#34#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/testThetasAnalyzer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="66" column="57" selection-start-line="66" selection-start-column="57" selection-end-line="66" selection-end-column="57" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -987,6 +984,33 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
           <caret line="8" column="7" lean-forward="true" selection-start-line="8" selection-start-column="7" selection-end-line="8" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/testPCA.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="9" column="54" selection-start-line="9" selection-start-column="54" selection-end-line="9" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/testThetasAnalyzer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="13" column="76" selection-start-line="13" selection-start-column="76" selection-end-line="13" selection-end-column="76" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="60" column="15" selection-start-line="60" selection-start-column="15" selection-end-line="60" selection-end-column="15" />
         </state>
       </provider>
     </entry>

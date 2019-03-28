@@ -11,7 +11,7 @@ from tools import GDFTTestCase
 
 #------Test data-----------------------------------------------------------------------------
 
-OPTIMIZED_THETAS = extract_thetas_records("data/", "100thetas12-26_1_26.json")
+OPTIMIZED_THETAS = extract_thetas_records("tests/data/", "100thetas_8dim_Rac")
 
 FIRST_THETAS_GROUP = [np.array([2.93467664, 0.3384844, 2.87214115, 1.20613475, 0.32252419,
                                 0.22130658, 2.20358886, 3.03256426]),
