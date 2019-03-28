@@ -9,7 +9,7 @@ from utils import extract_thetas_records
 
 #------Test data-----------------------------------------------------------------------------
 
-optimized_thetas = extract_thetas_records("tests/data/", "100thetas_8dim_Rac")
+optimized_thetas = extract_thetas_records("tests/testdata/", "100thetas_8dim_Rac.json")
 COV_MAT = np.array([[0.01, 0.02], [0.02, 0.04]])
 THETAS = [np.array([1, 2.2]), np.array([1.2, 2.6]), np.array([3, 4])]
 
