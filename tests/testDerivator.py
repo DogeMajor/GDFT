@@ -4,9 +4,9 @@ import numpy as np
 
 sys.path.append("../src")
 sys.path.append("src/")
-from gdft import dft_matrix
+from derivator import *
+from gdft import dft_matrix, gdft_matrix
 from correlations import Correlation
-from temp import *
 from tools import GDFTTestCase
 
 

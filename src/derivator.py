@@ -1,9 +1,6 @@
 from copy import deepcopy
 import numpy as np
-from scipy import linalg
-from utils import show
-from gdft import dft_matrix, gdft_matrix, two_param_gdft_matrix
-from analyzer import ThetasAnalyzer
+from gdft import dft_matrix, gdft_matrix
 from correlations import CorrelationAnalyzer, Correlation
 
 

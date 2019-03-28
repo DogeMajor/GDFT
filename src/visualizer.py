@@ -17,7 +17,8 @@ def orderings_dist(thetas):
 
 
 def find_best_orderings(thetas_collections):
-    records = [(theta, corr) for theta, corr in zip(thetas_collections.thetas, theta_collections.correlations)]
+    records = [(theta, corr) for theta, corr
+               in zip(thetas_collections.thetas, theta_collections.correlations)]
     def dist(item):
         return orderings_dist(item[0])
     return sorted(records, key=dist)
@@ -116,7 +117,8 @@ def plot_fn(fn, dim):
     plt.plot(x_new, y_new)
 
 
-def center_thetas(all_thetas, index=0, epsilon=1e-10):#Epsilon is needed to keep the data matrix pos. definite!!!
+def center_thetas(all_thetas, index=0, epsilon=1e-10):
+    # Epsilon is needed to keep the data matrix pos. definite!!!
     return [(theta - theta[index] + epsilon) % (2*np.pi) for theta in all_thetas]
 
 

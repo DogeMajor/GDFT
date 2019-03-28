@@ -34,9 +34,7 @@ class Correlation(object):
 
         #Set the indices c_col_row : to same as conjugate of c_col_row : with reversed order!!!
         for row in range(N):
-            for col in range(row):
-                tensor[row, col, :] = np.conjugate(tensor[col, row, ::-1])
-
+            tensor[row, :row, :] = tensor[:row, row, ::-1].conjugate()
         return tensor
 
     def _aperiodic_corr_fn(self, alpha, beta, pos_mu):
@@ -74,7 +72,8 @@ def is_cross_corr_mask(shape):
     return cc_mask
 
 
-Correlations = namedtuple('Correlations', 'max_auto_corr avg_auto_corr max_cross_corr avg_cross_corr avg_merit_factor')
+Correlations = namedtuple('Correlations',
+                          'max_auto_corr avg_auto_corr max_cross_corr avg_cross_corr avg_merit_factor')
 
 
 class CorrelationAnalyzer(object):

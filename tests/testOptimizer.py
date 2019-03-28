@@ -67,7 +67,7 @@ class TestOptimizer(unittest.TestCase):
         thetas, average_cross_correlation, _ = self.optimizer.optimize_corr_fn("avg_cross_corr",
                                                                                stop_criteria=0.3750, cycles=15)
         self.assertTrue(np.pi/2 - 0.5 < thetas.mean() < np.pi/2 + 0.5)
-        self.assertTrue(thetas.var() < 0.3)
+        self.assertTrue(thetas.var() < 0.5)
         self.assertAlmostEqual(average_cross_correlation, 0.3750, places=4)
 
     def tearDown(self):
