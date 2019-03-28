@@ -32,9 +32,9 @@ class TestClassifier(GDFTTestCase):
 
     def test_group_by_label(self):
         groups = self.classifier.group_by_label(UNSORTED_THETAS, KMEANS_RESULTS)
-        vals = list(groups.values())
-        self.assertAlmostEqualMatrices(vals[0][0], np.array([1, 2.05]))
-        self.assertAlmostEqualMatrices(vals[1][0], np.array([-3.05, -4]))
+        vals = [groups[0], groups[1]]
+        self.assertAlmostEqualMatrices(vals[1][0], np.array([1, 2.05]))
+        self.assertAlmostEqualMatrices(vals[0][0], np.array([-3.05, -4]))
         self.assertTrue(len(vals[0]) == len(vals[0]) == 1)
 
     def test_kmeans_to_histogram(self):

@@ -66,7 +66,7 @@ class TestOptimizer(unittest.TestCase):
     def test_optimize_avg_cross_corr_with_cycles(self):
         thetas, average_cross_correlation, _ = self.optimizer.optimize_corr_fn("avg_cross_corr",
                                                                                stop_criteria=0.3750, cycles=15)
-        self.assertTrue(np.pi/2 - 0.6 < thetas.mean() < np.pi/2 + 0.6)
+        self.assertTrue(np.pi/2 - 0.7 < thetas.mean() < np.pi/2 + 0.7)
         self.assertTrue(thetas.var() < 1)
         self.assertAlmostEqual(average_cross_correlation, 0.3750, places=4)
 
